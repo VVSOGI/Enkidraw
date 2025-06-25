@@ -43,7 +43,7 @@ module.exports = (env, argv) => {
       // 예: 'react': 'react' (만약 React 피어 디펜던시라면)
     },
 
-    devtool: isProduction ? "source-map" : "eval-source-map",
+    devtool: "source-map",
   };
 
   // 개발 서버용 설정
@@ -51,12 +51,16 @@ module.exports = (env, argv) => {
     return {
       ...commonConfig,
       mode: "development",
+      experiments: {
+        outputModule: true,
+      },
 
       output: {
         path: path.resolve(__dirname, "development", "source"),
         filename: "index.js",
-        library: "app",
-        libraryTarget: "var",
+        library: {
+          type: "module",
+        },
         clean: true,
       },
 
