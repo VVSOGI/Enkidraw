@@ -43,7 +43,7 @@ module.exports = (env, argv) => {
       // 예: 'react': 'react' (만약 React 피어 디펜던시라면)
     },
 
-    devtool: "source-map",
+    devtool: isProduction ? "source-map" : "eval-source-map",
   };
 
   // 개발 서버용 설정
@@ -71,7 +71,8 @@ module.exports = (env, argv) => {
         },
         port: 8080,
         open: true,
-        hot: true,
+        hot: false,
+        liveReload: true,
         compress: true,
         historyApiFallback: {
           index: "/index.html",
