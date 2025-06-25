@@ -94,9 +94,10 @@ module.exports = (env, argv) => {
       output: {
         path: path.resolve(__dirname, "dist"),
         filename: "index.js",
-        library: "EnkiDraw",
-        libraryTarget: "commonjs2",
-        clean: true,
+        library: {
+          type: "commonjs2",
+        },
+        clean: false,
       },
 
       optimization: isProduction
@@ -121,6 +122,7 @@ module.exports = (env, argv) => {
         },
         clean: false, // CommonJS 빌드 결과 유지
       },
+      target: ["web", "es2020"],
 
       optimization: isProduction
         ? {
