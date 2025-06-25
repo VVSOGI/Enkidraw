@@ -3,6 +3,7 @@ export class CanvasManager {
   private ctx: CanvasRenderingContext2D;
   private stageWidth!: number;
   private stageHeight!: number;
+  private animationId: number | null = null;
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
@@ -14,7 +15,7 @@ export class CanvasManager {
     this.resize();
     window.addEventListener("resize", this.resize);
 
-    requestAnimationFrame(this.draw);
+    this.animationId = requestAnimationFrame(this.draw);
   }
 
   private resize = () => {
@@ -32,5 +33,12 @@ export class CanvasManager {
     this.ctx.arc(this.stageWidth / 2, this.stageHeight / 2, 10, 0, Math.PI * 2);
     this.ctx.fillStyle = "black";
     this.ctx.fill();
+  };
+
+  destroy = () => {
+    window.removeEventListener("resize", this.resize);
+    if (this.animationId) {
+      cancelAnimationFrame(this.animationId);
+    }
   };
 }
