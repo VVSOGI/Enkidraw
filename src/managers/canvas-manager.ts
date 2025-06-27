@@ -1,9 +1,16 @@
+import { BaseTool, DragTool } from "../tools";
+import { ToolConstructor, ToolNames } from "../types";
+
 export class CanvasManager {
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
   private stageWidth!: number;
   private stageHeight!: number;
   private animationId: number | null = null;
+
+  private tools: Map<ToolNames, BaseTool> = new Map();
+  private currentTool: BaseTool | null = null;
+  private dragTool: DragTool;
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
@@ -15,8 +22,49 @@ export class CanvasManager {
     this.resize();
     window.addEventListener("resize", this.resize);
 
+    this.dragTool = new DragTool(this.canvas, this.ctx);
+    this.dragTool.activate();
+
     this.animationId = requestAnimationFrame(this.draw);
   }
+
+  public destroy = () => {
+    window.removeEventListener("resize", this.resize);
+    if (this.animationId) {
+      cancelAnimationFrame(this.animationId);
+    }
+  };
+
+  public addTool = (ToolClass: ToolConstructor, button?: HTMLElement, options?: any) => {
+    const tool = new ToolClass(this.canvas, this.ctx, options);
+    const toolName = tool.name as ToolNames;
+
+    if (toolName === "drag") {
+      console.info("Drag is automatically applied without buttons.");
+      return;
+    }
+
+    tool.resize(this.stageWidth, this.stageHeight);
+    this.tools.set(toolName, tool);
+
+    if (button) {
+      button.addEventListener("click", () => this.selectTool(toolName));
+    }
+
+    return this;
+  };
+
+  private selectTool = (name: ToolNames) => {
+    if (this.currentTool) {
+      this.currentTool.deactivate();
+    }
+
+    const tool = this.tools.get(name);
+    if (tool) {
+      this.currentTool = tool;
+      tool.activate();
+    }
+  };
 
   private resize = () => {
     this.stageWidth = this.canvas.clientWidth;
@@ -29,16 +77,10 @@ export class CanvasManager {
 
   private draw = (t: number) => {
     requestAnimationFrame(this.draw);
+    this.ctx.clearRect(0, 0, this.stageWidth, this.stageHeight);
 
-    this.ctx.arc(this.stageWidth / 2, this.stageHeight / 2, 10, 0, Math.PI * 2);
-    this.ctx.fillStyle = "black";
-    this.ctx.fill();
-  };
-
-  destroy = () => {
-    window.removeEventListener("resize", this.resize);
-    if (this.animationId) {
-      cancelAnimationFrame(this.animationId);
+    if (!this.currentTool) {
+      this.dragTool.draw();
     }
   };
 }

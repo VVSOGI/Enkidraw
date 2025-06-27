@@ -1,8 +1,12 @@
 export abstract class BaseTool {
+  abstract readonly name: string; // 각 툴에서 정의해야 함
+
   protected canvas: HTMLCanvasElement;
   protected ctx: CanvasRenderingContext2D;
   protected isActive: boolean = false;
   protected isDrawing: boolean = false;
+  protected stageWidth!: number;
+  protected stageHeight!: number;
 
   constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) {
     this.canvas = canvas;
@@ -20,10 +24,16 @@ export abstract class BaseTool {
     this.removeEventListeners();
   };
 
+  resize = (stageWidth: number, stageHeight: number) => {
+    this.stageWidth = stageWidth;
+    this.stageHeight = stageHeight;
+  };
+
   // 추상 메서드들 - 각 툴에서 구현 필요
   abstract onMouseDown(e: MouseEvent): void;
   abstract onMouseMove(e: MouseEvent): void;
   abstract onMouseUp(e: MouseEvent): void;
+  abstract draw(...props: any): void;
 
   // 공통 이벤트 리스너 관리
   private addEventListeners = () => {
@@ -36,14 +46,5 @@ export abstract class BaseTool {
     this.canvas.removeEventListener("mousedown", this.onMouseDown);
     this.canvas.removeEventListener("mousemove", this.onMouseMove);
     this.canvas.removeEventListener("mouseup", this.onMouseUp);
-  };
-
-  // 유틸리티 메서드
-  protected getMousePos = (e: MouseEvent) => {
-    const rect = this.canvas.getBoundingClientRect();
-    return {
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
-    };
   };
 }
