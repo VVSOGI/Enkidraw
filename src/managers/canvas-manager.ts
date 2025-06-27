@@ -1,3 +1,4 @@
+import { BaseComponent } from "../components";
 import { BaseTool, DragTool } from "../tools";
 import { ToolConstructor, ToolNames } from "../types";
 
@@ -9,6 +10,7 @@ export class CanvasManager {
   private animationId: number | null = null;
 
   private tools: Map<ToolNames, BaseTool> = new Map();
+  private components: Set<BaseComponent> = new Set();
   private currentTool: BaseTool | null = null;
   private dragTool: DragTool;
 
@@ -22,7 +24,7 @@ export class CanvasManager {
     this.resize();
     window.addEventListener("resize", this.resize);
 
-    this.dragTool = new DragTool(this.canvas, this.ctx);
+    this.dragTool = new DragTool(this.canvas, this.ctx, this.components, this.deleteCurrentTool);
     this.dragTool.activate();
 
     this.animationId = requestAnimationFrame(this.draw);
@@ -35,8 +37,8 @@ export class CanvasManager {
     }
   };
 
-  public addTool = (ToolClass: ToolConstructor, button?: HTMLElement, options?: any) => {
-    const tool = new ToolClass(this.canvas, this.ctx, options);
+  public addTool = (ToolClass: ToolConstructor, button?: HTMLElement) => {
+    const tool = new ToolClass(this.canvas, this.ctx, this.components, this.deleteCurrentTool);
     const toolName = tool.name as ToolNames;
 
     if (toolName === "drag") {
@@ -54,12 +56,17 @@ export class CanvasManager {
     return this;
   };
 
+  private deleteCurrentTool = () => {
+    this.currentTool = null;
+  };
+
   private selectTool = (name: ToolNames) => {
     if (this.currentTool) {
       this.currentTool.deactivate();
     }
 
     const tool = this.tools.get(name);
+
     if (tool) {
       this.currentTool = tool;
       tool.activate();
@@ -81,6 +88,14 @@ export class CanvasManager {
 
     if (!this.currentTool) {
       this.dragTool.draw();
+    }
+
+    if (this.currentTool) {
+      this.currentTool.draw();
+    }
+
+    for (const component of this.components) {
+      component.draw();
     }
   };
 }

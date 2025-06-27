@@ -1,3 +1,4 @@
+import { BaseComponent } from "../components";
 import { MousePoint } from "../types/common";
 import { MouseUtils } from "../utils";
 import { BaseTool } from "./base-tool";
@@ -14,13 +15,19 @@ export class DragTool extends BaseTool {
   private initPoint: MousePoint | null = null;
   private movePoint: MousePoint | null = null;
 
-  constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) {
-    super(canvas, ctx);
+  constructor(
+    canvas: HTMLCanvasElement,
+    ctx: CanvasRenderingContext2D,
+    components: Set<BaseComponent> | null,
+    deleteCurrentTool: () => void
+  ) {
+    super(canvas, ctx, components, deleteCurrentTool);
   }
 
   onMouseDown = (e: MouseEvent) => {
-    this.isDrawing = true;
     const position = MouseUtils.getMousePos(e, this.canvas);
+
+    this.isDrawing = true;
     this.initPoint = position;
     this.movePoint = position;
   };
