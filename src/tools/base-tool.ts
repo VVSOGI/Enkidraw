@@ -1,16 +1,27 @@
+import { BaseComponent } from "../components";
+
 export abstract class BaseTool {
   abstract readonly name: string; // 각 툴에서 정의해야 함
 
   protected canvas: HTMLCanvasElement;
   protected ctx: CanvasRenderingContext2D;
-  protected isActive: boolean = false;
   protected isDrawing: boolean = false;
+  protected isActive: boolean = false;
   protected stageWidth!: number;
   protected stageHeight!: number;
+  protected components: Set<BaseComponent> | null = null;
+  protected deleteCurrentTool: () => void;
 
-  constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) {
+  constructor(
+    canvas: HTMLCanvasElement,
+    ctx: CanvasRenderingContext2D,
+    components: Set<BaseComponent> | null,
+    deleteCurrentTool: () => void
+  ) {
     this.canvas = canvas;
     this.ctx = ctx;
+    this.components = components;
+    this.deleteCurrentTool = deleteCurrentTool;
   }
 
   // 툴 활성화/비활성화
@@ -22,6 +33,7 @@ export abstract class BaseTool {
   deactivate = () => {
     this.isActive = false;
     this.removeEventListeners();
+    this.deleteCurrentTool();
   };
 
   resize = (stageWidth: number, stageHeight: number) => {
