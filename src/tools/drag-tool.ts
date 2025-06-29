@@ -1,4 +1,5 @@
 import { BaseComponent } from "../components";
+import { CursorManager } from "../managers";
 import { MousePoint } from "../types/common";
 import { MouseUtils } from "../utils";
 import { BaseTool } from "./base-tool";
@@ -19,9 +20,11 @@ export class DragTool extends BaseTool {
     canvas: HTMLCanvasElement,
     ctx: CanvasRenderingContext2D,
     components: Set<BaseComponent> | null,
+    cursorManager: CursorManager,
     deleteCurrentTool: () => void
   ) {
-    super(canvas, ctx, components, deleteCurrentTool);
+    super(canvas, ctx, components, cursorManager, deleteCurrentTool);
+    this.activate();
   }
 
   onMouseDown = (e: MouseEvent) => {
