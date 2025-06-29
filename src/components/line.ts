@@ -23,7 +23,17 @@ export class Line extends BaseComponent<LinePosition> {
   onMouseUp = (e: MouseEvent) => {};
 
   getPosition = (): BasePosition => {
-    return this.position;
+    const left = Math.min(this.position.x1, this.position.x2);
+    const top = Math.min(this.position.y1, this.position.y2);
+    const right = Math.max(this.position.x1, this.position.x2);
+    const bottom = Math.max(this.position.y1, this.position.y2);
+
+    return {
+      x1: left,
+      y1: top,
+      x2: right,
+      y2: bottom,
+    };
   };
 
   setDragState = (state: boolean) => {
