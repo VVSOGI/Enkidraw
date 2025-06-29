@@ -1,3 +1,4 @@
+import { CursorManager } from ".";
 import { BaseComponent } from "../components";
 import { BaseTool, DragTool } from "../tools";
 import { ToolConstructor, ToolNames } from "../types";
@@ -13,6 +14,7 @@ export class CanvasManager {
   private components: Set<BaseComponent> = new Set();
   private currentTool: BaseTool | null = null;
   private dragTool: DragTool;
+  private cursorManager: CursorManager;
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
@@ -24,21 +26,24 @@ export class CanvasManager {
     this.resize();
     window.addEventListener("resize", this.resize);
 
-    this.dragTool = new DragTool(this.canvas, this.ctx, this.components, this.deleteCurrentTool);
-    this.dragTool.activate();
+    this.cursorManager = new CursorManager(canvas, this.ctx);
+    this.dragTool = new DragTool(this.canvas, this.ctx, this.components, this.cursorManager, this.deleteCurrentTool);
 
     this.animationId = requestAnimationFrame(this.draw);
   }
 
   public destroy = () => {
     window.removeEventListener("resize", this.resize);
+    this.dragTool.deactivate();
+    this.cursorManager.deactivate();
+
     if (this.animationId) {
       cancelAnimationFrame(this.animationId);
     }
   };
 
   public addTool = (ToolClass: ToolConstructor, button?: HTMLElement) => {
-    const tool = new ToolClass(this.canvas, this.ctx, this.components, this.deleteCurrentTool);
+    const tool = new ToolClass(this.canvas, this.ctx, this.components, this.cursorManager, this.deleteCurrentTool);
     const toolName = tool.name as ToolNames;
 
     if (toolName === "drag") {
@@ -95,9 +100,9 @@ export class CanvasManager {
           const { x1: componentX1, y1: componentY1, x2: componentX2, y2: componentY2 } = component.getPosition();
 
           if (componentX1 >= dragX1 && componentX2 <= dragX2 && componentY1 >= dragY1 && componentY2 <= dragY2) {
-            component.setDragState(true);
+            component.activate();
           } else {
-            component.setDragState(false);
+            component.deactivate();
           }
         }
       }
