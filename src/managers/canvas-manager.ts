@@ -87,7 +87,20 @@ export class CanvasManager {
     this.ctx.clearRect(0, 0, this.stageWidth, this.stageHeight);
 
     if (!this.currentTool) {
-      this.dragTool.draw();
+      const dragRange = this.dragTool.draw();
+      if (dragRange) {
+        const { x1: dragX1, y1: dragY1, x2: dragX2, y2: dragY2 } = dragRange;
+
+        for (const component of this.components) {
+          const { x1: componentX1, y1: componentY1, x2: componentX2, y2: componentY2 } = component.getPosition();
+
+          if (componentX1 >= dragX1 && componentX2 <= dragX2 && componentY1 >= dragY1 && componentY2 <= dragY2) {
+            component.setDragState(true);
+          } else {
+            component.setDragState(false);
+          }
+        }
+      }
     }
 
     if (this.currentTool) {
