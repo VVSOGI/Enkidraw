@@ -38,7 +38,6 @@ export class DragTool extends BaseTool {
 
   onMouseUp = (e: MouseEvent) => {
     this.isDrawing = false;
-
     this.initPoint = null;
     this.movePoint = null;
   };
