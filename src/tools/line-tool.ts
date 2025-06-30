@@ -2,7 +2,7 @@ import { BaseTool } from "./base-tool";
 import { MousePoint } from "../types";
 import { MouseUtils } from "../utils";
 import { BaseComponent, Line } from "../components";
-import { CursorManager } from "../managers";
+import { ActiveManager } from "../managers";
 
 export class LineTool extends BaseTool {
   public readonly name = "line";
@@ -13,10 +13,10 @@ export class LineTool extends BaseTool {
     canvas: HTMLCanvasElement,
     ctx: CanvasRenderingContext2D,
     components: Set<BaseComponent> | null,
-    cursorManager: CursorManager,
+    activeManager: ActiveManager,
     deleteCurrentTool: () => void
   ) {
-    super(canvas, ctx, components, cursorManager, deleteCurrentTool);
+    super(canvas, ctx, components, activeManager, deleteCurrentTool);
   }
 
   onMouseDown = (e: MouseEvent) => {
@@ -91,7 +91,7 @@ export class LineTool extends BaseTool {
         x2: endX,
         y2: endY,
       },
-      cursorManager: this.cursorManager,
+      activeManager: this.activeManager,
     });
 
     this.components?.add(line);

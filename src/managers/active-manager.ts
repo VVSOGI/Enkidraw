@@ -1,5 +1,5 @@
-export class CursorManager {
-  public currentCursor: "default" | "move" | "pointer" = "default";
+export class ActiveManager {
+  public currentActive: "default" | "move" | "pointer" = "default";
 
   protected canvas: HTMLCanvasElement;
   protected ctx: CanvasRenderingContext2D;
@@ -19,17 +19,17 @@ export class CursorManager {
   };
 
   public setDefault = () => {
-    this.currentCursor = "default";
+    this.currentActive = "default";
     this.canvas.style.cursor = "default";
   };
 
   public setMove = () => {
-    this.currentCursor = "move";
+    this.currentActive = "move";
     this.canvas.style.cursor = "move";
   };
 
   public setPointer = () => {
-    this.currentCursor = "pointer";
+    this.currentActive = "pointer";
     this.canvas.style.cursor = "pointer";
   };
 

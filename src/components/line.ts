@@ -1,4 +1,4 @@
-import { CursorManager } from "../managers";
+import { ActiveManager } from "../managers";
 import { MathUtils, MouseUtils } from "../utils";
 import { BaseComponent, BasePosition } from "./base-component";
 
@@ -11,7 +11,7 @@ interface Props {
   canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
   position: LinePosition;
-  cursorManager: CursorManager;
+  activeManager: ActiveManager;
 }
 
 export class Line extends BaseComponent<LinePosition> {
@@ -19,31 +19,22 @@ export class Line extends BaseComponent<LinePosition> {
 
   private threshold = 10;
 
-  constructor({ canvas, ctx, position, cursorManager }: Props) {
-    super(canvas, ctx, position, cursorManager);
+  constructor({ canvas, ctx, position, activeManager }: Props) {
+    super(canvas, ctx, position, activeManager);
   }
 
-  onMouseDown = (e: MouseEvent) => {};
-  onMouseMove = (e: MouseEvent) => {
-    // 컴포넌트를 클릭하거나 드래그 범위에 포함되었을 때
-    if (this.isActive) {
-      const mousePosition = MouseUtils.getMousePos(e, this.canvas);
-      const distance = MathUtils.getDistanceLineFromPoint(mousePosition, this.threshold, this.position);
-      if (distance <= this.threshold) {
-        this.cursorManager.setMove();
-      }
-
-      return;
-    }
-
-    // 컴포넌트가 클릭 및 드래그 되지 않은 기본 상태
+  isHover = (e: MouseEvent) => {
     const mousePosition = MouseUtils.getMousePos(e, this.canvas);
     const distance = MathUtils.getDistanceLineFromPoint(mousePosition, this.threshold, this.position);
-
     if (distance <= this.threshold) {
-      this.cursorManager.setPointer();
+      return true;
     }
+
+    return false;
   };
+
+  onMouseDown = (e: MouseEvent) => {};
+  onMouseMove = (e: MouseEvent) => {};
   onMouseUp = (e: MouseEvent) => {};
 
   getPosition = (): BasePosition => {
