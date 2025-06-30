@@ -1,5 +1,6 @@
 import { BaseComponent } from "../components";
 import { DragRange } from "../types";
+import { ActiveManager } from "./active-manager";
 
 export class ComponentManager {
   public components: Set<BaseComponent>;
@@ -7,10 +8,12 @@ export class ComponentManager {
 
   protected canvas: HTMLCanvasElement;
   protected ctx: CanvasRenderingContext2D;
+  protected activeManager: ActiveManager;
 
-  constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) {
+  constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, activeManager: ActiveManager) {
     this.canvas = canvas;
     this.ctx = ctx;
+    this.activeManager = activeManager;
     this.components = new Set();
     this.selectedComponents = new Set();
     this.addEventListeners();
@@ -67,7 +70,22 @@ export class ComponentManager {
     this.canvas.removeEventListener("mouseup", this.onMouseUp);
   };
 
-  private onMouseMove = (e: MouseEvent) => {};
+  private onMouseMove = (e: MouseEvent) => {
+    for (const component of this.components) {
+      // 컴포넌트를 클릭하거나 드래그 범위에 포함되었을 때
+      const isOverMouse = component.isHover(e);
+
+      if (component.isActive && isOverMouse) {
+        this.activeManager.setMove();
+        return;
+      }
+
+      // 컴포넌트가 클릭 및 드래그 되지 않은 기본 상태
+      if (isOverMouse) {
+        this.activeManager.setPointer();
+      }
+    }
+  };
 
   private onMouseDown = (e: MouseEvent) => {};
 
