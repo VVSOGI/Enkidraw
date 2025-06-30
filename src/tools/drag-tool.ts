@@ -1,15 +1,8 @@
 import { BaseComponent } from "../components";
 import { CursorManager } from "../managers";
-import { MousePoint } from "../types/common";
+import { DragRange, MousePoint } from "../types/common";
 import { MouseUtils } from "../utils";
 import { BaseTool } from "./base-tool";
-
-interface DragRange {
-  x1: number;
-  y1: number;
-  x2: number;
-  y2: number;
-}
 
 export class DragTool extends BaseTool {
   public readonly name = "drag";
