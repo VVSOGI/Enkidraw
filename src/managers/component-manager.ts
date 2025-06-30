@@ -1,14 +1,59 @@
 import { BaseComponent } from "../components";
-import { DragRange } from "../types";
+import { DragRange, MousePoint } from "../types";
+import { MouseUtils } from "../utils";
 import { ActiveManager } from "./active-manager";
 
+/**
+ * Component Click Handling Logic (onMouseDown, onMouseMove, onMouseUp)
+ *
+ * 1. Clicking an Active Component (selectedComponents.has(component) === true)
+ *    - onMouseDown:
+ *      • Detect clicked component via findComponentWithPosition(e)
+ *      • Verify component is already in selectedComponents
+ *      • Store starting point: tempPosition = MouseUtils.getMousePos(e, canvas)
+ *      • Activate move mode: activeManager.setMove()
+ *    - onMouseMove:
+ *      • Calculate difference between tempPosition and current mouse position
+ *      • Update position in real-time: component.moveComponent(next)
+ *    - onMouseUp:
+ *      • Reset: tempPosition = null
+ *      • Update originPosition: component.initialPosition()
+ *
+ * 2. Clicking an Inactive Component (component not in selectedComponents)
+ *    - onMouseDown:
+ *      • Detect clicked component via findComponentWithPosition(e)
+ *      • Call selectComponent(component):
+ *        - Clear existing selections: initializeSelectedComponents()
+ *        - Add new component: selectedComponents.add(component)
+ *        - Activate component: component.activate()
+ *      • Store tempPosition and call activeManager.setMove()
+ *    - Subsequent behavior same as scenario 1
+ *
+ * 3. Clicking Empty Space (findComponentWithPosition(e) === null)
+ *    - onMouseDown:
+ *      • Call initializeSelectedComponents():
+ *        - Deactivate all selectedComponents: component.deactivate()
+ *        - Reset selection: selectedComponents = new Set()
+ *        - Restore default mode: activeManager.setDefault()
+ *
+ * 4. Clicking One of Multiple Selected Components
+ *    - onMouseMove: All components in selectedComponents execute moveComponent() with same next value
+ *    - All selected components move simultaneously by the same distance
+ *
+ * Key State Variables:
+ * - selectedComponents: Set of currently selected components
+ * - tempPosition: Mouse position at drag start point
+ * - activeManager.currentActive: Current active mode ("move" | "default" | ...)
+ */
 export class ComponentManager {
   public components: Set<BaseComponent>;
-  public selectedComponents: Set<BaseComponent>;
 
   protected canvas: HTMLCanvasElement;
   protected ctx: CanvasRenderingContext2D;
   protected activeManager: ActiveManager;
+
+  private selectedComponents: Set<BaseComponent>;
+  private tempPosition: MousePoint | null = null;
 
   constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, activeManager: ActiveManager) {
     this.canvas = canvas;
@@ -25,7 +70,7 @@ export class ComponentManager {
     }
   };
 
-  public push = (component: BaseComponent) => {
+  public add = (component: BaseComponent) => {
     this.components.add(component);
   };
 
@@ -33,15 +78,10 @@ export class ComponentManager {
     return this.components;
   };
 
-  public getSelectedComponents = () => {
-    return this.selectedComponents;
-  };
-
   public dragComponents = (dragRange: DragRange) => {
     const { x1: dragX1, y1: dragY1, x2: dragX2, y2: dragY2 } = dragRange;
     for (const component of this.components) {
       const { x1: componentX1, y1: componentY1, x2: componentX2, y2: componentY2 } = component.getPosition();
-
       if (componentX1 >= dragX1 && componentX2 <= dragX2 && componentY1 >= dragY1 && componentY2 <= dragY2) {
         component.activate();
         this.selectedComponents.add(component);
@@ -52,10 +92,81 @@ export class ComponentManager {
     }
   };
 
-  public selectComponent = (component: BaseComponent) => {
+  private selectComponent = (component: BaseComponent) => {
     this.initializeSelectedComponents();
     this.selectedComponents.add(component);
     component.activate();
+  };
+
+  private findComponentWithPosition = (e: MouseEvent) => {
+    for (const component of this.components) {
+      if (component.isClicked(e)) {
+        return component;
+      }
+    }
+
+    return null;
+  };
+
+  private onMouseMove = (e: MouseEvent) => {
+    for (const component of this.components) {
+      if (this.selectedComponents.has(component) && component.isActive && this.activeManager.currentActive === "move") {
+        if (!this.tempPosition) return;
+        const { x: startX, y: startY } = this.tempPosition;
+        const { x: moveX, y: moveY } = MouseUtils.getMousePos(e, this.canvas);
+        const next = {
+          x: moveX - startX,
+          y: moveY - startY,
+        };
+        component.moveComponent(next);
+      }
+
+      const isOverMouse = component.isHover(e);
+      if (component.isActive && isOverMouse) {
+        this.activeManager.setCursorStyle("move");
+        continue;
+      }
+
+      if (isOverMouse) {
+        this.activeManager.setCursorStyle("pointer");
+      }
+    }
+  };
+
+  private onMouseDown = (e: MouseEvent) => {
+    const component = this.findComponentWithPosition(e);
+
+    if (component && this.selectedComponents.has(component)) {
+      this.tempPosition = MouseUtils.getMousePos(e, this.canvas);
+      this.activeManager.setMove();
+      this.activeManager.setCursorStyle("move");
+      return;
+    }
+
+    if (component) {
+      this.selectComponent(component);
+      this.activeManager.setMove();
+      this.activeManager.setCursorStyle("move");
+      this.tempPosition = MouseUtils.getMousePos(e, this.canvas);
+    } else {
+      this.initializeSelectedComponents();
+    }
+  };
+
+  private onMouseUp = (e: MouseEvent) => {
+    this.tempPosition = null;
+
+    for (const component of this.components) {
+      component.initialPosition();
+    }
+  };
+
+  private initializeSelectedComponents = () => {
+    for (const component of this.selectedComponents) {
+      component.deactivate();
+    }
+    this.selectedComponents = new Set();
+    this.activeManager.setDefault();
   };
 
   private addEventListeners = () => {
@@ -68,33 +179,5 @@ export class ComponentManager {
     this.canvas.removeEventListener("mousedown", this.onMouseDown);
     this.canvas.removeEventListener("mousemove", this.onMouseMove);
     this.canvas.removeEventListener("mouseup", this.onMouseUp);
-  };
-
-  private onMouseMove = (e: MouseEvent) => {
-    for (const component of this.components) {
-      // 컴포넌트를 클릭하거나 드래그 범위에 포함되었을 때
-      const isOverMouse = component.isHover(e);
-
-      if (component.isActive && isOverMouse) {
-        this.activeManager.setMove();
-        return;
-      }
-
-      // 컴포넌트가 클릭 및 드래그 되지 않은 기본 상태
-      if (isOverMouse) {
-        this.activeManager.setPointer();
-      }
-    }
-  };
-
-  private onMouseDown = (e: MouseEvent) => {};
-
-  private onMouseUp = (e: MouseEvent) => {};
-
-  private initializeSelectedComponents = () => {
-    for (const component of this.selectedComponents) {
-      component.deactivate();
-    }
-    this.selectedComponents = new Set();
   };
 }
