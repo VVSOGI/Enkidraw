@@ -1,4 +1,5 @@
-import { CursorManager } from "../managers";
+import { ActiveManager } from "../managers";
+import { MousePoint } from "../types";
 import { MathUtils, MouseUtils } from "../utils";
 import { BaseComponent, BasePosition } from "./base-component";
 
@@ -11,7 +12,7 @@ interface Props {
   canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
   position: LinePosition;
-  cursorManager: CursorManager;
+  activeManager: ActiveManager;
 }
 
 export class Line extends BaseComponent<LinePosition> {
@@ -19,32 +20,51 @@ export class Line extends BaseComponent<LinePosition> {
 
   private threshold = 10;
 
-  constructor({ canvas, ctx, position, cursorManager }: Props) {
-    super(canvas, ctx, position, cursorManager);
+  constructor({ canvas, ctx, position, activeManager }: Props) {
+    super(canvas, ctx, position, activeManager);
   }
 
-  onMouseDown = (e: MouseEvent) => {};
-  onMouseMove = (e: MouseEvent) => {
-    // 컴포넌트를 클릭하거나 드래그 범위에 포함되었을 때
-    if (this.isActive) {
-      const mousePosition = MouseUtils.getMousePos(e, this.canvas);
-      const distance = MathUtils.getDistanceLineFromPoint(mousePosition, this.threshold, this.position);
-      if (distance <= this.threshold) {
-        this.cursorManager.setMove();
-      }
+  initialPosition = () => {
+    this.originPosition = {
+      x1: this.position.x1,
+      y1: this.position.y1,
+      cx: this.position.cx,
+      cy: this.position.cy,
+      x2: this.position.x2,
+      y2: this.position.y2,
+    };
+  };
 
-      return;
-    }
-
-    // 컴포넌트가 클릭 및 드래그 되지 않은 기본 상태
+  isHover = (e: MouseEvent) => {
     const mousePosition = MouseUtils.getMousePos(e, this.canvas);
     const distance = MathUtils.getDistanceLineFromPoint(mousePosition, this.threshold, this.position);
-
     if (distance <= this.threshold) {
-      this.cursorManager.setPointer();
+      return true;
     }
+
+    return false;
   };
-  onMouseUp = (e: MouseEvent) => {};
+
+  isClicked = (e: MouseEvent) => {
+    const mousePosition = MouseUtils.getMousePos(e, this.canvas);
+    const distance = MathUtils.getDistanceLineFromPoint(mousePosition, this.threshold, this.position);
+    if (distance <= this.threshold) {
+      return true;
+    }
+
+    return false;
+  };
+
+  moveComponent = (move: MousePoint) => {
+    this.position = {
+      x1: this.originPosition.x1 + move.x,
+      y1: this.originPosition.y1 + move.y,
+      x2: this.originPosition.x2 + move.x,
+      y2: this.originPosition.y2 + move.y,
+      cx: this.originPosition.cx + move.x,
+      cy: this.originPosition.cy + move.y,
+    };
+  };
 
   getPosition = (): BasePosition => {
     const left = Math.min(this.position.x1, this.position.x2);

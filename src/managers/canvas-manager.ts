@@ -1,4 +1,4 @@
-import { ComponentManager, CursorManager } from ".";
+import { ComponentManager, ActiveManager } from ".";
 import { BaseTool, DragTool } from "../tools";
 import { ToolConstructor, ToolNames } from "../types";
 
@@ -12,7 +12,7 @@ export class CanvasManager {
   private tools: Map<ToolNames, BaseTool> = new Map();
   private currentTool: BaseTool | null = null;
   private dragTool: DragTool;
-  private cursorManager: CursorManager;
+  private activeManager: ActiveManager;
   private componentManager: ComponentManager;
 
   constructor(canvas: HTMLCanvasElement) {
@@ -25,13 +25,13 @@ export class CanvasManager {
     this.resize();
     window.addEventListener("resize", this.resize);
 
-    this.cursorManager = new CursorManager(canvas, this.ctx);
-    this.componentManager = new ComponentManager(canvas, this.ctx);
+    this.activeManager = new ActiveManager(canvas, this.ctx);
+    this.componentManager = new ComponentManager(canvas, this.ctx, this.activeManager);
     this.dragTool = new DragTool(
       this.canvas,
       this.ctx,
-      this.componentManager.components,
-      this.cursorManager,
+      this.componentManager,
+      this.activeManager,
       this.deleteCurrentTool
     );
 
@@ -41,7 +41,7 @@ export class CanvasManager {
   public destroy = () => {
     window.removeEventListener("resize", this.resize);
     this.dragTool.deactivate();
-    this.cursorManager.deactivate();
+    this.activeManager.deactivate();
 
     if (this.animationId) {
       cancelAnimationFrame(this.animationId);
@@ -53,7 +53,7 @@ export class CanvasManager {
       this.canvas,
       this.ctx,
       this.componentManager.components,
-      this.cursorManager,
+      this.activeManager,
       this.deleteCurrentTool
     );
     const toolName = tool.name as ToolNames;
@@ -103,7 +103,7 @@ export class CanvasManager {
     requestAnimationFrame(this.draw);
     this.ctx.clearRect(0, 0, this.stageWidth, this.stageHeight);
 
-    if (!this.currentTool) {
+    if (!this.currentTool && this.activeManager.currentActive === "drag") {
       const dragRange = this.dragTool.draw();
       if (dragRange) {
         this.componentManager.dragComponents(dragRange);

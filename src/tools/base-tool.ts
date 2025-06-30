@@ -1,13 +1,12 @@
-import { BaseComponent } from "../components";
-import { CursorManager } from "../managers";
+import { ActiveManager, ComponentManager } from "../managers";
 
 export abstract class BaseTool {
   abstract readonly name: string; // 각 툴에서 정의해야 함
 
   protected canvas: HTMLCanvasElement;
   protected ctx: CanvasRenderingContext2D;
-  protected components: Set<BaseComponent> | null = null;
-  protected cursorManager: CursorManager;
+  protected componentManager: ComponentManager;
+  protected activeManager: ActiveManager;
   protected deleteCurrentTool: () => void;
 
   protected isDrawing: boolean = false;
@@ -18,14 +17,14 @@ export abstract class BaseTool {
   constructor(
     canvas: HTMLCanvasElement,
     ctx: CanvasRenderingContext2D,
-    components: Set<BaseComponent> | null,
-    cursorManager: CursorManager,
+    componentManager: ComponentManager,
+    activeManager: ActiveManager,
     deleteCurrentTool: () => void
   ) {
     this.canvas = canvas;
     this.ctx = ctx;
-    this.components = components;
-    this.cursorManager = cursorManager;
+    this.componentManager = componentManager;
+    this.activeManager = activeManager;
     this.deleteCurrentTool = deleteCurrentTool;
   }
 

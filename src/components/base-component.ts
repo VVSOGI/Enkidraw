@@ -1,4 +1,6 @@
-import { CursorManager } from "../managers";
+import { ActiveManager } from "../managers";
+import { v4 } from "uuid";
+import { MousePoint } from "../types";
 
 export interface BasePosition {
   x1: number;
@@ -10,18 +12,20 @@ export interface BasePosition {
 export abstract class BaseComponent<T extends BasePosition = BasePosition> {
   abstract readonly name: string;
 
+  public readonly id = v4();
+  public isActive: boolean = false;
+  public position: T;
+  public originPosition: T;
+
   protected canvas: HTMLCanvasElement;
   protected ctx: CanvasRenderingContext2D;
-  protected isActive: boolean = false;
-  protected position: T;
-  protected cursorManager: CursorManager;
-  protected originPosition: T;
+  protected activeManager: ActiveManager;
 
-  constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, position: T, cursorManager: CursorManager) {
+  constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, position: T, activeManager: ActiveManager) {
     this.canvas = canvas;
     this.ctx = ctx;
     this.position = position;
-    this.cursorManager = cursorManager;
+    this.activeManager = activeManager;
     this.originPosition = position;
   }
 
@@ -33,9 +37,10 @@ export abstract class BaseComponent<T extends BasePosition = BasePosition> {
     this.isActive = false;
   };
 
-  abstract onMouseDown(e: MouseEvent): void;
-  abstract onMouseMove(e: MouseEvent): void;
-  abstract onMouseUp(e: MouseEvent): void;
+  abstract isHover(e: MouseEvent): boolean;
+  abstract isClicked(e: MouseEvent): boolean;
+  abstract moveComponent(move: MousePoint): void;
+  abstract initialPosition(): void;
   abstract getPosition(): BasePosition;
   abstract draw(): void;
 }

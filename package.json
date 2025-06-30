@@ -94,5 +94,8 @@
       "!src/**/*.d.ts",
       "!src/test-setup.ts"
     ]
+  },
+  "dependencies": {
+    "uuid": "^11.1.0"
   }
 }

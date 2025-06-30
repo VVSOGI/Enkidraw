@@ -1,5 +1,5 @@
-export class CursorManager {
-  public currentCursor: "default" | "move" | "pointer" = "default";
+export class ActiveManager {
+  public currentActive: "default" | "move" | "pointer" | "drag" = "default";
 
   protected canvas: HTMLCanvasElement;
   protected ctx: CanvasRenderingContext2D;
@@ -10,31 +10,32 @@ export class CursorManager {
     this.activate();
   }
 
-  public activate = () => {
-    this.addEventListeners();
-  };
-
   public deactivate = () => {
     this.removeEventListeners();
   };
 
   public setDefault = () => {
-    this.currentCursor = "default";
-    this.canvas.style.cursor = "default";
+    this.currentActive = "default";
+  };
+
+  public setCursorStyle = (style: "default" | "move" | "pointer") => {
+    this.canvas.style.cursor = style;
+  };
+
+  public setDrag = () => {
+    this.currentActive = "drag";
   };
 
   public setMove = () => {
-    this.currentCursor = "move";
-    this.canvas.style.cursor = "move";
+    this.currentActive = "move";
   };
 
-  public setPointer = () => {
-    this.currentCursor = "pointer";
-    this.canvas.style.cursor = "pointer";
+  private activate = () => {
+    this.addEventListeners();
   };
 
   private onMouseMove = (e: MouseEvent) => {
-    this.setDefault();
+    this.canvas.style.cursor = "default";
   };
 
   private onMouseDown = (e: MouseEvent) => {};
