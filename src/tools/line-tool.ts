@@ -1,8 +1,8 @@
 import { BaseTool } from "./base-tool";
 import { MousePoint } from "../types";
 import { MouseUtils } from "../utils";
-import { BaseComponent, Line } from "../components";
-import { ActiveManager } from "../managers";
+import { Line } from "../components";
+import { ActiveManager, ComponentManager } from "../managers";
 
 export class LineTool extends BaseTool {
   public readonly name = "line";
@@ -12,11 +12,11 @@ export class LineTool extends BaseTool {
   constructor(
     canvas: HTMLCanvasElement,
     ctx: CanvasRenderingContext2D,
-    components: Set<BaseComponent> | null,
+    componentManager: ComponentManager,
     activeManager: ActiveManager,
     deleteCurrentTool: () => void
   ) {
-    super(canvas, ctx, components, activeManager, deleteCurrentTool);
+    super(canvas, ctx, componentManager, activeManager, deleteCurrentTool);
   }
 
   onMouseDown = (e: MouseEvent) => {
@@ -94,10 +94,6 @@ export class LineTool extends BaseTool {
       activeManager: this.activeManager,
     });
 
-    this.components?.add(line);
-  };
-
-  private deleteComponent = (component: Line) => {
-    this.components?.delete(component);
+    this.componentManager.add(line);
   };
 }
