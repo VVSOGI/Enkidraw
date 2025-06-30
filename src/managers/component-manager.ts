@@ -109,11 +109,11 @@ export class ComponentManager {
   };
 
   private onMouseMove = (e: MouseEvent) => {
+    const { x: moveX, y: moveY } = MouseUtils.getMousePos(e, this.canvas);
     for (const component of this.components) {
       if (this.selectedComponents.has(component) && component.isActive && this.activeManager.currentActive === "move") {
         if (!this.tempPosition) return;
         const { x: startX, y: startY } = this.tempPosition;
-        const { x: moveX, y: moveY } = MouseUtils.getMousePos(e, this.canvas);
         const next = {
           x: moveX - startX,
           y: moveY - startY,
@@ -122,13 +122,10 @@ export class ComponentManager {
       }
 
       const isOverMouse = component.isHover(e);
-      if (component.isActive && isOverMouse) {
-        this.activeManager.setCursorStyle("move");
-        continue;
-      }
-
       if (isOverMouse) {
-        this.activeManager.setCursorStyle("pointer");
+        component.hoverComponent({ x: moveX, y: moveY });
+      } else {
+        component.initialPosition();
       }
     }
   };
