@@ -30,7 +30,7 @@ export class CanvasManager {
     this.dragTool = new DragTool(
       this.canvas,
       this.ctx,
-      this.componentManager.components,
+      this.componentManager,
       this.activeManager,
       this.deleteCurrentTool
     );
@@ -103,7 +103,7 @@ export class CanvasManager {
     requestAnimationFrame(this.draw);
     this.ctx.clearRect(0, 0, this.stageWidth, this.stageHeight);
 
-    if (!this.currentTool) {
+    if (!this.currentTool && this.activeManager.currentActive === "drag") {
       const dragRange = this.dragTool.draw();
       if (dragRange) {
         this.componentManager.dragComponents(dragRange);
