@@ -1,4 +1,5 @@
 import { ActiveManager } from "../managers";
+import { MousePoint } from "../types";
 import { MathUtils, MouseUtils } from "../utils";
 import { BaseComponent, BasePosition } from "./base-component";
 
@@ -23,6 +24,17 @@ export class Line extends BaseComponent<LinePosition> {
     super(canvas, ctx, position, activeManager);
   }
 
+  initialPosition = () => {
+    this.originPosition = {
+      x1: this.position.x1,
+      y1: this.position.y1,
+      cx: this.position.cx,
+      cy: this.position.cy,
+      x2: this.position.x2,
+      y2: this.position.y2,
+    };
+  };
+
   isHover = (e: MouseEvent) => {
     const mousePosition = MouseUtils.getMousePos(e, this.canvas);
     const distance = MathUtils.getDistanceLineFromPoint(mousePosition, this.threshold, this.position);
@@ -33,9 +45,26 @@ export class Line extends BaseComponent<LinePosition> {
     return false;
   };
 
-  onMouseDown = (e: MouseEvent) => {};
-  onMouseMove = (e: MouseEvent) => {};
-  onMouseUp = (e: MouseEvent) => {};
+  isClicked = (e: MouseEvent) => {
+    const mousePosition = MouseUtils.getMousePos(e, this.canvas);
+    const distance = MathUtils.getDistanceLineFromPoint(mousePosition, this.threshold, this.position);
+    if (distance <= this.threshold) {
+      return true;
+    }
+
+    return false;
+  };
+
+  moveComponent = (move: MousePoint) => {
+    this.position = {
+      x1: this.originPosition.x1 + move.x,
+      y1: this.originPosition.y1 + move.y,
+      x2: this.originPosition.x2 + move.x,
+      y2: this.originPosition.y2 + move.y,
+      cx: this.originPosition.cx + move.x,
+      cy: this.originPosition.cy + move.y,
+    };
+  };
 
   getPosition = (): BasePosition => {
     const left = Math.min(this.position.x1, this.position.x2);
