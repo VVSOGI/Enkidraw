@@ -1,5 +1,4 @@
-import { CursorManager } from ".";
-import { BaseComponent } from "../components";
+import { ComponentManager, CursorManager } from ".";
 import { BaseTool, DragTool } from "../tools";
 import { ToolConstructor, ToolNames } from "../types";
 
@@ -11,10 +10,10 @@ export class CanvasManager {
   private animationId: number | null = null;
 
   private tools: Map<ToolNames, BaseTool> = new Map();
-  private components: Set<BaseComponent> = new Set();
   private currentTool: BaseTool | null = null;
   private dragTool: DragTool;
   private cursorManager: CursorManager;
+  private componentManager: ComponentManager;
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
@@ -27,7 +26,14 @@ export class CanvasManager {
     window.addEventListener("resize", this.resize);
 
     this.cursorManager = new CursorManager(canvas, this.ctx);
-    this.dragTool = new DragTool(this.canvas, this.ctx, this.components, this.cursorManager, this.deleteCurrentTool);
+    this.componentManager = new ComponentManager(canvas, this.ctx);
+    this.dragTool = new DragTool(
+      this.canvas,
+      this.ctx,
+      this.componentManager.components,
+      this.cursorManager,
+      this.deleteCurrentTool
+    );
 
     this.animationId = requestAnimationFrame(this.draw);
   }
@@ -43,7 +49,13 @@ export class CanvasManager {
   };
 
   public addTool = (ToolClass: ToolConstructor, button?: HTMLElement) => {
-    const tool = new ToolClass(this.canvas, this.ctx, this.components, this.cursorManager, this.deleteCurrentTool);
+    const tool = new ToolClass(
+      this.canvas,
+      this.ctx,
+      this.componentManager.components,
+      this.cursorManager,
+      this.deleteCurrentTool
+    );
     const toolName = tool.name as ToolNames;
 
     if (toolName === "drag") {
@@ -94,17 +106,7 @@ export class CanvasManager {
     if (!this.currentTool) {
       const dragRange = this.dragTool.draw();
       if (dragRange) {
-        const { x1: dragX1, y1: dragY1, x2: dragX2, y2: dragY2 } = dragRange;
-
-        for (const component of this.components) {
-          const { x1: componentX1, y1: componentY1, x2: componentX2, y2: componentY2 } = component.getPosition();
-
-          if (componentX1 >= dragX1 && componentX2 <= dragX2 && componentY1 >= dragY1 && componentY2 <= dragY2) {
-            component.activate();
-          } else {
-            component.deactivate();
-          }
-        }
+        this.componentManager.dragComponents(dragRange);
       }
     }
 
@@ -112,7 +114,7 @@ export class CanvasManager {
       this.currentTool.draw();
     }
 
-    for (const component of this.components) {
+    for (const component of this.componentManager.components) {
       component.draw();
     }
   };
