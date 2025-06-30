@@ -39,7 +39,7 @@ export class LineTool extends BaseTool {
     const { x: initX, y: initY } = this.initPoint;
     const { x: endX, y: endY } = this.movePoint;
 
-    if (initX === endX && initY === endY) return;
+    if (Math.abs(initX - endX) <= 50 && Math.abs(initY - endY) <= 50) return;
 
     this.appendComponent(this.initPoint, this.movePoint);
     this.deactivate();
@@ -94,12 +94,10 @@ export class LineTool extends BaseTool {
       cursorManager: this.cursorManager,
     });
 
-    line.addEventListeners();
     this.components?.add(line);
   };
 
   private deleteComponent = (component: Line) => {
-    component.removeEventListeners();
     this.components?.delete(component);
   };
 }

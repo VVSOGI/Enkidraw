@@ -15,12 +15,14 @@ export abstract class BaseComponent<T extends BasePosition = BasePosition> {
   protected isActive: boolean = false;
   protected position: T;
   protected cursorManager: CursorManager;
+  protected originPosition: T;
 
   constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, position: T, cursorManager: CursorManager) {
     this.canvas = canvas;
     this.ctx = ctx;
     this.position = position;
     this.cursorManager = cursorManager;
+    this.originPosition = position;
   }
 
   public activate = () => {
@@ -36,16 +38,4 @@ export abstract class BaseComponent<T extends BasePosition = BasePosition> {
   abstract onMouseUp(e: MouseEvent): void;
   abstract getPosition(): BasePosition;
   abstract draw(): void;
-
-  public addEventListeners = () => {
-    this.canvas.addEventListener("mousedown", this.onMouseDown);
-    this.canvas.addEventListener("mousemove", this.onMouseMove);
-    this.canvas.addEventListener("mouseup", this.onMouseUp);
-  };
-
-  public removeEventListeners = () => {
-    this.canvas.removeEventListener("mousedown", this.onMouseDown);
-    this.canvas.removeEventListener("mousemove", this.onMouseMove);
-    this.canvas.removeEventListener("mouseup", this.onMouseUp);
-  };
 }
