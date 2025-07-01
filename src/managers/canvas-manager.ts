@@ -114,8 +114,6 @@ export class CanvasManager {
       this.currentTool.draw();
     }
 
-    for (const component of this.componentManager.components) {
-      component.draw();
-    }
+    this.componentManager.draw();
   };
 }
