@@ -20,7 +20,7 @@ export class Line extends BaseComponent<LinePosition> {
 
   private type: "line" | "curve" = "line";
   private threshold = 10;
-  private dragCornerRectSize = 10;
+  private dragCornerRectSize = 7.5;
   private moveCornorPoint = -1;
   private hoverPosition: MousePoint | null = null;
 
@@ -66,36 +66,68 @@ export class Line extends BaseComponent<LinePosition> {
     return false;
   };
 
-  hoverComponent = (move: MousePoint) => {
-    if (this.isActive) {
-      const { point, coordinates } = this.getMouseHitControlPoint(move);
-      if (point > -1) {
-        this.hoverPosition = coordinates as MousePoint;
-        this.activeManager.setCursorStyle("pointer");
-        return;
-      } else {
-        this.hoverPosition = null;
-      }
+  hoverComponent = (e: MouseEvent, move: MousePoint) => {
+    const isHovered = this.isHover(e);
 
-      this.activeManager.setCursorStyle("move");
-    } else {
+    if (!isHovered) {
+      this.hoverPosition = null;
+      this.activeManager.setCursorStyle("default");
+      return;
+    }
+
+    if (!this.isActive) {
       this.activeManager.setCursorStyle("pointer");
+      return;
+    }
+
+    const { point, coordinates } = this.getMouseHitControlPoint(move);
+
+    if (point > -1) {
+      this.hoverPosition = coordinates as MousePoint;
+      this.activeManager.setCursorStyle("pointer");
+    } else {
+      this.hoverPosition = null;
+      this.activeManager.setCursorStyle("move");
     }
   };
 
-  moveComponent = (move: MousePoint) => {
+  moveComponent = (e: MouseEvent, move: MousePoint) => {
     if (this.moveCornorPoint > -1) {
-      if (this.type === "line") {
+      if (this.moveCornorPoint === 1) {
+        this.position.cx = this.originPosition.cx + move.x;
+        this.position.cy = this.originPosition.cy + move.y;
+        this.hoverPosition = { x: this.position.cx, y: this.position.cy };
+        this.type = "curve";
+        return;
+      }
+
+      if (this.type === "curve") {
         if (this.moveCornorPoint === 0) {
           this.position.x1 = this.originPosition.x1 + move.x;
           this.position.y1 = this.originPosition.y1 + move.y;
-          // this.hoverEndpoint = { x: this.position.x1, y: this.position.y1 };
+          this.hoverPosition = { x: this.position.x1, y: this.position.y1 };
         }
 
         if (this.moveCornorPoint === 2) {
           this.position.x2 = this.originPosition.x2 + move.x;
           this.position.y2 = this.originPosition.y2 + move.y;
-          // this.hoverEndpoint = { x: this.position.x2, y: this.position.y2 };
+          this.hoverPosition = { x: this.position.x2, y: this.position.y2 };
+        }
+
+        return;
+      }
+
+      if (this.type === "line") {
+        if (this.moveCornorPoint === 0) {
+          this.position.x1 = this.originPosition.x1 + move.x;
+          this.position.y1 = this.originPosition.y1 + move.y;
+          this.hoverPosition = { x: this.position.x1, y: this.position.y1 };
+        }
+
+        if (this.moveCornorPoint === 2) {
+          this.position.x2 = this.originPosition.x2 + move.x;
+          this.position.y2 = this.originPosition.y2 + move.y;
+          this.hoverPosition = { x: this.position.x2, y: this.position.y2 };
         }
 
         this.position.cx = (this.position.x1 + this.position.x2) / 2;
@@ -201,29 +233,42 @@ export class Line extends BaseComponent<LinePosition> {
   private dragEffect = () => {
     this.ctx.save();
     this.ctx.beginPath();
-    this.ctx.arc(this.position.x1, this.position.y1, 5, 0, Math.PI * 2);
-    this.ctx.arc(this.position.cx, this.position.cy, 5, 0, Math.PI * 2);
-    this.ctx.arc(this.position.x2, this.position.y2, 5, 0, Math.PI * 2);
-    this.ctx.fillStyle = "rgba(105, 105, 230, 0.5)";
-    this.ctx.fill();
-    this.ctx.closePath();
-    this.ctx.restore();
-
-    this.ctx.save();
-    this.ctx.beginPath();
-    this.ctx.arc(this.position.x1, this.position.y1, 2.5, 0, Math.PI * 2);
-    this.ctx.arc(this.position.cx, this.position.cy, 2.5, 0, Math.PI * 2);
-    this.ctx.arc(this.position.x2, this.position.y2, 2.5, 0, Math.PI * 2);
+    this.ctx.roundRect(
+      this.position.x1 + this.dragCornerRectSize / 2,
+      this.position.y1 + this.dragCornerRectSize / 2,
+      -this.dragCornerRectSize,
+      -this.dragCornerRectSize,
+      4
+    );
+    this.ctx.roundRect(
+      this.position.cx + this.dragCornerRectSize / 2,
+      this.position.cy + this.dragCornerRectSize / 2,
+      -this.dragCornerRectSize,
+      -this.dragCornerRectSize,
+      4
+    );
+    this.ctx.roundRect(
+      this.position.x2 + this.dragCornerRectSize / 2,
+      this.position.y2 + this.dragCornerRectSize / 2,
+      -this.dragCornerRectSize,
+      -this.dragCornerRectSize,
+      4
+    );
     this.ctx.fillStyle = "#ffffff";
     this.ctx.fill();
+    this.ctx.strokeStyle = "rgba(105, 105, 230, 0.5)";
+    this.ctx.stroke();
     this.ctx.closePath();
     this.ctx.restore();
   };
 
   draw = () => {
+    const controlX = MathUtils.getBezierControlPoint(0.5, this.position.cx, this.position.x1, this.position.x2);
+    const controlY = MathUtils.getBezierControlPoint(0.5, this.position.cy, this.position.y1, this.position.y2);
+
     this.ctx.beginPath();
     this.ctx.moveTo(this.position.x1, this.position.y1);
-    this.ctx.lineTo(this.position.x2, this.position.y2);
+    this.ctx.quadraticCurveTo(controlX, controlY, this.position.x2, this.position.y2);
     this.ctx.strokeStyle = "black";
     this.ctx.stroke();
     this.ctx.closePath();
