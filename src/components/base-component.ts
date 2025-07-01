@@ -61,6 +61,7 @@ export abstract class BaseComponent<T extends BasePosition = BasePosition> {
   abstract isClicked(e: MouseEvent): boolean;
   abstract hoverComponent(e: MouseEvent, move: MousePoint): void;
   abstract moveComponent(e: MouseEvent, move: MousePoint): void;
+  abstract resizeComponent(newBounds: BasePosition): void;
   abstract initialPosition(): void;
   abstract getPosition(): BasePosition;
   abstract draw(): void;

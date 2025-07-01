@@ -178,6 +178,8 @@ export class Line extends BaseComponent<LinePosition> {
     this.isMultiDrag = mode;
   };
 
+  resizeComponent = (newBounds: BasePosition) => {};
+
   private getMouseHitControlPoint = (mousePosition: MousePoint) => {
     const { x: mouseX, y: mouseY } = mousePosition;
 
