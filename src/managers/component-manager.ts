@@ -58,6 +58,7 @@ export class ComponentManager {
   private originMultiSelectRange: DragRange | null = null;
   private multiSelectRange: DragRange | null = null;
   private multiRangePadding = 10;
+  private multiRangeCornerRectSize = 10;
 
   constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, activeManager: ActiveManager) {
     this.canvas = canvas;
@@ -75,20 +76,8 @@ export class ComponentManager {
 
     if (!this.multiSelectRange) return;
 
-    const { x1, y1, x2, y2 } = this.multiSelectRange;
-
-    this.ctx.save();
-    this.ctx.beginPath();
-    this.ctx.setLineDash([1, 1]);
-    this.ctx.moveTo(x1, y1);
-    this.ctx.lineTo(x2, y1);
-    this.ctx.lineTo(x2, y2);
-    this.ctx.lineTo(x1, y2);
-    this.ctx.lineTo(x1, y1);
-    this.ctx.strokeStyle = "#000000";
-    this.ctx.stroke();
-    this.ctx.closePath();
-    this.ctx.restore();
+    this.multiDragRangeEffect(this.multiSelectRange);
+    this.multiDragRangeCornerEffect(this.multiSelectRange);
   };
 
   public add = (component: BaseComponent) => {
@@ -102,17 +91,6 @@ export class ComponentManager {
   public dragComponents = (dragRange: DragRange) => {
     const { x1: dragX1, y1: dragY1, x2: dragX2, y2: dragY2 } = dragRange;
 
-    /**
-     * All Selected Components deactivated When selected component more than 1
-     */
-    if (this.selectedComponents.size > 1) {
-      for (const component of this.selectedComponents) {
-        component.deactivate();
-      }
-
-      return;
-    }
-
     for (const component of this.components) {
       const { x1: componentX1, y1: componentY1, x2: componentX2, y2: componentY2 } = component.getPosition();
       if (componentX1 >= dragX1 && componentX2 <= dragX2 && componentY1 >= dragY1 && componentY2 <= dragY2) {
@@ -121,6 +99,16 @@ export class ComponentManager {
       } else {
         component.deactivate();
         this.selectedComponents.delete(component);
+      }
+    }
+
+    /**
+     * All Selected Components deactivated When selected component more than 1
+     */
+    if (this.selectedComponents.size > 1) {
+      for (const component of this.selectedComponents) {
+        component.deactivate();
+        component.multiDragMode(true);
       }
     }
   };
@@ -246,11 +234,74 @@ export class ComponentManager {
   private initializeSelectedComponents = () => {
     for (const component of this.selectedComponents) {
       component.deactivate();
+      component.multiDragMode(false);
     }
     this.multiSelectRange = null;
     this.originMultiSelectRange = null;
     this.selectedComponents = new Set();
     this.activeManager.setDefault();
+  };
+
+  private multiDragRangeEffect = (range: DragRange) => {
+    const { x1, y1, x2, y2 } = range;
+
+    this.ctx.save();
+    this.ctx.beginPath();
+    this.ctx.setLineDash([1, 1]);
+    this.ctx.moveTo(x1, y1);
+    this.ctx.lineTo(x2, y1);
+    this.ctx.lineTo(x2, y2);
+    this.ctx.lineTo(x1, y2);
+    this.ctx.lineTo(x1, y1);
+    this.ctx.strokeStyle = "rgba(105, 105, 230, 0.5)";
+    this.ctx.stroke();
+    this.ctx.closePath();
+    this.ctx.restore();
+  };
+
+  private multiDragRangeCornerEffect = (range: DragRange) => {
+    const { x1, y1, x2, y2 } = range;
+
+    this.ctx.save();
+    this.ctx.beginPath();
+    this.ctx.roundRect(
+      x1 - this.multiRangeCornerRectSize / 2,
+      y1 - this.multiRangeCornerRectSize / 2,
+      this.multiRangeCornerRectSize,
+      this.multiRangeCornerRectSize,
+      2
+    );
+
+    this.ctx.roundRect(
+      x2 - this.multiRangeCornerRectSize / 2,
+      y1 - this.multiRangeCornerRectSize / 2,
+      this.multiRangeCornerRectSize,
+      this.multiRangeCornerRectSize,
+      2
+    );
+
+    this.ctx.roundRect(
+      x2 - this.multiRangeCornerRectSize / 2,
+      y2 - this.multiRangeCornerRectSize / 2,
+      this.multiRangeCornerRectSize,
+      this.multiRangeCornerRectSize,
+      2
+    );
+
+    this.ctx.roundRect(
+      x1 - this.multiRangeCornerRectSize / 2,
+      y2 - this.multiRangeCornerRectSize / 2,
+      this.multiRangeCornerRectSize,
+      this.multiRangeCornerRectSize,
+      2
+    );
+
+    this.ctx.fillStyle = "#ffffff";
+    this.ctx.fill();
+    this.ctx.strokeStyle = "rgba(105, 105, 230, 0.5)";
+    this.ctx.stroke();
+    this.ctx.closePath();
+    this.ctx.restore();
   };
 
   private addEventListeners = () => {
