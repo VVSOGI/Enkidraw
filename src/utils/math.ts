@@ -19,4 +19,15 @@ export class MathUtils {
 
     return Math.abs(A * x + B * y + C) / Math.sqrt(A * A + B * B);
   };
+
+  static getBezierControlPoint = (t: number, targetPoint: number, p0: number, p2: number) => {
+    if (t === 0.5) {
+      return 2 * targetPoint - 0.5 * (p0 + p2);
+    }
+
+    const oneMinusT = 1 - t;
+    const denominator = 2 * oneMinusT * t;
+
+    return (targetPoint - oneMinusT * oneMinusT * p0 - t * t * p2) / denominator;
+  };
 }
