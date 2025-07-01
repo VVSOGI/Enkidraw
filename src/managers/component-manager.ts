@@ -118,15 +118,10 @@ export class ComponentManager {
           x: moveX - startX,
           y: moveY - startY,
         };
-        component.moveComponent(next);
+        component.moveComponent(e, next);
       }
 
-      const isOverMouse = component.isHover(e);
-      if (isOverMouse) {
-        component.hoverComponent({ x: moveX, y: moveY });
-      } else {
-        component.initialPosition();
-      }
+      component.hoverComponent(e, { x: moveX, y: moveY });
     }
   };
 
