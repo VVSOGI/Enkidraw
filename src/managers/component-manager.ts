@@ -59,6 +59,7 @@ export class ComponentManager {
   private multiSelectRange: DragRange | null = null;
   private multiRangePadding = 10;
   private multiRangeCornerRectSize = 10;
+  private multiResizeRange = 5;
 
   constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, activeManager: ActiveManager) {
     this.canvas = canvas;
@@ -99,6 +100,7 @@ export class ComponentManager {
       } else {
         component.deactivate();
         this.selectedComponents.delete(component);
+        component.multiDragMode(false);
       }
     }
 
@@ -109,6 +111,12 @@ export class ComponentManager {
       for (const component of this.selectedComponents) {
         component.deactivate();
         component.multiDragMode(true);
+      }
+    } else {
+      for (const component of this.selectedComponents) {
+        component.activate();
+        component.multiDragMode(false);
+        this.multiSelectRange = null;
       }
     }
   };
@@ -129,76 +137,136 @@ export class ComponentManager {
     return null;
   };
 
-  private onMouseMove = (e: MouseEvent) => {
-    const { x: moveX, y: moveY } = MouseUtils.getMousePos(e, this.canvas);
-
+  /**
+   * Handle multi-drag mode range calculation and display
+   */
+  private handleMultiDragMode = (mousePos: MousePoint): boolean => {
     if (this.activeManager.currentActive === "drag" && this.selectedComponents.size > 1) {
-      /**
-       * Find min [top, left] max [bottom, right] in components
-       */
-      let top = Infinity;
-      let left = Infinity;
-      let right = -Infinity;
-      let bottom = -Infinity;
-
-      for (const component of this.components) {
-        const { x1: minimumX, y1: minimumY, x2: maximumX, y2: maximumY } = component.getPosition();
-
-        top = Math.min(top, minimumY);
-        left = Math.min(left, minimumX);
-        right = Math.max(right, maximumX);
-        bottom = Math.max(bottom, maximumY);
-      }
-
-      const multiRange = {
-        x1: left - this.multiRangePadding,
-        y1: top - this.multiRangePadding,
-        x2: right + this.multiRangePadding,
-        y2: bottom + this.multiRangePadding,
-      };
-
+      const multiRange = this.calculateMultiSelectBounds();
       this.multiSelectRange = Object.assign({}, multiRange);
       this.originMultiSelectRange = Object.assign({}, multiRange);
+      return true;
+    }
+    return false;
+  };
 
-      return;
+  /**
+   * Handle movement of selected components
+   */
+  private handleComponentMove = (e: MouseEvent, mousePos: MousePoint) => {
+    if (!this.tempPosition) return;
+
+    const delta = {
+      x: mousePos.x - this.tempPosition.x,
+      y: mousePos.y - this.tempPosition.y,
+    };
+
+    for (const component of this.selectedComponents) {
+      if (this.activeManager.currentActive === "move") {
+        component.moveComponent(e, delta);
+      }
     }
 
-    if (!this.tempPosition) return;
-    const { x: startX, y: startY } = this.tempPosition;
+    this.updateMultiSelectRange(delta);
+  };
 
-    for (const component of this.components) {
-      if (this.selectedComponents.has(component) && this.activeManager.currentActive === "move") {
-        const next = {
-          x: moveX - startX,
-          y: moveY - startY,
-        };
-        component.moveComponent(e, next);
-
-        if (this.multiSelectRange && this.originMultiSelectRange) {
-          this.multiSelectRange.x1 = this.originMultiSelectRange.x1 + next.x;
-          this.multiSelectRange.y1 = this.originMultiSelectRange.y1 + next.y;
-          this.multiSelectRange.x2 = this.originMultiSelectRange.x2 + next.x;
-          this.multiSelectRange.y2 = this.originMultiSelectRange.y2 + next.y;
-        }
+  /**
+   * Handle hover effects for all components
+   */
+  private handleHoverEffects = (e: MouseEvent, mouse: MousePoint) => {
+    // Handle multi-select range hover
+    if (this.multiSelectRange) {
+      const zone = this.getMultiSelectHoverZone(mouse);
+      if (zone !== "outside") {
+        const cursorStyle = this.getCursorStyleForZone(zone);
+        this.activeManager.setCursorStyle(cursorStyle);
+        return;
       }
+    }
 
-      component.hoverComponent(e, { x: moveX, y: moveY });
+    // Handle individual component hover
+    for (const component of this.components) {
+      if (component.isHover(e)) {
+        component.hoverComponent(e, mouse);
+        this.activeManager.setCursorStyle("pointer");
+        return;
+      }
+    }
+
+    // Default cursor when not hovering anything
+    this.activeManager.setCursorStyle("default");
+  };
+
+  /**
+   * Calculate bounds of selected components
+   */
+  private calculateMultiSelectBounds = (): DragRange => {
+    let top = Infinity;
+    let left = Infinity;
+    let right = -Infinity;
+    let bottom = -Infinity;
+
+    for (const component of this.selectedComponents) {
+      const { x1: minimumX, y1: minimumY, x2: maximumX, y2: maximumY } = component.getPosition();
+
+      top = Math.min(top, minimumY);
+      left = Math.min(left, minimumX);
+      right = Math.max(right, maximumX);
+      bottom = Math.max(bottom, maximumY);
+    }
+
+    return {
+      x1: left - this.multiRangePadding,
+      y1: top - this.multiRangePadding,
+      x2: right + this.multiRangePadding,
+      y2: bottom + this.multiRangePadding,
+    };
+  };
+
+  /**
+   * Update multi-select range position
+   */
+  private updateMultiSelectRange = (delta: { x: number; y: number }) => {
+    if (this.multiSelectRange && this.originMultiSelectRange) {
+      this.multiSelectRange.x1 = this.originMultiSelectRange.x1 + delta.x;
+      this.multiSelectRange.y1 = this.originMultiSelectRange.y1 + delta.y;
+      this.multiSelectRange.x2 = this.originMultiSelectRange.x2 + delta.x;
+      this.multiSelectRange.y2 = this.originMultiSelectRange.y2 + delta.y;
     }
   };
 
+  private onMouseMove = (e: MouseEvent) => {
+    const mousePos = MouseUtils.getMousePos(e, this.canvas);
+
+    // 1. Handle multi-drag mode
+    if (this.handleMultiDragMode(mousePos)) {
+      return;
+    }
+
+    // 2. Handle component movement
+    this.handleComponentMove(e, mousePos);
+
+    // 3. Handle hover effects
+    this.handleHoverEffects(e, mousePos);
+  };
+
   private onMouseDown = (e: MouseEvent) => {
-    /** If clicked multi drag range */
+    const mousePos = MouseUtils.getMousePos(e, this.canvas);
+
+    // Handle multi-select range interactions
     if (this.multiSelectRange) {
-      const { x: clickX, y: clickY } = MouseUtils.getMousePos(e, this.canvas);
-      if (
-        clickX >= this.multiSelectRange.x1 &&
-        clickX <= this.multiSelectRange.x2 &&
-        clickY >= this.multiSelectRange.y1 &&
-        clickY <= this.multiSelectRange.y2
-      ) {
-        this.tempPosition = { x: clickX, y: clickY };
-        this.activeManager.setMove();
-        this.activeManager.setCursorStyle("move");
+      const zone = this.getMultiSelectHoverZone(mousePos);
+
+      if (zone !== "outside") {
+        this.tempPosition = mousePos;
+
+        // Set appropriate mode based on zone
+        if (zone === "inside") {
+          this.activeManager.setMove();
+        } else {
+          this.activeManager.setMove();
+        }
+
         return;
       }
     }
@@ -206,17 +274,15 @@ export class ComponentManager {
     const component = this.findComponentWithPosition(e);
 
     if (component && this.selectedComponents.has(component)) {
-      this.tempPosition = MouseUtils.getMousePos(e, this.canvas);
+      this.tempPosition = mousePos;
       this.activeManager.setMove();
-      this.activeManager.setCursorStyle("move");
       return;
     }
 
     if (component) {
       this.selectComponent(component);
       this.activeManager.setMove();
-      this.activeManager.setCursorStyle("move");
-      this.tempPosition = MouseUtils.getMousePos(e, this.canvas);
+      this.tempPosition = mousePos;
     } else {
       this.initializeSelectedComponents();
     }
@@ -302,6 +368,80 @@ export class ComponentManager {
     this.ctx.stroke();
     this.ctx.closePath();
     this.ctx.restore();
+  };
+
+  /**
+   * Detect which zone of multi-select range the mouse is hovering
+   */
+  private getMultiSelectHoverZone = (mouse: MousePoint): "left" | "right" | "top" | "bottom" | "inside" | "outside" => {
+    if (!this.multiSelectRange) return "outside";
+
+    const { x1: left, x2: right, y1: top, y2: bottom } = this.multiSelectRange;
+
+    // Left edge
+    if (
+      mouse.x >= left - this.multiResizeRange &&
+      mouse.x <= left + this.multiResizeRange &&
+      mouse.y >= top &&
+      mouse.y <= bottom
+    ) {
+      return "left";
+    }
+
+    // Right edge
+    if (
+      mouse.x >= right - this.multiResizeRange &&
+      mouse.x <= right + this.multiResizeRange &&
+      mouse.y >= top &&
+      mouse.y <= bottom
+    ) {
+      return "right";
+    }
+
+    // Top edge
+    if (
+      mouse.x >= left &&
+      mouse.x <= right &&
+      mouse.y >= top - this.multiResizeRange &&
+      mouse.y <= top + this.multiResizeRange
+    ) {
+      return "top";
+    }
+
+    // Bottom edge
+    if (
+      mouse.x >= left &&
+      mouse.x <= right &&
+      mouse.y >= bottom - this.multiResizeRange &&
+      mouse.y <= bottom + this.multiResizeRange
+    ) {
+      return "bottom";
+    }
+
+    // Inside
+    if (mouse.x >= left && mouse.x <= right && mouse.y >= top && mouse.y <= bottom) {
+      return "inside";
+    }
+
+    return "outside";
+  };
+
+  /**
+   * Get cursor style based on hover zone
+   */
+  private getCursorStyleForZone = (zone: ReturnType<typeof this.getMultiSelectHoverZone>) => {
+    switch (zone) {
+      case "left":
+      case "right":
+        return "ew-resize";
+      case "top":
+      case "bottom":
+        return "ns-resize";
+      case "inside":
+        return "move";
+      default:
+        return "default";
+    }
   };
 
   private addEventListeners = () => {
