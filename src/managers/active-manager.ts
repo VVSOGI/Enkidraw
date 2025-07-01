@@ -1,3 +1,5 @@
+import { CursorStyle } from "../types";
+
 export class ActiveManager {
   public currentActive: "default" | "move" | "pointer" | "drag" = "default";
 
@@ -18,7 +20,7 @@ export class ActiveManager {
     this.currentActive = "default";
   };
 
-  public setCursorStyle = (style: "default" | "move" | "pointer") => {
+  public setCursorStyle = (style: CursorStyle) => {
     this.canvas.style.cursor = style;
   };
 
