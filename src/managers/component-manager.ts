@@ -235,6 +235,11 @@ export class ComponentManager {
     }
   };
 
+  /**
+   * Handle component resizing
+   */
+  private handleComponentResize = (e: MouseEvent, mousePos: MousePoint) => {};
+
   private onMouseMove = (e: MouseEvent) => {
     const mousePos = MouseUtils.getMousePos(e, this.canvas);
 
@@ -243,10 +248,16 @@ export class ComponentManager {
       return;
     }
 
-    // 2. Handle component movement
+    // 2. Handle component resizing
+    if (this.activeManager.currentActive === "resize") {
+      this.handleComponentResize(e, mousePos);
+      return;
+    }
+
+    // 3. Handle component movement
     this.handleComponentMove(e, mousePos);
 
-    // 3. Handle hover effects
+    // 4. Handle hover effects
     this.handleHoverEffects(e, mousePos);
   };
 
@@ -264,7 +275,8 @@ export class ComponentManager {
         if (zone === "inside") {
           this.activeManager.setMove();
         } else {
-          this.activeManager.setMove();
+          // Handle resize modes for edges
+          this.activeManager.setResize();
         }
 
         return;

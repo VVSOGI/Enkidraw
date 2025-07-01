@@ -1,7 +1,7 @@
 import { CursorStyle } from "../types";
 
 export class ActiveManager {
-  public currentActive: "default" | "move" | "pointer" | "drag" = "default";
+  public currentActive: "default" | "move" | "pointer" | "drag" | "resize" = "default";
 
   protected canvas: HTMLCanvasElement;
   protected ctx: CanvasRenderingContext2D;
@@ -30,6 +30,10 @@ export class ActiveManager {
 
   public setMove = () => {
     this.currentActive = "move";
+  };
+
+  public setResize = () => {
+    this.currentActive = "resize";
   };
 
   private activate = () => {
