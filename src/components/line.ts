@@ -3,7 +3,7 @@ import { MousePoint } from "../types";
 import { MathUtils, MouseUtils } from "../utils";
 import { BaseComponent, BasePosition } from "./base-component";
 
-interface LinePosition extends BasePosition {
+export interface LinePosition extends BasePosition {
   cx: number;
   cy: number;
 }
@@ -43,10 +43,20 @@ export class Line extends BaseComponent<LinePosition> {
   };
 
   isHover = (e: MouseEvent) => {
-    const mousePosition = MouseUtils.getMousePos(e, this.canvas);
-    const distance = MathUtils.getDistanceLineFromPoint(mousePosition, this.threshold, this.position);
-    if (distance <= this.threshold) {
-      return true;
+    if (this.type === "curve") {
+      const mousePosition = MouseUtils.getMousePos(e, this.canvas);
+      const distance = MathUtils.getDistanceCurveFromPoint(mousePosition, this.position);
+      if (distance <= this.threshold) {
+        return true;
+      }
+    }
+
+    if (this.type === "line") {
+      const mousePosition = MouseUtils.getMousePos(e, this.canvas);
+      const distance = MathUtils.getDistanceLineFromPoint(mousePosition, this.threshold, this.position);
+      if (distance <= this.threshold) {
+        return true;
+      }
     }
 
     return false;
@@ -54,7 +64,10 @@ export class Line extends BaseComponent<LinePosition> {
 
   isClicked = (e: MouseEvent) => {
     const mousePosition = MouseUtils.getMousePos(e, this.canvas);
-    const distance = MathUtils.getDistanceLineFromPoint(mousePosition, this.threshold, this.position);
+    const distance =
+      this.type === "curve"
+        ? MathUtils.getDistanceCurveFromPoint(mousePosition, this.position)
+        : MathUtils.getDistanceLineFromPoint(mousePosition, this.threshold, this.position);
     if (distance <= this.threshold) {
       const { point } = this.getMouseHitControlPoint(mousePosition);
       if (point > -1) {

@@ -1,7 +1,22 @@
-import { BasePosition } from "../components";
+import { BasePosition, LinePosition } from "../components";
 import { MousePoint } from "../types";
 
 export class MathUtils {
+  static getBezierCurve = (t: number, p0: number, p1: number, p2: number) => {
+    return (1 - t) * (1 - t) * p0 + 2 * (1 - t) * t * p1 + t * t * p2;
+  };
+
+  static getBezierControlPoint = (t: number, targetPoint: number, p0: number, p2: number) => {
+    if (t === 0.5) {
+      return 2 * targetPoint - 0.5 * (p0 + p2);
+    }
+
+    const oneMinusT = 1 - t;
+    const denominator = 2 * oneMinusT * t;
+
+    return (targetPoint - oneMinusT * oneMinusT * p0 - t * t * p2) / denominator;
+  };
+
   static getDistanceLineFromPoint = (mousePosition: MousePoint, threshold: number, position: BasePosition) => {
     const { x, y } = mousePosition;
     const top = Math.min(position.y1, position.y2) - threshold / 2;
@@ -20,14 +35,26 @@ export class MathUtils {
     return Math.abs(A * x + B * y + C) / Math.sqrt(A * A + B * B);
   };
 
-  static getBezierControlPoint = (t: number, targetPoint: number, p0: number, p2: number) => {
-    if (t === 0.5) {
-      return 2 * targetPoint - 0.5 * (p0 + p2);
+  static getDistanceCurveFromPoint = (mousePosition: MousePoint, position: LinePosition) => {
+    const { x, y } = mousePosition;
+
+    const controlX = MathUtils.getBezierControlPoint(0.5, position.cx, position.x1, position.x2);
+    const controlY = MathUtils.getBezierControlPoint(0.5, position.cy, position.y1, position.y2);
+
+    const dots = 100;
+    let minDistance = Infinity;
+
+    for (let i = 0; i <= dots; i++) {
+      const t = i / dots;
+      const curveX = MathUtils.getBezierCurve(t, position.x1, controlX, position.x2);
+      const curveY = MathUtils.getBezierCurve(t, position.y1, controlY, position.y2);
+      const distance = Math.sqrt(Math.pow(x - curveX, 2) + Math.pow(y - curveY, 2));
+
+      if (distance < minDistance) {
+        minDistance = distance;
+      }
     }
 
-    const oneMinusT = 1 - t;
-    const denominator = 2 * oneMinusT * t;
-
-    return (targetPoint - oneMinusT * oneMinusT * p0 - t * t * p2) / denominator;
+    return minDistance;
   };
 }
