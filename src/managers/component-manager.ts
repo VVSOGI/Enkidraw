@@ -120,7 +120,7 @@ export class ComponentManager {
         };
         component.moveComponent(e, next);
       }
-
+      //
       component.hoverComponent(e, { x: moveX, y: moveY });
     }
   };
