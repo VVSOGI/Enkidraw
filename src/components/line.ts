@@ -174,6 +174,10 @@ export class Line extends BaseComponent<LinePosition> {
     };
   };
 
+  multiDragMode = (mode: boolean) => {
+    this.isMultiDrag = mode;
+  };
+
   private getMouseHitControlPoint = (mousePosition: MousePoint) => {
     const { x: mouseX, y: mouseY } = mousePosition;
 
@@ -292,6 +296,10 @@ export class Line extends BaseComponent<LinePosition> {
 
     if (this.isActive) {
       this.dragEffect();
+    }
+
+    if (this.isMultiDrag) {
+      this.multiDragEffect();
     }
   };
 }
