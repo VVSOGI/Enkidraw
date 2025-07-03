@@ -1,6 +1,6 @@
 import { ActiveManager } from "../managers";
 import { v4 } from "uuid";
-import { MousePoint } from "../types";
+import { EdgeDirection, MousePoint } from "../types";
 
 export interface BasePosition {
   x1: number;
@@ -45,7 +45,7 @@ export abstract class BaseComponent<T extends BasePosition = BasePosition> {
   abstract isClicked(e: MouseEvent): boolean;
   abstract hoverComponent(e: MouseEvent, move: MousePoint): void;
   abstract moveComponent(e: MouseEvent, move: MousePoint): void;
-  abstract resizeComponent(newBounds: BasePosition): void;
+  abstract resizeComponent(mouseDistance: MousePoint, edgeDirection: EdgeDirection): void;
   abstract initialPosition(): void;
   abstract getPosition(): BasePosition;
   abstract draw(): void;

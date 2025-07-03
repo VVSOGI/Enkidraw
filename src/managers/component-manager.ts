@@ -1,5 +1,5 @@
 import { BaseComponent } from "../components";
-import { DragRange, MousePoint } from "../types";
+import { DragRange, EdgeDirection, MousePoint } from "../types";
 import { MouseUtils } from "../utils";
 import { ActiveManager } from "./active-manager";
 
@@ -54,6 +54,7 @@ export class ComponentManager {
 
   private selectedComponents: Set<BaseComponent>;
   private tempPosition: MousePoint | null = null;
+  private resizeEdge: EdgeDirection | null = null;
 
   private originMultiSelectRange: DragRange | null = null;
   private multiSelectRange: DragRange | null = null;
@@ -171,6 +172,24 @@ export class ComponentManager {
   };
 
   /**
+   * Handle component resizing
+   */
+  private handleComponentResize = (e: MouseEvent, mousePos: MousePoint) => {
+    if (!this.tempPosition || !this.resizeEdge) return;
+
+    const mouseDistance = {
+      x: mousePos.x - this.tempPosition.x,
+      y: mousePos.y - this.tempPosition.y,
+    };
+
+    console.log();
+
+    for (const component of this.selectedComponents) {
+      component.resizeComponent(mouseDistance, this.resizeEdge);
+    }
+  };
+
+  /**
    * Handle hover effects for all components
    */
   private handleHoverEffects = (e: MouseEvent, mouse: MousePoint) => {
@@ -235,11 +254,6 @@ export class ComponentManager {
     }
   };
 
-  /**
-   * Handle component resizing
-   */
-  private handleComponentResize = (e: MouseEvent, mousePos: MousePoint) => {};
-
   private onMouseMove = (e: MouseEvent) => {
     const mousePos = MouseUtils.getMousePos(e, this.canvas);
 
@@ -276,6 +290,7 @@ export class ComponentManager {
           this.activeManager.setMove();
         } else {
           // Handle resize modes for edges
+          this.resizeEdge = zone;
           this.activeManager.setResize();
         }
 
