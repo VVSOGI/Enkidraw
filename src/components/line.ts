@@ -160,6 +160,35 @@ export class Line extends BaseComponent<LinePosition> {
     };
   };
 
+  resizeComponent = (mouseDistance: MousePoint) => {
+    /** Line */
+    /**
+     * 좌우 리사이즈일 때
+     * totalX
+     */
+    const totalX = Math.abs(this.originPosition.x2 - this.originPosition.x1);
+
+    /**
+     * 상하 리사이즈일 때
+     */
+    /**
+     * 대각선 리사이즈일 때
+     */
+    /***************************** */
+    /***************************** */
+    /** Curve */
+    /**
+     * 좌우 리사이즈일 때
+     * totalX
+     */
+    /**
+     * 상하 리사이즈일 때
+     */
+    /**
+     * 대각선 리사이즈일 때
+     */
+  };
+
   getPosition = (): BasePosition => {
     if (this.type === "curve") {
       let left = Infinity;
@@ -210,8 +239,6 @@ export class Line extends BaseComponent<LinePosition> {
   multiDragMode = (mode: boolean) => {
     this.isMultiDrag = mode;
   };
-
-  resizeComponent = (newBounds: BasePosition) => {};
 
   multiDragEffect = () => {
     const { x1, y1, x2, y2 } = this.getPosition();
