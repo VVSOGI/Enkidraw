@@ -175,17 +175,15 @@ export class ComponentManager {
    * Handle component resizing
    */
   private handleComponentResize = (e: MouseEvent, mousePos: MousePoint) => {
-    if (!this.tempPosition || !this.resizeEdge) return;
+    if (!this.tempPosition || !this.resizeEdge || !this.originMultiSelectRange) return;
 
     const mouseDistance = {
       x: mousePos.x - this.tempPosition.x,
       y: mousePos.y - this.tempPosition.y,
     };
 
-    console.log();
-
     for (const component of this.selectedComponents) {
-      component.resizeComponent(mouseDistance, this.resizeEdge);
+      component.resizeComponent(mouseDistance, this.originMultiSelectRange, this.resizeEdge);
     }
   };
 
