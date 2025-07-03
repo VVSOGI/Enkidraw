@@ -1,4 +1,3 @@
-import { BaseComponent } from "../components";
 import { ActiveManager, ComponentManager } from "../managers";
 import { DragRange, MousePoint } from "../types/common";
 import { MouseUtils } from "../utils";

@@ -9,3 +9,5 @@ export interface DragRange {
   x2: number;
   y2: number;
 }
+
+export type EdgeDirection = "right" | "left" | "top" | "bottom";
