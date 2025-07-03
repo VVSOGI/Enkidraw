@@ -21,8 +21,7 @@ export abstract class BaseComponent<T extends BasePosition = BasePosition> {
   protected canvas: HTMLCanvasElement;
   protected ctx: CanvasRenderingContext2D;
   protected activeManager: ActiveManager;
-
-  private multiDragPadding = 5;
+  protected multiDragPadding = 5;
 
   constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, position: T, activeManager: ActiveManager) {
     this.canvas = canvas;
@@ -40,22 +39,7 @@ export abstract class BaseComponent<T extends BasePosition = BasePosition> {
     this.isActive = false;
   };
 
-  protected multiDragEffect = () => {
-    const { x1, y1, x2, y2 } = this.getPosition();
-
-    this.ctx.save();
-    this.ctx.beginPath();
-    this.ctx.moveTo(x1 - this.multiDragPadding, y1 - this.multiDragPadding);
-    this.ctx.lineTo(x2 + this.multiDragPadding, y1 - this.multiDragPadding);
-    this.ctx.lineTo(x2 + this.multiDragPadding, y2 + this.multiDragPadding);
-    this.ctx.lineTo(x1 - this.multiDragPadding, y2 + this.multiDragPadding);
-    this.ctx.lineTo(x1 - this.multiDragPadding, y1 - this.multiDragPadding);
-    this.ctx.strokeStyle = "rgba(105, 105, 230, 0.5)";
-    this.ctx.stroke();
-    this.ctx.closePath();
-    this.ctx.restore();
-  };
-
+  abstract multiDragEffect(): void;
   abstract multiDragMode(mode: boolean): void;
   abstract isHover(e: MouseEvent): boolean;
   abstract isClicked(e: MouseEvent): boolean;

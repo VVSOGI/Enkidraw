@@ -161,6 +161,39 @@ export class Line extends BaseComponent<LinePosition> {
   };
 
   getPosition = (): BasePosition => {
+    if (this.type === "curve") {
+      let left = Infinity;
+      let top = Infinity;
+      let right = -Infinity;
+      let bottom = -Infinity;
+
+      const dots = 100;
+      for (let i = 0; i <= dots; i++) {
+        const t = i / dots;
+
+        const controlX = MathUtils.getBezierControlPoint(0.5, this.position.cx, this.position.x1, this.position.x2);
+        const controlY = MathUtils.getBezierControlPoint(0.5, this.position.cy, this.position.y1, this.position.y2);
+
+        const x =
+          Math.pow(1 - t, 2) * this.position.x1 + 2 * (1 - t) * t * controlX + Math.pow(t, 2) * this.position.x2;
+
+        const y =
+          Math.pow(1 - t, 2) * this.position.y1 + 2 * (1 - t) * t * controlY + Math.pow(t, 2) * this.position.y2;
+
+        left = Math.min(left, x);
+        top = Math.min(top, y);
+        right = Math.max(right, x);
+        bottom = Math.max(bottom, y);
+      }
+
+      return {
+        x1: left,
+        y1: top,
+        x2: right,
+        y2: bottom,
+      };
+    }
+
     const left = Math.min(this.position.x1, this.position.x2);
     const top = Math.min(this.position.y1, this.position.y2);
     const right = Math.max(this.position.x1, this.position.x2);
@@ -179,6 +212,22 @@ export class Line extends BaseComponent<LinePosition> {
   };
 
   resizeComponent = (newBounds: BasePosition) => {};
+
+  multiDragEffect = () => {
+    const { x1, y1, x2, y2 } = this.getPosition();
+    1;
+    this.ctx.save();
+    this.ctx.beginPath();
+    this.ctx.moveTo(x1 - this.multiDragPadding, y1 - this.multiDragPadding);
+    this.ctx.lineTo(x2 + this.multiDragPadding, y1 - this.multiDragPadding);
+    this.ctx.lineTo(x2 + this.multiDragPadding, y2 + this.multiDragPadding);
+    this.ctx.lineTo(x1 - this.multiDragPadding, y2 + this.multiDragPadding);
+    this.ctx.lineTo(x1 - this.multiDragPadding, y1 - this.multiDragPadding);
+    this.ctx.strokeStyle = "rgba(105, 105, 230, 0.5)";
+    this.ctx.stroke();
+    this.ctx.closePath();
+    this.ctx.restore();
+  };
 
   private getMouseHitControlPoint = (mousePosition: MousePoint) => {
     const { x: mouseX, y: mouseY } = mousePosition;
