@@ -313,11 +313,11 @@ export class Line extends BaseComponent<LinePosition> {
     1;
     this.ctx.save();
     this.ctx.beginPath();
-    this.ctx.moveTo(x1 - this.multiDragPadding, y1 - this.multiDragPadding);
-    this.ctx.lineTo(x2 + this.multiDragPadding, y1 - this.multiDragPadding);
-    this.ctx.lineTo(x2 + this.multiDragPadding, y2 + this.multiDragPadding);
-    this.ctx.lineTo(x1 - this.multiDragPadding, y2 + this.multiDragPadding);
-    this.ctx.lineTo(x1 - this.multiDragPadding, y1 - this.multiDragPadding);
+    this.ctx.moveTo(x1, y1);
+    this.ctx.lineTo(x2, y1);
+    this.ctx.lineTo(x2, y2);
+    this.ctx.lineTo(x1, y2);
+    this.ctx.lineTo(x1, y1);
     this.ctx.strokeStyle = "rgba(105, 105, 230, 0.5)";
     this.ctx.stroke();
     this.ctx.closePath();
