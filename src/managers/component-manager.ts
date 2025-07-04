@@ -3,48 +3,6 @@ import { DragRange, EdgeDirection, MousePoint } from "../types";
 import { MouseUtils } from "../utils";
 import { ActiveManager } from "./active-manager";
 
-/**
- * Component Click Handling Logic (onMouseDown, onMouseMove, onMouseUp)
- *
- * 1. Clicking an Active Component (selectedComponents.has(component) === true)
- *    - onMouseDown:
- *      • Detect clicked component via findComponentWithPosition(e)
- *      • Verify component is already in selectedComponents
- *      • Store starting point: tempPosition = MouseUtils.getMousePos(e, canvas)
- *      • Activate move mode: activeManager.setMove()
- *    - onMouseMove:
- *      • Calculate difference between tempPosition and current mouse position
- *      • Update position in real-time: component.moveComponent(next)
- *    - onMouseUp:
- *      • Reset: tempPosition = null
- *      • Update originPosition: component.initialPosition()
- *
- * 2. Clicking an Inactive Component (component not in selectedComponents)
- *    - onMouseDown:
- *      • Detect clicked component via findComponentWithPosition(e)
- *      • Call selectComponent(component):
- *        - Clear existing selections: initializeSelectedComponents()
- *        - Add new component: selectedComponents.add(component)
- *        - Activate component: component.activate()
- *      • Store tempPosition and call activeManager.setMove()
- *    - Subsequent behavior same as scenario 1
- *
- * 3. Clicking Empty Space (findComponentWithPosition(e) === null)
- *    - onMouseDown:
- *      • Call initializeSelectedComponents():
- *        - Deactivate all selectedComponents: component.deactivate()
- *        - Reset selection: selectedComponents = new Set()
- *        - Restore default mode: activeManager.setDefault()
- *
- * 4. Clicking One of Multiple Selected Components
- *    - onMouseMove: All components in selectedComponents execute moveComponent() with same next value
- *    - All selected components move simultaneously by the same distance
- *
- * Key State Variables:
- * - selectedComponents: Set of currently selected components
- * - tempPosition: Mouse position at drag start point
- * - activeManager.currentActive: Current active mode ("move" | "default" | ...)
- */
 export class ComponentManager {
   public components: Set<BaseComponent>;
 
