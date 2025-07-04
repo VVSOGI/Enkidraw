@@ -175,12 +175,42 @@ export class ComponentManager {
    * Handle component resizing
    */
   private handleComponentResize = (e: MouseEvent, mousePos: MousePoint) => {
-    if (!this.tempPosition || !this.resizeEdge || !this.originMultiSelectRange) return;
+    if (!this.tempPosition || !this.resizeEdge || !this.originMultiSelectRange || !this.multiSelectRange) return;
 
     const mouseDistance = {
       x: mousePos.x - this.tempPosition.x,
       y: mousePos.y - this.tempPosition.y,
     };
+
+    if (this.resizeEdge === "left") {
+      this.multiSelectRange = {
+        ...this.multiSelectRange,
+        x1: this.originMultiSelectRange.x1 + mouseDistance.x,
+      };
+
+      if (this.multiSelectRange.x1 + this.multiRangePadding + 5 > this.multiSelectRange.x2) {
+        this.resizeEdge = "right";
+        this.tempPosition = Object.assign({}, mousePos);
+      }
+    }
+
+    if (this.resizeEdge === "right") {
+      this.multiSelectRange = {
+        ...this.multiSelectRange,
+        x2: this.originMultiSelectRange.x2 + mouseDistance.x,
+      };
+
+      if (this.multiSelectRange.x2 - this.multiRangePadding - 5 < this.multiSelectRange.x1) {
+        this.resizeEdge = "left";
+        this.tempPosition = Object.assign({}, mousePos);
+      }
+    }
+
+    if (this.resizeEdge === "top") {
+    }
+
+    if (this.resizeEdge === "bottom") {
+    }
 
     for (const component of this.selectedComponents) {
       component.resizeComponent(mouseDistance, this.originMultiSelectRange, this.resizeEdge);
