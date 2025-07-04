@@ -10,4 +10,12 @@ export interface DragRange {
   y2: number;
 }
 
-export type EdgeDirection = "right" | "left" | "top" | "bottom";
+export type EdgeDirection =
+  | "right"
+  | "left"
+  | "top"
+  | "bottom"
+  | "top-left"
+  | "top-right"
+  | "bottom-left"
+  | "bottom-right";
