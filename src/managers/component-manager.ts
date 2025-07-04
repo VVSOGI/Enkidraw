@@ -182,16 +182,16 @@ export class ComponentManager {
       y: mousePos.y - this.tempPosition.y,
     };
 
-    // 왼쪽 리사이즈
+    // Left resize
     if (this.resizeEdge === "left") {
       const newX1 = this.originMultiSelectRange.x1 + mouseDistance.x;
 
-      // 왼쪽 벽이 오른쪽 벽에 닿으면 오른쪽 리사이즈로 변경
+      // Switch to right resize when left wall touches right wall
       if (newX1 >= this.multiSelectRange.x2 - this.multiRangePadding) {
         this.resizeEdge = "right";
         this.tempPosition = mousePos;
 
-        // 현재 선택 영역의 크기를 유지
+        // Maintain current selection area size
         const currentWidth = this.multiSelectRange.x2 - this.multiSelectRange.x1;
 
         this.originMultiSelectRange = {
@@ -200,7 +200,7 @@ export class ComponentManager {
           x2: this.multiSelectRange.x2,
         };
 
-        // 모든 컴포넌트의 현재 위치를 originPosition으로 설정
+        // Set current position as originPosition for all components
         for (const component of this.selectedComponents) {
           component.initialPosition();
         }
@@ -213,16 +213,16 @@ export class ComponentManager {
       };
     }
 
-    // 오른쪽 리사이즈
+    // Right resize
     if (this.resizeEdge === "right") {
       const newX2 = this.originMultiSelectRange.x2 + mouseDistance.x;
 
-      // 오른쪽 벽이 왼쪽 벽에 닿으면 왼쪽 리사이즈로 변경
+      // Switch to left resize when right wall touches left wall
       if (newX2 <= this.multiSelectRange.x1 + this.multiRangePadding) {
         this.resizeEdge = "left";
         this.tempPosition = mousePos;
 
-        // 현재 선택 영역의 크기를 유지
+        // Maintain current selection area size
         const currentWidth = this.multiSelectRange.x2 - this.multiSelectRange.x1;
         this.originMultiSelectRange = {
           ...this.multiSelectRange,
@@ -230,7 +230,7 @@ export class ComponentManager {
           x2: this.multiSelectRange.x1 + currentWidth,
         };
 
-        // 모든 컴포넌트의 현재 위치를 originPosition으로 설정
+        // Set current position as originPosition for all components
         for (const component of this.selectedComponents) {
           component.initialPosition();
         }
@@ -243,16 +243,16 @@ export class ComponentManager {
       };
     }
 
-    // 위쪽 리사이즈
+    // Top resize
     if (this.resizeEdge === "top") {
       const newY1 = this.originMultiSelectRange.y1 + mouseDistance.y;
 
-      // 위쪽 벽이 아래쪽 벽에 닿으면 아래쪽 리사이즈로 변경
+      // Switch to bottom resize when top wall touches bottom wall
       if (newY1 >= this.multiSelectRange.y2 - this.multiRangePadding) {
         this.resizeEdge = "bottom";
         this.tempPosition = mousePos;
 
-        // 현재 선택 영역의 크기를 유지
+        // Maintain current selection area size
         const currentHeight = this.multiSelectRange.y2 - this.multiSelectRange.y1;
         this.originMultiSelectRange = {
           ...this.multiSelectRange,
@@ -260,7 +260,7 @@ export class ComponentManager {
           y2: this.multiSelectRange.y2,
         };
 
-        // 모든 컴포넌트의 현재 위치를 originPosition으로 설정
+        // Set current position as originPosition for all components
         for (const component of this.selectedComponents) {
           component.initialPosition();
         }
@@ -273,16 +273,16 @@ export class ComponentManager {
       };
     }
 
-    // 아래쪽 리사이즈
+    // Bottom resize
     if (this.resizeEdge === "bottom") {
       const newY2 = this.originMultiSelectRange.y2 + mouseDistance.y;
 
-      // 아래쪽 벽이 위쪽 벽에 닿으면 위쪽 리사이즈로 변경
+      // Switch to top resize when bottom wall touches top wall
       if (newY2 <= this.multiSelectRange.y1 + this.multiRangePadding) {
         this.resizeEdge = "top";
         this.tempPosition = mousePos;
 
-        // 현재 선택 영역의 크기를 유지
+        // Maintain current selection area size
         const currentHeight = this.multiSelectRange.y2 - this.multiSelectRange.y1;
         this.originMultiSelectRange = {
           ...this.multiSelectRange,
@@ -290,7 +290,7 @@ export class ComponentManager {
           y2: this.multiSelectRange.y1 + currentHeight,
         };
 
-        // 모든 컴포넌트의 현재 위치를 originPosition으로 설정
+        // Set current position as originPosition for all components
         for (const component of this.selectedComponents) {
           component.initialPosition();
         }
