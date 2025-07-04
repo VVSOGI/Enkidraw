@@ -175,12 +175,133 @@ export class ComponentManager {
    * Handle component resizing
    */
   private handleComponentResize = (e: MouseEvent, mousePos: MousePoint) => {
-    if (!this.tempPosition || !this.resizeEdge || !this.originMultiSelectRange) return;
+    if (!this.tempPosition || !this.resizeEdge || !this.originMultiSelectRange || !this.multiSelectRange) return;
 
     const mouseDistance = {
       x: mousePos.x - this.tempPosition.x,
       y: mousePos.y - this.tempPosition.y,
     };
+
+    // Left resize
+    if (this.resizeEdge === "left") {
+      const newX1 = this.originMultiSelectRange.x1 + mouseDistance.x;
+
+      // Switch to right resize when left wall touches right wall
+      if (newX1 >= this.multiSelectRange.x2 - this.multiRangePadding) {
+        this.resizeEdge = "right";
+        this.tempPosition = mousePos;
+
+        // Maintain current selection area size
+        const currentWidth = this.multiSelectRange.x2 - this.multiSelectRange.x1;
+
+        this.originMultiSelectRange = {
+          ...this.multiSelectRange,
+          x1: this.multiSelectRange.x2 - currentWidth,
+          x2: this.multiSelectRange.x2,
+        };
+
+        // Set current position as originPosition for all components
+        for (const component of this.selectedComponents) {
+          component.initialPosition();
+        }
+        return;
+      }
+
+      this.multiSelectRange = {
+        ...this.multiSelectRange,
+        x1: newX1,
+      };
+    }
+
+    // Right resize
+    if (this.resizeEdge === "right") {
+      const newX2 = this.originMultiSelectRange.x2 + mouseDistance.x;
+
+      // Switch to left resize when right wall touches left wall
+      if (newX2 <= this.multiSelectRange.x1 + this.multiRangePadding) {
+        this.resizeEdge = "left";
+        this.tempPosition = mousePos;
+
+        // Maintain current selection area size
+        const currentWidth = this.multiSelectRange.x2 - this.multiSelectRange.x1;
+        this.originMultiSelectRange = {
+          ...this.multiSelectRange,
+          x1: this.multiSelectRange.x1,
+          x2: this.multiSelectRange.x1 + currentWidth,
+        };
+
+        // Set current position as originPosition for all components
+        for (const component of this.selectedComponents) {
+          component.initialPosition();
+        }
+        return;
+      }
+
+      this.multiSelectRange = {
+        ...this.multiSelectRange,
+        x2: newX2,
+      };
+    }
+
+    // Top resize
+    if (this.resizeEdge === "top") {
+      const newY1 = this.originMultiSelectRange.y1 + mouseDistance.y;
+
+      // Switch to bottom resize when top wall touches bottom wall
+      if (newY1 >= this.multiSelectRange.y2 - this.multiRangePadding) {
+        this.resizeEdge = "bottom";
+        this.tempPosition = mousePos;
+
+        // Maintain current selection area size
+        const currentHeight = this.multiSelectRange.y2 - this.multiSelectRange.y1;
+        this.originMultiSelectRange = {
+          ...this.multiSelectRange,
+          y1: this.multiSelectRange.y2 - currentHeight,
+          y2: this.multiSelectRange.y2,
+        };
+
+        // Set current position as originPosition for all components
+        for (const component of this.selectedComponents) {
+          component.initialPosition();
+        }
+        return;
+      }
+
+      this.multiSelectRange = {
+        ...this.multiSelectRange,
+        y1: newY1,
+      };
+    }
+
+    // Bottom resize
+    if (this.resizeEdge === "bottom") {
+      const newY2 = this.originMultiSelectRange.y2 + mouseDistance.y;
+
+      // Switch to top resize when bottom wall touches top wall
+      if (newY2 <= this.multiSelectRange.y1 + this.multiRangePadding) {
+        this.resizeEdge = "top";
+        this.tempPosition = mousePos;
+
+        // Maintain current selection area size
+        const currentHeight = this.multiSelectRange.y2 - this.multiSelectRange.y1;
+        this.originMultiSelectRange = {
+          ...this.multiSelectRange,
+          y1: this.multiSelectRange.y1,
+          y2: this.multiSelectRange.y1 + currentHeight,
+        };
+
+        // Set current position as originPosition for all components
+        for (const component of this.selectedComponents) {
+          component.initialPosition();
+        }
+        return;
+      }
+
+      this.multiSelectRange = {
+        ...this.multiSelectRange,
+        y2: newY2,
+      };
+    }
 
     for (const component of this.selectedComponents) {
       component.resizeComponent(mouseDistance, this.originMultiSelectRange, this.resizeEdge);
