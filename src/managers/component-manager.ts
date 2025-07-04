@@ -182,34 +182,125 @@ export class ComponentManager {
       y: mousePos.y - this.tempPosition.y,
     };
 
+    // 왼쪽 리사이즈
     if (this.resizeEdge === "left") {
-      this.multiSelectRange = {
-        ...this.multiSelectRange,
-        x1: this.originMultiSelectRange.x1 + mouseDistance.x,
-      };
+      const newX1 = this.originMultiSelectRange.x1 + mouseDistance.x;
 
-      if (this.multiSelectRange.x1 + this.multiRangePadding + 5 > this.multiSelectRange.x2) {
+      // 왼쪽 벽이 오른쪽 벽에 닿으면 오른쪽 리사이즈로 변경
+      if (newX1 >= this.multiSelectRange.x2 - this.multiRangePadding) {
         this.resizeEdge = "right";
-        this.tempPosition = Object.assign({}, mousePos);
-      }
-    }
+        this.tempPosition = mousePos;
 
-    if (this.resizeEdge === "right") {
+        // 현재 선택 영역의 크기를 유지
+        const currentWidth = this.multiSelectRange.x2 - this.multiSelectRange.x1;
+
+        this.originMultiSelectRange = {
+          ...this.multiSelectRange,
+          x1: this.multiSelectRange.x2 - currentWidth,
+          x2: this.multiSelectRange.x2,
+        };
+
+        // 모든 컴포넌트의 현재 위치를 originPosition으로 설정
+        for (const component of this.selectedComponents) {
+          component.initialPosition();
+        }
+        return;
+      }
+
       this.multiSelectRange = {
         ...this.multiSelectRange,
-        x2: this.originMultiSelectRange.x2 + mouseDistance.x,
+        x1: newX1,
       };
+    }
 
-      if (this.multiSelectRange.x2 - this.multiRangePadding - 5 < this.multiSelectRange.x1) {
+    // 오른쪽 리사이즈
+    if (this.resizeEdge === "right") {
+      const newX2 = this.originMultiSelectRange.x2 + mouseDistance.x;
+
+      // 오른쪽 벽이 왼쪽 벽에 닿으면 왼쪽 리사이즈로 변경
+      if (newX2 <= this.multiSelectRange.x1 + this.multiRangePadding) {
         this.resizeEdge = "left";
-        this.tempPosition = Object.assign({}, mousePos);
+        this.tempPosition = mousePos;
+
+        // 현재 선택 영역의 크기를 유지
+        const currentWidth = this.multiSelectRange.x2 - this.multiSelectRange.x1;
+        this.originMultiSelectRange = {
+          ...this.multiSelectRange,
+          x1: this.multiSelectRange.x1,
+          x2: this.multiSelectRange.x1 + currentWidth,
+        };
+
+        // 모든 컴포넌트의 현재 위치를 originPosition으로 설정
+        for (const component of this.selectedComponents) {
+          component.initialPosition();
+        }
+        return;
       }
+
+      this.multiSelectRange = {
+        ...this.multiSelectRange,
+        x2: newX2,
+      };
     }
 
+    // 위쪽 리사이즈
     if (this.resizeEdge === "top") {
+      const newY1 = this.originMultiSelectRange.y1 + mouseDistance.y;
+
+      // 위쪽 벽이 아래쪽 벽에 닿으면 아래쪽 리사이즈로 변경
+      if (newY1 >= this.multiSelectRange.y2 - this.multiRangePadding) {
+        this.resizeEdge = "bottom";
+        this.tempPosition = mousePos;
+
+        // 현재 선택 영역의 크기를 유지
+        const currentHeight = this.multiSelectRange.y2 - this.multiSelectRange.y1;
+        this.originMultiSelectRange = {
+          ...this.multiSelectRange,
+          y1: this.multiSelectRange.y2 - currentHeight,
+          y2: this.multiSelectRange.y2,
+        };
+
+        // 모든 컴포넌트의 현재 위치를 originPosition으로 설정
+        for (const component of this.selectedComponents) {
+          component.initialPosition();
+        }
+        return;
+      }
+
+      this.multiSelectRange = {
+        ...this.multiSelectRange,
+        y1: newY1,
+      };
     }
 
+    // 아래쪽 리사이즈
     if (this.resizeEdge === "bottom") {
+      const newY2 = this.originMultiSelectRange.y2 + mouseDistance.y;
+
+      // 아래쪽 벽이 위쪽 벽에 닿으면 위쪽 리사이즈로 변경
+      if (newY2 <= this.multiSelectRange.y1 + this.multiRangePadding) {
+        this.resizeEdge = "top";
+        this.tempPosition = mousePos;
+
+        // 현재 선택 영역의 크기를 유지
+        const currentHeight = this.multiSelectRange.y2 - this.multiSelectRange.y1;
+        this.originMultiSelectRange = {
+          ...this.multiSelectRange,
+          y1: this.multiSelectRange.y1,
+          y2: this.multiSelectRange.y1 + currentHeight,
+        };
+
+        // 모든 컴포넌트의 현재 위치를 originPosition으로 설정
+        for (const component of this.selectedComponents) {
+          component.initialPosition();
+        }
+        return;
+      }
+
+      this.multiSelectRange = {
+        ...this.multiSelectRange,
+        y2: newY2,
+      };
     }
 
     for (const component of this.selectedComponents) {
