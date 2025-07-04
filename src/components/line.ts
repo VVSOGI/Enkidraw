@@ -162,56 +162,40 @@ export class Line extends BaseComponent<LinePosition> {
 
   resizeComponent = (mouseDistance: MousePoint, multiSelectRange: DragRange, edgeDirection: EdgeDirection) => {
     /** Line */
-    /**
-     * 좌우 리사이즈일 때
-     * totalX
-     */
     if (this.type === "line") {
-      if (edgeDirection === "left") {
-        const totalRangeX = Math.abs(multiSelectRange.x2 - multiSelectRange.x1);
-        const newTotalRangeX = totalRangeX - mouseDistance.x;
-        const scale = newTotalRangeX / totalRangeX;
-
-        // 선택 영역의 끝점(x2)을 기준으로 상대적 위치를 계산하여 스케일 적용
-        const relativeX1 = this.originPosition.x1 - multiSelectRange.x2;
-
-        this.position = {
-          ...this.position,
-          x1: multiSelectRange.x2 + relativeX1 * scale,
-          cx: (this.position.x2 + multiSelectRange.x2 + relativeX1 * scale) / 2,
-        };
-      }
-
       if (edgeDirection === "right") {
         const totalRangeX = Math.abs(multiSelectRange.x2 - multiSelectRange.x1);
         const newTotalRangeX = totalRangeX + mouseDistance.x;
         const scale = newTotalRangeX / totalRangeX;
 
+        // 선택 영역 시작점 기준으로 상대 위치 계산
         const relativeX1 = this.originPosition.x1 - multiSelectRange.x1;
         const relativeX2 = this.originPosition.x2 - multiSelectRange.x1;
 
+        // 모든 점들을 같은 비율로 조정
         this.position = {
           ...this.position,
           x1: multiSelectRange.x1 + relativeX1 * scale,
           x2: multiSelectRange.x1 + relativeX2 * scale,
-          cx: (multiSelectRange.x1 + relativeX1 * scale + multiSelectRange.x1 + relativeX2 * scale) / 2,
+          cx: multiSelectRange.x1 + ((relativeX1 + relativeX2) / 2) * scale,
         };
       }
 
-      if (edgeDirection === "top") {
-        const totalRangeY = Math.abs(multiSelectRange.y2 - multiSelectRange.y1);
-        const newTotalRangeY = totalRangeY - mouseDistance.y;
-        const scale = newTotalRangeY / totalRangeY;
+      if (edgeDirection === "left") {
+        const totalRangeX = Math.abs(multiSelectRange.x2 - multiSelectRange.x1);
+        const newTotalRangeX = totalRangeX - mouseDistance.x;
+        const scale = newTotalRangeX / totalRangeX;
 
-        // 선택 영역의 끝점(y2)을 기준으로 상대적 위치를 계산
-        const relativeY1 = this.originPosition.y1 - multiSelectRange.y2;
-        const relativeY2 = this.originPosition.y2 - multiSelectRange.y2;
+        // 선택 영역 끝점 기준으로 상대 위치 계산
+        const relativeX1 = this.originPosition.x1 - multiSelectRange.x2;
+        const relativeX2 = this.originPosition.x2 - multiSelectRange.x2;
 
+        // 모든 점들을 같은 비율로 조정
         this.position = {
           ...this.position,
-          y1: multiSelectRange.y2 + relativeY1 * scale,
-          y2: multiSelectRange.y2 + relativeY2 * scale,
-          cy: (multiSelectRange.y2 + relativeY1 * scale + multiSelectRange.y2 + relativeY2 * scale) / 2,
+          x1: multiSelectRange.x2 + relativeX1 * scale,
+          x2: multiSelectRange.x2 + relativeX2 * scale,
+          cx: multiSelectRange.x2 + ((relativeX1 + relativeX2) / 2) * scale,
         };
       }
 
@@ -220,15 +204,34 @@ export class Line extends BaseComponent<LinePosition> {
         const newTotalRangeY = totalRangeY + mouseDistance.y;
         const scale = newTotalRangeY / totalRangeY;
 
-        // 선택 영역의 끝점(y1)을 기준으로 상대적 위치를 계산
+        // 선택 영역 시작점 기준으로 상대 위치 계산
         const relativeY1 = this.originPosition.y1 - multiSelectRange.y1;
         const relativeY2 = this.originPosition.y2 - multiSelectRange.y1;
 
+        // 모든 점들을 같은 비율로 조정
         this.position = {
           ...this.position,
           y1: multiSelectRange.y1 + relativeY1 * scale,
           y2: multiSelectRange.y1 + relativeY2 * scale,
-          cy: (multiSelectRange.y1 + relativeY1 * scale + multiSelectRange.y1 + relativeY2 * scale) / 2,
+          cy: multiSelectRange.y1 + ((relativeY1 + relativeY2) / 2) * scale,
+        };
+      }
+
+      if (edgeDirection === "top") {
+        const totalRangeY = Math.abs(multiSelectRange.y2 - multiSelectRange.y1);
+        const newTotalRangeY = totalRangeY - mouseDistance.y;
+        const scale = newTotalRangeY / totalRangeY;
+
+        // 선택 영역 끝점 기준으로 상대 위치 계산
+        const relativeY1 = this.originPosition.y1 - multiSelectRange.y2;
+        const relativeY2 = this.originPosition.y2 - multiSelectRange.y2;
+
+        // 모든 점들을 같은 비율로 조정
+        this.position = {
+          ...this.position,
+          y1: multiSelectRange.y2 + relativeY1 * scale,
+          y2: multiSelectRange.y2 + relativeY2 * scale,
+          cy: multiSelectRange.y2 + ((relativeY1 + relativeY2) / 2) * scale,
         };
       }
     }
