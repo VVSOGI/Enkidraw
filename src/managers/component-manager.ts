@@ -3,48 +3,6 @@ import { DragRange, EdgeDirection, MousePoint } from "../types";
 import { MouseUtils } from "../utils";
 import { ActiveManager } from "./active-manager";
 
-/**
- * Component Click Handling Logic (onMouseDown, onMouseMove, onMouseUp)
- *
- * 1. Clicking an Active Component (selectedComponents.has(component) === true)
- *    - onMouseDown:
- *      • Detect clicked component via findComponentWithPosition(e)
- *      • Verify component is already in selectedComponents
- *      • Store starting point: tempPosition = MouseUtils.getMousePos(e, canvas)
- *      • Activate move mode: activeManager.setMove()
- *    - onMouseMove:
- *      • Calculate difference between tempPosition and current mouse position
- *      • Update position in real-time: component.moveComponent(next)
- *    - onMouseUp:
- *      • Reset: tempPosition = null
- *      • Update originPosition: component.initialPosition()
- *
- * 2. Clicking an Inactive Component (component not in selectedComponents)
- *    - onMouseDown:
- *      • Detect clicked component via findComponentWithPosition(e)
- *      • Call selectComponent(component):
- *        - Clear existing selections: initializeSelectedComponents()
- *        - Add new component: selectedComponents.add(component)
- *        - Activate component: component.activate()
- *      • Store tempPosition and call activeManager.setMove()
- *    - Subsequent behavior same as scenario 1
- *
- * 3. Clicking Empty Space (findComponentWithPosition(e) === null)
- *    - onMouseDown:
- *      • Call initializeSelectedComponents():
- *        - Deactivate all selectedComponents: component.deactivate()
- *        - Reset selection: selectedComponents = new Set()
- *        - Restore default mode: activeManager.setDefault()
- *
- * 4. Clicking One of Multiple Selected Components
- *    - onMouseMove: All components in selectedComponents execute moveComponent() with same next value
- *    - All selected components move simultaneously by the same distance
- *
- * Key State Variables:
- * - selectedComponents: Set of currently selected components
- * - tempPosition: Mouse position at drag start point
- * - activeManager.currentActive: Current active mode ("move" | "default" | ...)
- */
 export class ComponentManager {
   public components: Set<BaseComponent>;
 
@@ -303,6 +261,330 @@ export class ComponentManager {
       };
     }
 
+    // Top-left corner resize
+    if (this.resizeEdge === "top-left") {
+      const newX1 = this.originMultiSelectRange.x1 + mouseDistance.x;
+      const newY1 = this.originMultiSelectRange.y1 + mouseDistance.y;
+
+      // Switch to bottom-right when both walls touch
+      if (
+        newX1 >= this.multiSelectRange.x2 - this.multiRangePadding &&
+        newY1 >= this.multiSelectRange.y2 - this.multiRangePadding
+      ) {
+        this.resizeEdge = "bottom-right";
+        this.tempPosition = mousePos;
+
+        // Maintain current selection area size
+        const currentWidth = this.multiSelectRange.x2 - this.multiSelectRange.x1;
+        const currentHeight = this.multiSelectRange.y2 - this.multiSelectRange.y1;
+
+        this.originMultiSelectRange = {
+          ...this.multiSelectRange,
+          x1: this.multiSelectRange.x2 - currentWidth,
+          y1: this.multiSelectRange.y2 - currentHeight,
+          x2: this.multiSelectRange.x2,
+          y2: this.multiSelectRange.y2,
+        };
+
+        // Set current position as originPosition for all components
+        for (const component of this.selectedComponents) {
+          component.initialPosition();
+        }
+        return;
+      }
+
+      // Switch to top-right when left wall touches
+      if (newX1 >= this.multiSelectRange.x2 - this.multiRangePadding) {
+        this.resizeEdge = "top-right";
+        this.tempPosition = mousePos;
+
+        // Maintain current selection area size
+        const currentWidth = this.multiSelectRange.x2 - this.multiSelectRange.x1;
+
+        this.originMultiSelectRange = {
+          ...this.multiSelectRange,
+          x1: this.multiSelectRange.x2 - currentWidth,
+          x2: this.multiSelectRange.x2,
+        };
+
+        // Set current position as originPosition for all components
+        for (const component of this.selectedComponents) {
+          component.initialPosition();
+        }
+        return;
+      }
+
+      // Switch to bottom-left when top wall touches
+      if (newY1 >= this.multiSelectRange.y2 - this.multiRangePadding) {
+        this.resizeEdge = "bottom-left";
+        this.tempPosition = mousePos;
+
+        // Maintain current selection area size
+        const currentHeight = this.multiSelectRange.y2 - this.multiSelectRange.y1;
+
+        this.originMultiSelectRange = {
+          ...this.multiSelectRange,
+          y1: this.multiSelectRange.y2 - currentHeight,
+          y2: this.multiSelectRange.y2,
+        };
+
+        // Set current position as originPosition for all components
+        for (const component of this.selectedComponents) {
+          component.initialPosition();
+        }
+        return;
+      }
+
+      this.multiSelectRange = {
+        ...this.multiSelectRange,
+        x1: newX1,
+        y1: newY1,
+      };
+    }
+
+    // Top-right corner resize
+    if (this.resizeEdge === "top-right") {
+      const newX2 = this.originMultiSelectRange.x2 + mouseDistance.x;
+      const newY1 = this.originMultiSelectRange.y1 + mouseDistance.y;
+
+      // Switch to bottom-left when both walls touch
+      if (
+        newX2 <= this.multiSelectRange.x1 + this.multiRangePadding &&
+        newY1 >= this.multiSelectRange.y2 - this.multiRangePadding
+      ) {
+        this.resizeEdge = "bottom-left";
+        this.tempPosition = mousePos;
+
+        // Maintain current selection area size
+        const currentWidth = this.multiSelectRange.x2 - this.multiSelectRange.x1;
+        const currentHeight = this.multiSelectRange.y2 - this.multiSelectRange.y1;
+
+        this.originMultiSelectRange = {
+          ...this.multiSelectRange,
+          x1: this.multiSelectRange.x1,
+          y1: this.multiSelectRange.y2 - currentHeight,
+          x2: this.multiSelectRange.x1 + currentWidth,
+          y2: this.multiSelectRange.y2,
+        };
+
+        // Set current position as originPosition for all components
+        for (const component of this.selectedComponents) {
+          component.initialPosition();
+        }
+        return;
+      }
+
+      // Switch to top-left when right wall touches
+      if (newX2 <= this.multiSelectRange.x1 + this.multiRangePadding) {
+        this.resizeEdge = "top-left";
+        this.tempPosition = mousePos;
+
+        // Maintain current selection area size
+        const currentWidth = this.multiSelectRange.x2 - this.multiSelectRange.x1;
+
+        this.originMultiSelectRange = {
+          ...this.multiSelectRange,
+          x1: this.multiSelectRange.x1,
+          x2: this.multiSelectRange.x1 + currentWidth,
+        };
+
+        // Set current position as originPosition for all components
+        for (const component of this.selectedComponents) {
+          component.initialPosition();
+        }
+        return;
+      }
+
+      // Switch to bottom-right when top wall touches
+      if (newY1 >= this.multiSelectRange.y2 - this.multiRangePadding) {
+        this.resizeEdge = "bottom-right";
+        this.tempPosition = mousePos;
+
+        // Maintain current selection area size
+        const currentHeight = this.multiSelectRange.y2 - this.multiSelectRange.y1;
+
+        this.originMultiSelectRange = {
+          ...this.multiSelectRange,
+          y1: this.multiSelectRange.y2 - currentHeight,
+          y2: this.multiSelectRange.y2,
+        };
+
+        // Set current position as originPosition for all components
+        for (const component of this.selectedComponents) {
+          component.initialPosition();
+        }
+        return;
+      }
+
+      this.multiSelectRange = {
+        ...this.multiSelectRange,
+        x2: newX2,
+        y1: newY1,
+      };
+    }
+
+    // Bottom-left corner resize
+    if (this.resizeEdge === "bottom-left") {
+      const newX1 = this.originMultiSelectRange.x1 + mouseDistance.x;
+      const newY2 = this.originMultiSelectRange.y2 + mouseDistance.y;
+
+      // Switch to top-right when both walls touch
+      if (
+        newX1 >= this.multiSelectRange.x2 - this.multiRangePadding &&
+        newY2 <= this.multiSelectRange.y1 + this.multiRangePadding
+      ) {
+        this.resizeEdge = "top-right";
+        this.tempPosition = mousePos;
+
+        // Maintain current selection area size
+        const currentWidth = this.multiSelectRange.x2 - this.multiSelectRange.x1;
+        const currentHeight = this.multiSelectRange.y2 - this.multiSelectRange.y1;
+
+        this.originMultiSelectRange = {
+          ...this.multiSelectRange,
+          x1: this.multiSelectRange.x2 - currentWidth,
+          y1: this.multiSelectRange.y1,
+          x2: this.multiSelectRange.x2,
+          y2: this.multiSelectRange.y1 + currentHeight,
+        };
+
+        // Set current position as originPosition for all components
+        for (const component of this.selectedComponents) {
+          component.initialPosition();
+        }
+        return;
+      }
+
+      // Switch to bottom-right when left wall touches
+      if (newX1 >= this.multiSelectRange.x2 - this.multiRangePadding) {
+        this.resizeEdge = "bottom-right";
+        this.tempPosition = mousePos;
+
+        // Maintain current selection area size
+        const currentWidth = this.multiSelectRange.x2 - this.multiSelectRange.x1;
+
+        this.originMultiSelectRange = {
+          ...this.multiSelectRange,
+          x1: this.multiSelectRange.x2 - currentWidth,
+          x2: this.multiSelectRange.x2,
+        };
+
+        // Set current position as originPosition for all components
+        for (const component of this.selectedComponents) {
+          component.initialPosition();
+        }
+        return;
+      }
+
+      // Switch to top-left when bottom wall touches
+      if (newY2 <= this.multiSelectRange.y1 + this.multiRangePadding) {
+        this.resizeEdge = "top-left";
+        this.tempPosition = mousePos;
+
+        // Maintain current selection area size
+        const currentHeight = this.multiSelectRange.y2 - this.multiSelectRange.y1;
+
+        this.originMultiSelectRange = {
+          ...this.multiSelectRange,
+          y1: this.multiSelectRange.y1,
+          y2: this.multiSelectRange.y1 + currentHeight,
+        };
+
+        // Set current position as originPosition for all components
+        for (const component of this.selectedComponents) {
+          component.initialPosition();
+        }
+        return;
+      }
+
+      this.multiSelectRange = {
+        ...this.multiSelectRange,
+        x1: newX1,
+        y2: newY2,
+      };
+    }
+
+    // Bottom-right corner resize
+    if (this.resizeEdge === "bottom-right") {
+      const newX2 = this.originMultiSelectRange.x2 + mouseDistance.x;
+      const newY2 = this.originMultiSelectRange.y2 + mouseDistance.y;
+
+      // Switch to top-left when both walls touch
+      if (
+        newX2 <= this.multiSelectRange.x1 + this.multiRangePadding &&
+        newY2 <= this.multiSelectRange.y1 + this.multiRangePadding
+      ) {
+        this.resizeEdge = "top-left";
+        this.tempPosition = mousePos;
+
+        // Maintain current selection area size
+        const currentWidth = this.multiSelectRange.x2 - this.multiSelectRange.x1;
+        const currentHeight = this.multiSelectRange.y2 - this.multiSelectRange.y1;
+
+        this.originMultiSelectRange = {
+          ...this.multiSelectRange,
+          x1: this.multiSelectRange.x1,
+          y1: this.multiSelectRange.y1,
+          x2: this.multiSelectRange.x1 + currentWidth,
+          y2: this.multiSelectRange.y1 + currentHeight,
+        };
+
+        // Set current position as originPosition for all components
+        for (const component of this.selectedComponents) {
+          component.initialPosition();
+        }
+        return;
+      }
+
+      // Switch to bottom-left when right wall touches
+      if (newX2 <= this.multiSelectRange.x1 + this.multiRangePadding) {
+        this.resizeEdge = "bottom-left";
+        this.tempPosition = mousePos;
+
+        // Maintain current selection area size
+        const currentWidth = this.multiSelectRange.x2 - this.multiSelectRange.x1;
+
+        this.originMultiSelectRange = {
+          ...this.multiSelectRange,
+          x1: this.multiSelectRange.x1,
+          x2: this.multiSelectRange.x1 + currentWidth,
+        };
+
+        // Set current position as originPosition for all components
+        for (const component of this.selectedComponents) {
+          component.initialPosition();
+        }
+        return;
+      }
+
+      // Switch to top-right when bottom wall touches
+      if (newY2 <= this.multiSelectRange.y1 + this.multiRangePadding) {
+        this.resizeEdge = "top-right";
+        this.tempPosition = mousePos;
+
+        // Maintain current selection area size
+        const currentHeight = this.multiSelectRange.y2 - this.multiSelectRange.y1;
+
+        this.originMultiSelectRange = {
+          ...this.multiSelectRange,
+          y1: this.multiSelectRange.y1,
+          y2: this.multiSelectRange.y1 + currentHeight,
+        };
+
+        // Set current position as originPosition for all components
+        for (const component of this.selectedComponents) {
+          component.initialPosition();
+        }
+        return;
+      }
+
+      this.multiSelectRange = {
+        ...this.multiSelectRange,
+        x2: newX2,
+        y2: newY2,
+      };
+    }
+
     for (const component of this.selectedComponents) {
       component.resizeComponent(mouseDistance, this.originMultiSelectRange, this.resizeEdge);
     }
@@ -519,10 +801,50 @@ export class ComponentManager {
   /**
    * Detect which zone of multi-select range the mouse is hovering
    */
-  private getMultiSelectHoverZone = (mouse: MousePoint): "left" | "right" | "top" | "bottom" | "inside" | "outside" => {
+  private getMultiSelectHoverZone = (mouse: MousePoint): EdgeDirection | "inside" | "outside" => {
     if (!this.multiSelectRange) return "outside";
 
     const { x1: left, x2: right, y1: top, y2: bottom } = this.multiSelectRange;
+
+    // Top-left corner
+    if (
+      mouse.x >= left - this.multiResizeRange &&
+      mouse.x <= left + this.multiResizeRange &&
+      mouse.y >= top - this.multiResizeRange &&
+      mouse.y <= top + this.multiResizeRange
+    ) {
+      return "top-left";
+    }
+
+    // Top-right corner
+    if (
+      mouse.x >= right - this.multiResizeRange &&
+      mouse.x <= right + this.multiResizeRange &&
+      mouse.y >= top - this.multiResizeRange &&
+      mouse.y <= top + this.multiResizeRange
+    ) {
+      return "top-right";
+    }
+
+    // Bottom-left corner
+    if (
+      mouse.x >= left - this.multiResizeRange &&
+      mouse.x <= left + this.multiResizeRange &&
+      mouse.y >= bottom - this.multiResizeRange &&
+      mouse.y <= bottom + this.multiResizeRange
+    ) {
+      return "bottom-left";
+    }
+
+    // Bottom-right corner
+    if (
+      mouse.x >= right - this.multiResizeRange &&
+      mouse.x <= right + this.multiResizeRange &&
+      mouse.y >= bottom - this.multiResizeRange &&
+      mouse.y <= bottom + this.multiResizeRange
+    ) {
+      return "bottom-right";
+    }
 
     // Left edge
     if (
@@ -583,6 +905,12 @@ export class ComponentManager {
       case "top":
       case "bottom":
         return "ns-resize";
+      case "top-left":
+      case "bottom-right":
+        return "nw-resize";
+      case "top-right":
+      case "bottom-left":
+        return "ne-resize";
       case "inside":
         return "move";
       default:
