@@ -5,7 +5,6 @@ export class SelectionManager {
   private selectedComponents: Set<BaseComponent>;
   private multiSelectRange: DragRange | null = null;
   private originMultiSelectRange: DragRange | null = null;
-  private multiRangePadding = 10;
   private multiResizeRange = 5;
 
   constructor() {
@@ -238,10 +237,10 @@ export class SelectionManager {
     }
 
     return {
-      x1: left - this.multiRangePadding,
-      y1: top - this.multiRangePadding,
-      x2: right + this.multiRangePadding,
-      y2: bottom + this.multiRangePadding,
+      x1: left,
+      y1: top,
+      x2: right,
+      y2: bottom,
     };
   }
 }
