@@ -95,6 +95,10 @@ export class ComponentInteractionManager {
     this.tempPosition = null;
     this.selectionManager.resetOriginMultiSelectRange();
 
+    if (this.activeManager.currentActive === "resize") {
+      this.selectionManager.updateMultiSelectMode();
+    }
+
     for (const component of this.components) {
       component.initialPosition();
     }
@@ -144,46 +148,62 @@ export class ComponentInteractionManager {
       y: mousePos.y - this.tempPosition.y,
     };
 
-    const multiRangePadding = 10;
-
     // Handle resize logic for each edge/corner
-    const result = this.handleResizeLogic(
-      mousePos,
-      mouseDistance,
-      currentMultiSelectRange,
-      currentOriginMultiSelectRange,
-      multiRangePadding
-    );
+    this.handleResizeLogic(mouseDistance, currentMultiSelectRange, currentOriginMultiSelectRange);
 
     // Apply changes back to SelectionManager
     this.selectionManager.setMultiSelectRange(currentMultiSelectRange);
-    if (result.newOriginRange) {
-      this.selectionManager.setOriginMultiSelectRange(result.newOriginRange);
-    }
 
     // Update components only if resize edge didn't change
-    if (!result.resizeEdgeChanged) {
-      const selectedComponents = this.selectionManager.getSelectedComponents();
-      for (const component of selectedComponents) {
-        component.resizeComponent(mouseDistance, currentOriginMultiSelectRange, this.resizeEdge);
-      }
+    const selectedComponents = this.selectionManager.getSelectedComponents();
+    for (const component of selectedComponents) {
+      component.resizeComponent(mouseDistance, currentOriginMultiSelectRange, this.resizeEdge);
     }
   }
 
   private handleResizeLogic(
-    mousePos: MousePoint,
     mouseDistance: { x: number; y: number },
     multiSelectRange: DragRange,
-    originMultiSelectRange: DragRange,
-    multiRangePadding: number
-  ): { resizeEdgeChanged: boolean; newOriginRange?: DragRange } {
-    return { resizeEdgeChanged: false };
-  }
+    originMultiSelectRange: DragRange
+  ) {
+    if (this.resizeEdge === "left") {
+      const newX1 = originMultiSelectRange.x1 + mouseDistance.x;
+      multiSelectRange.x1 = newX1;
+    }
 
-  private resetComponentPositions(): void {
-    const selectedComponents = this.selectionManager.getSelectedComponents();
-    for (const component of selectedComponents) {
-      component.initialPosition();
+    if (this.resizeEdge === "right") {
+      const newX2 = originMultiSelectRange.x2 + mouseDistance.x;
+      multiSelectRange.x2 = newX2;
+    }
+
+    if (this.resizeEdge === "top") {
+      const newY1 = originMultiSelectRange.y1 + mouseDistance.y;
+      multiSelectRange.y1 = newY1;
+    }
+
+    if (this.resizeEdge === "bottom") {
+      const newY2 = originMultiSelectRange.y2 + mouseDistance.y;
+      multiSelectRange.y2 = newY2;
+    }
+
+    if (this.resizeEdge === "top-left") {
+      multiSelectRange.x1 = originMultiSelectRange.x1 + mouseDistance.x;
+      multiSelectRange.y1 = originMultiSelectRange.y1 + mouseDistance.y;
+    }
+
+    if (this.resizeEdge === "top-right") {
+      multiSelectRange.x2 = originMultiSelectRange.x2 + mouseDistance.x;
+      multiSelectRange.y1 = originMultiSelectRange.y1 + mouseDistance.y;
+    }
+
+    if (this.resizeEdge === "bottom-left") {
+      multiSelectRange.x1 = originMultiSelectRange.x1 + mouseDistance.x;
+      multiSelectRange.y2 = originMultiSelectRange.y2 + mouseDistance.y;
+    }
+
+    if (this.resizeEdge === "bottom-right") {
+      multiSelectRange.x2 = originMultiSelectRange.x2 + mouseDistance.x;
+      multiSelectRange.y2 = originMultiSelectRange.y2 + mouseDistance.y;
     }
   }
 
