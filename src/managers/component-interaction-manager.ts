@@ -147,7 +147,7 @@ export class ComponentInteractionManager {
     const multiRangePadding = 10;
 
     // Handle resize logic for each edge/corner
-    const result = this.handleResizeLogicSync(
+    const result = this.handleResizeLogic(
       mousePos,
       mouseDistance,
       currentMultiSelectRange,
@@ -170,135 +170,13 @@ export class ComponentInteractionManager {
     }
   }
 
-  private handleResizeLogicSync(
+  private handleResizeLogic(
     mousePos: MousePoint,
     mouseDistance: { x: number; y: number },
     multiSelectRange: DragRange,
     originMultiSelectRange: DragRange,
     multiRangePadding: number
   ): { resizeEdgeChanged: boolean; newOriginRange?: DragRange } {
-    // Left resize
-    if (this.resizeEdge === "left") {
-      const newX1 = originMultiSelectRange.x1 + mouseDistance.x;
-
-      // Switch to right resize when left wall touches right wall
-      if (newX1 >= multiSelectRange.x2 - multiRangePadding) {
-        this.resizeEdge = "right";
-        this.tempPosition = mousePos;
-
-        // Maintain current selection area size
-        const currentWidth = multiSelectRange.x2 - multiSelectRange.x1;
-
-        const newOriginRange = {
-          ...multiSelectRange,
-          x1: multiSelectRange.x2 - currentWidth,
-          x2: multiSelectRange.x2,
-        };
-
-        this.resetComponentPositions();
-
-        return { resizeEdgeChanged: true, newOriginRange };
-      }
-
-      multiSelectRange.x1 = newX1;
-    }
-
-    // Right resize
-    if (this.resizeEdge === "right") {
-      const newX2 = originMultiSelectRange.x2 + mouseDistance.x;
-
-      // Switch to left resize when right wall touches left wall
-      if (newX2 <= multiSelectRange.x1 + multiRangePadding) {
-        this.resizeEdge = "left";
-        this.tempPosition = mousePos;
-
-        // Maintain current selection area size
-        const currentWidth = multiSelectRange.x2 - multiSelectRange.x1;
-
-        const newOriginRange = {
-          ...multiSelectRange,
-          x1: multiSelectRange.x1,
-          x2: multiSelectRange.x1 + currentWidth,
-        };
-
-        this.resetComponentPositions();
-        return { resizeEdgeChanged: true, newOriginRange };
-      }
-
-      multiSelectRange.x2 = newX2;
-    }
-
-    // Top resize
-    if (this.resizeEdge === "top") {
-      const newY1 = originMultiSelectRange.y1 + mouseDistance.y;
-
-      // Switch to bottom resize when top wall touches bottom wall
-      if (newY1 >= multiSelectRange.y2 - multiRangePadding) {
-        this.resizeEdge = "bottom";
-        this.tempPosition = mousePos;
-
-        // Maintain current selection area size
-        const currentHeight = multiSelectRange.y2 - multiSelectRange.y1;
-
-        const newOriginRange = {
-          ...multiSelectRange,
-          y1: multiSelectRange.y2 - currentHeight,
-          y2: multiSelectRange.y2,
-        };
-
-        this.resetComponentPositions();
-        return { resizeEdgeChanged: true, newOriginRange };
-      }
-
-      multiSelectRange.y1 = newY1;
-    }
-
-    // Bottom resize
-    if (this.resizeEdge === "bottom") {
-      const newY2 = originMultiSelectRange.y2 + mouseDistance.y;
-
-      // Switch to top resize when bottom wall touches top wall
-      if (newY2 <= multiSelectRange.y1 + multiRangePadding) {
-        this.resizeEdge = "top";
-        this.tempPosition = mousePos;
-
-        // Maintain current selection area size
-        const currentHeight = multiSelectRange.y2 - multiSelectRange.y1;
-
-        const newOriginRange = {
-          ...multiSelectRange,
-          y1: multiSelectRange.y1,
-          y2: multiSelectRange.y1 + currentHeight,
-        };
-
-        this.resetComponentPositions();
-        return { resizeEdgeChanged: true, newOriginRange };
-      }
-
-      multiSelectRange.y2 = newY2;
-    }
-
-    // Handle corner resize cases (simplified)
-    if (this.resizeEdge === "top-left") {
-      multiSelectRange.x1 = originMultiSelectRange.x1 + mouseDistance.x;
-      multiSelectRange.y1 = originMultiSelectRange.y1 + mouseDistance.y;
-    }
-
-    if (this.resizeEdge === "top-right") {
-      multiSelectRange.x2 = originMultiSelectRange.x2 + mouseDistance.x;
-      multiSelectRange.y1 = originMultiSelectRange.y1 + mouseDistance.y;
-    }
-
-    if (this.resizeEdge === "bottom-left") {
-      multiSelectRange.x1 = originMultiSelectRange.x1 + mouseDistance.x;
-      multiSelectRange.y2 = originMultiSelectRange.y2 + mouseDistance.y;
-    }
-
-    if (this.resizeEdge === "bottom-right") {
-      multiSelectRange.x2 = originMultiSelectRange.x2 + mouseDistance.x;
-      multiSelectRange.y2 = originMultiSelectRange.y2 + mouseDistance.y;
-    }
-
     return { resizeEdgeChanged: false };
   }
 
