@@ -379,6 +379,63 @@ export class Line extends BaseComponent<LinePosition> {
           cx: multiSelectRange.x2 + relativeCx * scale,
         };
       }
+
+      if (edgeDirection === "right") {
+        const totalRangeX = Math.abs(multiSelectRange.x2 - multiSelectRange.x1);
+        const newTotalRangeX = totalRangeX + mouseDistance.x;
+        const scale = newTotalRangeX / totalRangeX;
+
+        // Calculate relative positions based on start point of selection area
+        const relativeX1 = this.originPosition.x1 - multiSelectRange.x1;
+        const relativeX2 = this.originPosition.x2 - multiSelectRange.x1;
+        const relativeCx = this.originPosition.cx - multiSelectRange.x1;
+
+        // Adjust all points with the same scale
+        this.position = {
+          ...this.position,
+          x1: multiSelectRange.x1 + relativeX1 * scale,
+          x2: multiSelectRange.x1 + relativeX2 * scale,
+          cx: multiSelectRange.x1 + relativeCx * scale,
+        };
+      }
+
+      if (edgeDirection === "top") {
+        const totalRangeY = Math.abs(multiSelectRange.y2 - multiSelectRange.y1);
+        const newTotalRangeY = totalRangeY - mouseDistance.y;
+        const scale = newTotalRangeY / totalRangeY;
+
+        // Calculate relative positions based on end point of selection area
+        const relativeY1 = this.originPosition.y1 - multiSelectRange.y2;
+        const relativeY2 = this.originPosition.y2 - multiSelectRange.y2;
+        const relativeCy = this.originPosition.cy - multiSelectRange.y2;
+
+        // Adjust all points with the same scale
+        this.position = {
+          ...this.position,
+          y1: multiSelectRange.y2 + relativeY1 * scale,
+          y2: multiSelectRange.y2 + relativeY2 * scale,
+          cy: multiSelectRange.y2 + relativeCy * scale,
+        };
+      }
+
+      if (edgeDirection === "bottom") {
+        const totalRangeY = Math.abs(multiSelectRange.y2 - multiSelectRange.y1);
+        const newTotalRangeY = totalRangeY + mouseDistance.y;
+        const scale = newTotalRangeY / totalRangeY;
+
+        // Calculate relative positions based on start point of selection area
+        const relativeY1 = this.originPosition.y1 - multiSelectRange.y1;
+        const relativeY2 = this.originPosition.y2 - multiSelectRange.y1;
+        const relativeCy = this.originPosition.cy - multiSelectRange.y1;
+
+        // Adjust all points with the same scale
+        this.position = {
+          ...this.position,
+          y1: multiSelectRange.y1 + relativeY1 * scale,
+          y2: multiSelectRange.y1 + relativeY2 * scale,
+          cy: multiSelectRange.y1 + relativeCy * scale,
+        };
+      }
     }
 
     /**
