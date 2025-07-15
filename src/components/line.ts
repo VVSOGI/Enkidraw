@@ -436,27 +436,70 @@ export class Line extends BaseComponent<LinePosition> {
           cy: multiSelectRange.y1 + relativeCy * scale,
         };
       }
-    }
 
-    /**
-     * Vertical resize
-     */
-    /**
-     * Diagonal resize
-     */
-    /***************************** */
-    /***************************** */
-    /** Curve */
-    /**
-     * Horizontal resize
-     * totalX
-     */
-    /**
-     * Vertical resize
-     */
-    /**
-     * Diagonal resize
-     */
+      if (edgeDirection === "top-left") {
+        // Horizontal scale
+        const totalRangeX = Math.abs(multiSelectRange.x2 - multiSelectRange.x1);
+        const newTotalRangeX = totalRangeX - mouseDistance.x;
+        const scaleX = newTotalRangeX / totalRangeX;
+
+        // Vertical scale
+        const totalRangeY = Math.abs(multiSelectRange.y2 - multiSelectRange.y1);
+        const newTotalRangeY = totalRangeY - mouseDistance.y;
+        const scaleY = newTotalRangeY / totalRangeY;
+
+        // Calculate relative positions based on bottom-right corner
+        const relativeX1 = this.originPosition.x1 - multiSelectRange.x2;
+        const relativeX2 = this.originPosition.x2 - multiSelectRange.x2;
+        const relativeCx = this.originPosition.cx - multiSelectRange.x2;
+        const relativeY1 = this.originPosition.y1 - multiSelectRange.y2;
+        const relativeY2 = this.originPosition.y2 - multiSelectRange.y2;
+        const relativeCy = this.originPosition.cy - multiSelectRange.y2;
+
+        // Adjust all points with both scales
+        this.position = {
+          ...this.position,
+          x1: multiSelectRange.x2 + relativeX1 * scaleX,
+          x2: multiSelectRange.x2 + relativeX2 * scaleX,
+          cx: multiSelectRange.x2 + relativeCx * scaleX,
+          y1: multiSelectRange.y2 + relativeY1 * scaleY,
+          y2: multiSelectRange.y2 + relativeY2 * scaleY,
+          cy: multiSelectRange.y2 + relativeCy * scaleY,
+        };
+      }
+
+      // Top-right corner resize
+      if (edgeDirection === "top-right") {
+        // Horizontal scale
+        const totalRangeX = Math.abs(multiSelectRange.x2 - multiSelectRange.x1);
+        const newTotalRangeX = totalRangeX + mouseDistance.x;
+        const scaleX = newTotalRangeX / totalRangeX;
+
+        // Vertical scale
+        const totalRangeY = Math.abs(multiSelectRange.y2 - multiSelectRange.y1);
+        const newTotalRangeY = totalRangeY - mouseDistance.y;
+        const scaleY = newTotalRangeY / totalRangeY;
+
+        // Calculate relative positions
+        const relativeX1 = this.originPosition.x1 - multiSelectRange.x1;
+        const relativeX2 = this.originPosition.x2 - multiSelectRange.x1;
+        const relativeCx = this.originPosition.cx - multiSelectRange.x1;
+        const relativeY1 = this.originPosition.y1 - multiSelectRange.y2;
+        const relativeY2 = this.originPosition.y2 - multiSelectRange.y2;
+        const relativeCy = this.originPosition.cy - multiSelectRange.y2;
+
+        // Adjust all points with both scales
+        this.position = {
+          ...this.position,
+          x1: multiSelectRange.x1 + relativeX1 * scaleX,
+          x2: multiSelectRange.x1 + relativeX2 * scaleX,
+          cx: multiSelectRange.x1 + relativeCx * scaleX,
+          y1: multiSelectRange.y2 + relativeY1 * scaleY,
+          y2: multiSelectRange.y2 + relativeY2 * scaleY,
+          cy: multiSelectRange.y2 + relativeCy * scaleY,
+        };
+      }
+    }
   };
 
   getPosition = (): BasePosition => {
