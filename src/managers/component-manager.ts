@@ -24,7 +24,8 @@ export class ComponentManager {
       canvas,
       activeManager,
       this.selectionManager,
-      this.components
+      this.components,
+      this.removeSelected
     );
   }
 
@@ -42,6 +43,18 @@ export class ComponentManager {
 
   public add = (component: BaseComponent) => {
     this.components.add(component);
+  };
+
+  public remove = (component: BaseComponent) => {
+    this.components.delete(component);
+  };
+
+  public removeSelected = () => {
+    const selectedComponents = this.selectionManager.getSelectedComponents();
+    for (const component of selectedComponents) {
+      this.components.delete(component);
+    }
+    this.selectionManager.clearSelection();
   };
 
   public getComponents = () => {
