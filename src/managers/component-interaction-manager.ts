@@ -9,6 +9,7 @@ export class ComponentInteractionManager {
   private activeManager: ActiveManager;
   private selectionManager: SelectionManager;
   private components: Set<BaseComponent>;
+  private removeSelectedComponents: () => void;
 
   private tempPosition: MousePoint | null = null;
   private resizeEdge: EdgeDirection | null = null;
@@ -17,12 +18,14 @@ export class ComponentInteractionManager {
     canvas: HTMLCanvasElement,
     activeManager: ActiveManager,
     selectionManager: SelectionManager,
-    components: Set<BaseComponent>
+    components: Set<BaseComponent>,
+    removeSelectedComponents: () => void
   ) {
     this.canvas = canvas;
     this.activeManager = activeManager;
     this.selectionManager = selectionManager;
     this.components = components;
+    this.removeSelectedComponents = removeSelectedComponents;
     this.addEventListeners();
   }
 
@@ -241,15 +244,29 @@ export class ComponentInteractionManager {
     return null;
   }
 
+  private onKeyDown = (e: KeyboardEvent) => {
+    if (e.key === "Backspace" || e.key === "Delete") {
+      e.preventDefault();
+      const selectedComponents = this.selectionManager.getSelectedComponents();
+
+      if (selectedComponents.size > 0) {
+        this.removeSelectedComponents();
+      }
+    }
+  };
+
   private addEventListeners(): void {
     this.canvas.addEventListener("mousedown", this.onMouseDown);
     this.canvas.addEventListener("mousemove", this.onMouseMove);
     this.canvas.addEventListener("mouseup", this.onMouseUp);
+
+    document.addEventListener("keydown", this.onKeyDown);
   }
 
   public removeEventListeners(): void {
     this.canvas.removeEventListener("mousedown", this.onMouseDown);
     this.canvas.removeEventListener("mousemove", this.onMouseMove);
     this.canvas.removeEventListener("mouseup", this.onMouseUp);
+    document.removeEventListener("keydown", this.onKeyDown);
   }
 }
