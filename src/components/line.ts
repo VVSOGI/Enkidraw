@@ -360,6 +360,27 @@ export class Line extends BaseComponent<LinePosition> {
       }
     }
 
+    if (this.type === "curve") {
+      if (edgeDirection === "left") {
+        const totalRangeX = Math.abs(multiSelectRange.x2 - multiSelectRange.x1);
+        const newTotalRangeX = totalRangeX - mouseDistance.x;
+        const scale = newTotalRangeX / totalRangeX;
+
+        // Calculate relative positions based on end point of selection area
+        const relativeX1 = this.originPosition.x1 - multiSelectRange.x2;
+        const relativeX2 = this.originPosition.x2 - multiSelectRange.x2;
+        const relativeCx = this.originPosition.cx - multiSelectRange.x2;
+
+        // Adjust all points with the same scale
+        this.position = {
+          ...this.position,
+          x1: multiSelectRange.x2 + relativeX1 * scale,
+          x2: multiSelectRange.x2 + relativeX2 * scale,
+          cx: multiSelectRange.x2 + relativeCx * scale,
+        };
+      }
+    }
+
     /**
      * Vertical resize
      */
