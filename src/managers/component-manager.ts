@@ -21,8 +21,8 @@ export class ComponentManager {
 
     this.selectionManager = new SelectionManager();
     this.componentInteractionManager = new ComponentInteractionManager(
-      canvas,
-      activeManager,
+      this.canvas,
+      this.activeManager,
       this.selectionManager,
       this.components,
       this.removeSelected
@@ -126,9 +126,5 @@ export class ComponentManager {
     this.ctx.stroke();
     this.ctx.closePath();
     this.ctx.restore();
-  };
-
-  public destroy = () => {
-    this.componentInteractionManager.removeEventListeners();
   };
 }
