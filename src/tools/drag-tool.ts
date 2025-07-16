@@ -47,6 +47,8 @@ export class DragTool extends BaseTool {
     this.activeManager.setDefault();
   };
 
+  onKeyDown = (e: KeyboardEvent) => {};
+
   draw = (): DragRange | null => {
     if (!this.initPoint || !this.movePoint) return null;
 

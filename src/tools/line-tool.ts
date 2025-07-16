@@ -19,6 +19,12 @@ export class LineTool extends BaseTool {
     super(canvas, ctx, componentManager, activeManager, deleteCurrentTool);
   }
 
+  private reset = () => {
+    this.isDrawing = false;
+    this.initPoint = null;
+    this.movePoint = null;
+  };
+
   onMouseDown = (e: MouseEvent) => {
     const position = MouseUtils.getMousePos(e, this.canvas);
 
@@ -43,9 +49,16 @@ export class LineTool extends BaseTool {
 
     this.appendComponent(this.initPoint, this.movePoint);
     this.deactivate();
-    this.isDrawing = false;
-    this.initPoint = null;
-    this.movePoint = null;
+    this.reset();
+  };
+
+  onKeyDown = (e: KeyboardEvent) => {
+    if (this.isActive && (e.key === "Esc" || e.key === "Escape")) {
+      e.preventDefault();
+      this.deleteCurrentTool();
+      this.deactivate();
+      this.reset();
+    }
   };
 
   draw = () => {

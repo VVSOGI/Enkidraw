@@ -45,6 +45,7 @@ export abstract class BaseTool {
     this.stageHeight = stageHeight;
   };
 
+  abstract onKeyDown(e: KeyboardEvent): void;
   abstract onMouseDown(e: MouseEvent): void;
   abstract onMouseMove(e: MouseEvent): void;
   abstract onMouseUp(e: MouseEvent): void;
@@ -54,11 +55,13 @@ export abstract class BaseTool {
     this.canvas.addEventListener("mousedown", this.onMouseDown);
     this.canvas.addEventListener("mousemove", this.onMouseMove);
     this.canvas.addEventListener("mouseup", this.onMouseUp);
+    document.addEventListener("keydown", this.onKeyDown);
   };
 
   private removeEventListeners = () => {
     this.canvas.removeEventListener("mousedown", this.onMouseDown);
     this.canvas.removeEventListener("mousemove", this.onMouseMove);
     this.canvas.removeEventListener("mouseup", this.onMouseUp);
+    document.removeEventListener("keydown", this.onKeyDown);
   };
 }
