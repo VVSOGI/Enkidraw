@@ -1,7 +1,7 @@
 import { BaseComponent } from "../components";
 import { DragRange } from "../types";
 import { ActiveManager } from "./active-manager";
-import { SelectionManager } from "./selection-manager";
+import { SelectedComponentManager } from "./selection-manager";
 import { ComponentInteractionManager } from "./component-interaction-manager";
 
 export class ComponentManager {
@@ -10,7 +10,7 @@ export class ComponentManager {
   protected canvas: HTMLCanvasElement;
   protected ctx: CanvasRenderingContext2D;
   protected activeManager: ActiveManager;
-  protected selectionManager: SelectionManager;
+  protected selectedComponentManager: SelectedComponentManager;
   protected componentInteractionManager: ComponentInteractionManager;
 
   constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, activeManager: ActiveManager) {
@@ -19,11 +19,11 @@ export class ComponentManager {
     this.activeManager = activeManager;
     this.components = new Set();
 
-    this.selectionManager = new SelectionManager();
+    this.selectedComponentManager = new SelectedComponentManager();
     this.componentInteractionManager = new ComponentInteractionManager(
       this.canvas,
       this.activeManager,
-      this.selectionManager,
+      this.selectedComponentManager,
       this.components,
       this.removeSelected
     );
@@ -34,7 +34,7 @@ export class ComponentManager {
       component.draw();
     }
 
-    const multiSelectRange = this.selectionManager.getMultiSelectRange();
+    const multiSelectRange = this.selectedComponentManager.getMultiSelectRange();
     if (multiSelectRange) {
       this.multiDragRangeEffect(multiSelectRange);
       this.multiDragRangeCornerEffect(multiSelectRange);
@@ -50,11 +50,11 @@ export class ComponentManager {
   };
 
   public removeSelected = () => {
-    const selectedComponents = this.selectionManager.getSelectedComponents();
+    const selectedComponents = this.selectedComponentManager.getSelectedComponents();
     for (const component of selectedComponents) {
       this.components.delete(component);
     }
-    this.selectionManager.clearSelection();
+    this.selectedComponentManager.clearSelection();
   };
 
   public getComponents = () => {
@@ -62,7 +62,7 @@ export class ComponentManager {
   };
 
   public dragComponents = (dragRange: DragRange) => {
-    this.selectionManager.dragComponents(this.components, dragRange);
+    this.selectedComponentManager.dragComponents(this.components, dragRange);
   };
 
   private multiDragRangeEffect = (range: DragRange) => {

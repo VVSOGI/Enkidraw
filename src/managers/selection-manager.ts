@@ -1,7 +1,7 @@
 import { BaseComponent } from "../components";
 import { DragRange, EdgeDirection, MousePoint, CursorStyle } from "../types";
 
-export class SelectionManager {
+export class SelectedComponentManager {
   private selectedComponents: Set<BaseComponent>;
   private multiSelectRange: DragRange | null = null;
   private originMultiSelectRange: DragRange | null = null;

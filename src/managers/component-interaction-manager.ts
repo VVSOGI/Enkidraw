@@ -2,12 +2,12 @@ import { BaseComponent } from "../components";
 import { DragRange, EdgeDirection, MousePoint } from "../types";
 import { MouseUtils } from "../utils";
 import { ActiveManager } from "./active-manager";
-import { SelectionManager } from "./selection-manager";
+import { SelectedComponentManager } from "./selection-manager";
 
 export class ComponentInteractionManager {
   private canvas: HTMLCanvasElement;
   private activeManager: ActiveManager;
-  private selectionManager: SelectionManager;
+  private selectionManager: SelectedComponentManager;
   private components: Set<BaseComponent>;
   private removeSelectedComponents: () => void;
 
@@ -17,7 +17,7 @@ export class ComponentInteractionManager {
   constructor(
     canvas: HTMLCanvasElement,
     activeManager: ActiveManager,
-    selectionManager: SelectionManager,
+    selectionManager: SelectedComponentManager,
     components: Set<BaseComponent>,
     removeSelectedComponents: () => void
   ) {
