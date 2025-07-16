@@ -1,13 +1,16 @@
 import { BaseComponent } from "../components";
 import { DragRange, EdgeDirection, MousePoint, CursorStyle } from "../types";
+import { EventEmitter } from "../utils";
 
-export class SelectedComponentManager {
-  private selectedComponents: Set<BaseComponent>;
+export class SelectedComponentManager extends EventEmitter {
+  public selectedComponents: Set<BaseComponent>;
+
+  private multiResizeRange = 5;
   private multiSelectRange: DragRange | null = null;
   private originMultiSelectRange: DragRange | null = null;
-  private multiResizeRange = 5;
 
   constructor() {
+    super();
     this.selectedComponents = new Set();
   }
 
@@ -41,6 +44,7 @@ export class SelectedComponentManager {
   public selectComponent(component: BaseComponent): void {
     this.clearSelection();
     this.selectedComponents.add(component);
+    this.emit("menuActivate");
     component.activate();
   }
 
@@ -51,6 +55,7 @@ export class SelectedComponentManager {
       const { x1: componentX1, y1: componentY1, x2: componentX2, y2: componentY2 } = component.getPosition();
       if (componentX1 >= dragX1 && componentX2 <= dragX2 && componentY1 >= dragY1 && componentY2 <= dragY2) {
         component.activate();
+        this.emit("menuActivate");
         this.selectedComponents.add(component);
       } else {
         component.deactivate();
@@ -65,12 +70,14 @@ export class SelectedComponentManager {
         component.deactivate();
         component.multiDragMode(true);
       }
-    } else {
+    } else if (this.selectedComponents.size === 1) {
       for (const component of this.selectedComponents) {
         component.activate();
         component.multiDragMode(false);
         this.multiSelectRange = null;
       }
+    } else {
+      this.emit("menuDeactivate");
     }
   }
 
@@ -211,6 +218,7 @@ export class SelectedComponentManager {
     for (const component of this.selectedComponents) {
       component.deactivate();
       component.multiDragMode(false);
+      this.emit("menuDeactivate");
     }
     this.multiSelectRange = null;
     this.originMultiSelectRange = null;
