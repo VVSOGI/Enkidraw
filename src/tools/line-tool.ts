@@ -2,7 +2,7 @@ import { BaseTool } from "./base-tool";
 import { MousePoint } from "../types";
 import { MouseUtils } from "../utils";
 import { Line } from "../components";
-import { ActiveManager, ComponentManager } from "../managers";
+import { ActiveManager, ComponentManager, LeftMenuManager } from "../managers";
 
 export class LineTool extends BaseTool {
   public readonly name = "line";
@@ -14,9 +14,10 @@ export class LineTool extends BaseTool {
     ctx: CanvasRenderingContext2D,
     componentManager: ComponentManager,
     activeManager: ActiveManager,
-    deleteCurrentTool: () => void
+    deleteCurrentTool: () => void,
+    leftMenuManager: LeftMenuManager
   ) {
-    super(canvas, ctx, componentManager, activeManager, deleteCurrentTool);
+    super(canvas, ctx, componentManager, activeManager, deleteCurrentTool, leftMenuManager);
   }
 
   private reset = () => {
@@ -66,20 +67,20 @@ export class LineTool extends BaseTool {
 
     this.ctx.beginPath();
     this.ctx.arc(this.initPoint.x, this.initPoint.y, 2, 0, Math.PI * 2);
-    this.ctx.fillStyle = "black";
+    this.ctx.fillStyle = this.leftMenuManager.strokeColor;
     this.ctx.fill();
     this.ctx.closePath();
 
     this.ctx.beginPath();
     this.ctx.moveTo(this.initPoint.x, this.initPoint.y);
     this.ctx.lineTo(this.movePoint.x, this.movePoint.y);
-    this.ctx.strokeStyle = "black";
+    this.ctx.strokeStyle = this.leftMenuManager.strokeColor;
     this.ctx.stroke();
     this.ctx.closePath();
 
     this.ctx.beginPath();
     this.ctx.arc(this.movePoint.x, this.movePoint.y, 2, 0, Math.PI * 2);
-    this.ctx.fillStyle = "black";
+    this.ctx.fillStyle = this.leftMenuManager.strokeColor;
     this.ctx.fill();
     this.ctx.closePath();
 
@@ -106,6 +107,8 @@ export class LineTool extends BaseTool {
       },
       activeManager: this.activeManager,
     });
+
+    line.color = this.leftMenuManager.strokeColor;
 
     this.componentManager.add(line);
   };

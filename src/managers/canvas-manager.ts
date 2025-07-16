@@ -28,7 +28,7 @@ export class CanvasManager {
 
     this.leftMenuManager = new LeftMenuManager();
     this.activeManager = new ActiveManager(canvas, this.ctx);
-    this.componentManager = new ComponentManager(canvas, this.ctx, this.activeManager);
+    this.componentManager = new ComponentManager(canvas, this.ctx, this.activeManager, this.leftMenuManager);
     this.dragTool = new DragTool(
       this.canvas,
       this.ctx,
@@ -54,9 +54,10 @@ export class CanvasManager {
     const tool = new ToolClass(
       this.canvas,
       this.ctx,
-      this.componentManager.components,
+      this.componentManager,
       this.activeManager,
-      this.deleteCurrentTool
+      this.deleteCurrentTool,
+      this.leftMenuManager
     );
     const toolName = tool.name as ToolNames;
 
