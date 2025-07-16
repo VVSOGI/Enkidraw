@@ -1,6 +1,10 @@
+import { BaseComponent, BasePosition } from "../components";
 import { STYLE_SYSTEM } from "../utils";
 
 export class LeftMenuManager {
+  public styleMenu: HTMLDivElement;
+
+  private components: Set<BaseComponent<BasePosition>> = new Set();
   private strokeButtons: HTMLButtonElement[];
   private currentStrokeColor: string;
   private currentStrokeColorButton!: HTMLButtonElement;
@@ -24,8 +28,12 @@ export class LeftMenuManager {
     });
 
     this.strokeButtons = buttons;
-    const styleMenu = this.appendLeftMenu();
-    this.appendStrokeColorTab(styleMenu);
+    this.styleMenu = this.appendLeftMenu();
+    this.appendStrokeColorTab();
+  }
+
+  public setComponents(components: Set<BaseComponent<BasePosition>>): void {
+    this.components = components;
   }
 
   get strokeColor(): string {
@@ -39,6 +47,14 @@ export class LeftMenuManager {
     }
   }
 
+  public activate = () => {
+    this.styleMenu.style.display = "flex";
+  };
+
+  public deactivate = () => {
+    this.styleMenu.style.display = "none";
+  };
+
   private appendLeftMenu = () => {
     const styleMenu = document.createElement("div");
     styleMenu.setAttribute("class", "left-menu");
@@ -46,7 +62,7 @@ export class LeftMenuManager {
     styleMenu.style.height = "fit-content";
     styleMenu.style.top = "60px";
     styleMenu.style.left = "15px";
-    styleMenu.style.display = "flex";
+    styleMenu.style.display = "none";
     styleMenu.style.gap = "12px";
     styleMenu.style.padding = "16px 12px";
 
@@ -58,7 +74,7 @@ export class LeftMenuManager {
     return styleMenu;
   };
 
-  private appendStrokeColorTab = (menu: HTMLDivElement) => {
+  private appendStrokeColorTab = () => {
     const strokeColorTab = document.createElement("div");
     const title = this.createTabTitle("Stroke Color");
     strokeColorTab.style.width = "100%";
@@ -84,7 +100,7 @@ export class LeftMenuManager {
     colors.appendChild(divider);
     colors.appendChild(this.currentStrokeColorButton);
 
-    menu.appendChild(strokeColorTab);
+    this.styleMenu.appendChild(strokeColorTab);
   };
 
   private adjustColorButtonStyle = (button: HTMLButtonElement, color: string) => {
@@ -106,6 +122,9 @@ export class LeftMenuManager {
     });
 
     button.addEventListener("click", () => {
+      for (const component of this.components) {
+        component.color = color;
+      }
       this.strokeColor = color;
       button.style.outline = "1px solid black";
       button.style.border = "1px solid white";
