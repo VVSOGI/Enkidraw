@@ -1,8 +1,7 @@
 import { BaseComponent } from "../components";
 import { DragRange, EdgeDirection, MousePoint } from "../types";
 import { MouseUtils } from "../utils";
-import { ActiveManager } from "./active-manager";
-import { SelectedComponentManager } from "./selection-manager";
+import { ActiveManager, SelectedComponentManager } from ".";
 
 export class ComponentInteractionManager {
   private canvas: HTMLCanvasElement;

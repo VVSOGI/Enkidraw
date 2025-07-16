@@ -1,8 +1,6 @@
+import { ActiveManager, ComponentInteractionManager, SelectedComponentManager } from ".";
 import { BaseComponent } from "../components";
 import { DragRange } from "../types";
-import { ActiveManager } from "./active-manager";
-import { SelectedComponentManager } from "./selection-manager";
-import { ComponentInteractionManager } from "./component-interaction-manager";
 
 export class ComponentManager {
   public components: Set<BaseComponent>;
