@@ -1,6 +1,7 @@
 import { ActiveManager, ComponentInteractionManager, SelectedComponentManager } from ".";
 import { BaseComponent } from "../components";
 import { DragRange } from "../types";
+import { STYLE_SYSTEM } from "../utils";
 
 export class ComponentManager {
   public components: Set<BaseComponent>;
@@ -74,7 +75,7 @@ export class ComponentManager {
     this.ctx.lineTo(x2, y2);
     this.ctx.lineTo(x1, y2);
     this.ctx.lineTo(x1, y1);
-    this.ctx.strokeStyle = "rgba(105, 105, 230, 0.5)";
+    this.ctx.strokeStyle = STYLE_SYSTEM.primary;
     this.ctx.stroke();
     this.ctx.closePath();
     this.ctx.restore();
@@ -118,9 +119,9 @@ export class ComponentManager {
       2
     );
 
-    this.ctx.fillStyle = "#ffffff";
+    this.ctx.fillStyle = STYLE_SYSTEM.white;
     this.ctx.fill();
-    this.ctx.strokeStyle = "rgba(105, 105, 230, 0.5)";
+    this.ctx.strokeStyle = STYLE_SYSTEM.primary;
     this.ctx.stroke();
     this.ctx.closePath();
     this.ctx.restore();
