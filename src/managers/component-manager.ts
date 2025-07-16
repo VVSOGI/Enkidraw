@@ -1,4 +1,4 @@
-import { ActiveManager, ComponentInteractionManager, SelectedComponentManager } from ".";
+import { ActiveManager, ComponentInteractionManager, LeftMenuManager, SelectedComponentManager } from ".";
 import { BaseComponent } from "../components";
 import { DragRange } from "../types";
 import { STYLE_SYSTEM } from "../utils";
@@ -11,14 +11,30 @@ export class ComponentManager {
   protected activeManager: ActiveManager;
   protected selectedComponentManager: SelectedComponentManager;
   protected componentInteractionManager: ComponentInteractionManager;
+  protected leftMenuManager: LeftMenuManager;
 
-  constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, activeManager: ActiveManager) {
+  constructor(
+    canvas: HTMLCanvasElement,
+    ctx: CanvasRenderingContext2D,
+    activeManager: ActiveManager,
+    leftMenuManager: LeftMenuManager
+  ) {
     this.canvas = canvas;
     this.ctx = ctx;
     this.activeManager = activeManager;
     this.components = new Set();
+    this.leftMenuManager = leftMenuManager;
 
     this.selectedComponentManager = new SelectedComponentManager();
+    this.selectedComponentManager.on("menuActivate", () => {
+      this.leftMenuManager.setComponents(this.selectedComponentManager.selectedComponents);
+      this.leftMenuManager.activate();
+    });
+
+    this.selectedComponentManager.on("menuDeactivate", () => {
+      this.leftMenuManager.deactivate();
+    });
+
     this.componentInteractionManager = new ComponentInteractionManager(
       this.canvas,
       this.activeManager,
