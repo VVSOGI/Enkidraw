@@ -1,6 +1,7 @@
 import { ActiveManager } from "../managers";
 import { v4 } from "uuid";
 import { DragRange, EdgeDirection, MousePoint } from "../types";
+import { STYLE_SYSTEM } from "../utils";
 
 export interface BasePosition {
   x1: number;
@@ -17,6 +18,7 @@ export abstract class BaseComponent<T extends BasePosition = BasePosition> {
   public isMultiDrag: boolean = false;
   public position: T;
   public originPosition: T;
+  public color = STYLE_SYSTEM.BLACK;
 
   protected canvas: HTMLCanvasElement;
   protected ctx: CanvasRenderingContext2D;

@@ -740,7 +740,7 @@ export class Line extends BaseComponent<LinePosition> {
     this.ctx.beginPath();
     this.ctx.moveTo(this.position.x1, this.position.y1);
     this.ctx.quadraticCurveTo(controlX, controlY, this.position.x2, this.position.y2);
-    this.ctx.strokeStyle = "black";
+    this.ctx.strokeStyle = this.color;
     this.ctx.stroke();
     this.ctx.closePath();
 
