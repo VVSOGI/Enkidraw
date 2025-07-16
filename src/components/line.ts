@@ -626,7 +626,7 @@ export class Line extends BaseComponent<LinePosition> {
     this.ctx.lineTo(x2, y2);
     this.ctx.lineTo(x1, y2);
     this.ctx.lineTo(x1, y1);
-    this.ctx.strokeStyle = STYLE_SYSTEM.primary;
+    this.ctx.strokeStyle = STYLE_SYSTEM.PRIMARY;
     this.ctx.stroke();
     this.ctx.closePath();
     this.ctx.restore();
@@ -695,7 +695,7 @@ export class Line extends BaseComponent<LinePosition> {
     this.ctx.save();
     this.ctx.beginPath();
     this.ctx.roundRect(this.hoverPosition.x - 7.5, this.hoverPosition.y - 7.5, 15, 15, 10);
-    this.ctx.fillStyle = STYLE_SYSTEM.primary;
+    this.ctx.fillStyle = STYLE_SYSTEM.PRIMARY;
     this.ctx.fill();
     this.ctx.closePath();
     this.ctx.restore();
@@ -725,9 +725,9 @@ export class Line extends BaseComponent<LinePosition> {
       -this.dragCornerRectSize,
       4
     );
-    this.ctx.fillStyle = STYLE_SYSTEM.white;
+    this.ctx.fillStyle = STYLE_SYSTEM.WHITE;
     this.ctx.fill();
-    this.ctx.strokeStyle = STYLE_SYSTEM.primary;
+    this.ctx.strokeStyle = STYLE_SYSTEM.PRIMARY;
     this.ctx.stroke();
     this.ctx.closePath();
     this.ctx.restore();

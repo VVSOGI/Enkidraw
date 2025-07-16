@@ -75,7 +75,7 @@ export class ComponentManager {
     this.ctx.lineTo(x2, y2);
     this.ctx.lineTo(x1, y2);
     this.ctx.lineTo(x1, y1);
-    this.ctx.strokeStyle = STYLE_SYSTEM.primary;
+    this.ctx.strokeStyle = STYLE_SYSTEM.PRIMARY;
     this.ctx.stroke();
     this.ctx.closePath();
     this.ctx.restore();
@@ -119,9 +119,9 @@ export class ComponentManager {
       2
     );
 
-    this.ctx.fillStyle = STYLE_SYSTEM.white;
+    this.ctx.fillStyle = STYLE_SYSTEM.WHITE;
     this.ctx.fill();
-    this.ctx.strokeStyle = STYLE_SYSTEM.primary;
+    this.ctx.strokeStyle = STYLE_SYSTEM.PRIMARY;
     this.ctx.stroke();
     this.ctx.closePath();
     this.ctx.restore();
