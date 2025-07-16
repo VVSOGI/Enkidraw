@@ -1,4 +1,4 @@
-import { ComponentManager, ActiveManager } from ".";
+import { ComponentManager, ActiveManager, LeftMenuManager } from ".";
 import { BaseTool, DragTool } from "../tools";
 import { ToolConstructor, ToolNames } from "../types";
 
@@ -14,6 +14,7 @@ export class CanvasManager {
   private dragTool: DragTool;
   private activeManager: ActiveManager;
   private componentManager: ComponentManager;
+  private leftMenuManager: LeftMenuManager;
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
@@ -25,6 +26,7 @@ export class CanvasManager {
     this.resize();
     window.addEventListener("resize", this.resize);
 
+    this.leftMenuManager = new LeftMenuManager();
     this.activeManager = new ActiveManager(canvas, this.ctx);
     this.componentManager = new ComponentManager(canvas, this.ctx, this.activeManager);
     this.dragTool = new DragTool(
