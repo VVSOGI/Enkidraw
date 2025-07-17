@@ -59,23 +59,37 @@ export class LineTool extends BaseTool {
     if (this.multiPointDrawMode) {
       this.points.push(this.movePoint);
     } else {
-      this.appendLineComponent();
+      this.appendLineComponent(this.initPoint, this.movePoint);
       this.deactivate();
       this.reset();
     }
   };
 
   onKeyDown = (e: KeyboardEvent) => {
-    if (this.isActive && (e.key === "Esc" || e.key === "Escape")) {
-      if (this.multiPointDrawMode && this.points.length > 1 && this.initPoint && this.movePoint) {
-        this.appendCurveComponent();
-      }
+    if (!this.isActive || (e.key !== "Esc" && e.key !== "Escape")) {
+      return;
+    }
 
+    if (!this.initPoint || !this.movePoint || !this.multiPointDrawMode) {
       e.preventDefault();
       this.deleteCurrentTool();
       this.deactivate();
       this.reset();
+      return;
     }
+
+    if (this.points.length > 2) {
+      this.appendCurveComponent();
+    }
+
+    if (this.points.length === 2) {
+      this.appendLineComponent(this.initPoint, this.points[this.points.length - 1]);
+    }
+
+    e.preventDefault();
+    this.deleteCurrentTool();
+    this.deactivate();
+    this.reset();
   };
 
   draw = () => {
@@ -132,11 +146,9 @@ export class LineTool extends BaseTool {
     this.componentManager.add(line);
   };
 
-  private appendLineComponent = () => {
-    if (!this.initPoint || !this.movePoint) return;
-
-    const { x: initX, y: initY } = this.initPoint;
-    const { x: endX, y: endY } = this.movePoint;
+  private appendLineComponent = (init: MousePoint, end: MousePoint) => {
+    const { x: initX, y: initY } = init;
+    const { x: endX, y: endY } = end;
 
     const cx = Math.min(initX, endX) + Math.abs(endX - initX) / 2;
     const cy = Math.min(initY, endY) + Math.abs(endY - initY) / 2;
