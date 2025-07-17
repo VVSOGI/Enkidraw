@@ -38,8 +38,8 @@ export class MathUtils {
   static getDistanceCurveFromPoint = (mousePosition: MousePoint, position: LinePosition) => {
     const { x, y } = mousePosition;
 
-    const controlX = MathUtils.getBezierControlPoint(0.5, position.cx, position.x1, position.x2);
-    const controlY = MathUtils.getBezierControlPoint(0.5, position.cy, position.y1, position.y2);
+    const controlX = MathUtils.getBezierControlPoint(0.5, position.crossPoints[0].cx, position.x1, position.x2);
+    const controlY = MathUtils.getBezierControlPoint(0.5, position.crossPoints[0].cy, position.y1, position.y2);
 
     const dots = 100;
     let minDistance = Infinity;
