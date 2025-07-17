@@ -803,22 +803,51 @@ export class Line extends BaseComponent<LinePosition> {
   };
 
   draw = () => {
-    const controlX = MathUtils.getBezierControlPoint(
-      0.5,
-      this.position.crossPoint[0].cx,
-      this.position.x1,
-      this.position.x2
-    );
-    const controlY = MathUtils.getBezierControlPoint(
-      0.5,
-      this.position.crossPoint[0].cy,
-      this.position.y1,
-      this.position.y2
-    );
-
     this.ctx.beginPath();
     this.ctx.moveTo(this.position.x1, this.position.y1);
-    this.ctx.quadraticCurveTo(controlX, controlY, this.position.x2, this.position.y2);
+
+    if (this.type === "line") {
+      this.ctx.lineTo(this.position.x2, this.position.y2);
+    } else {
+      const allPoints = [
+        { x: this.position.x1, y: this.position.y1 },
+        ...this.position.crossPoint.map((cp) => ({ x: cp.cx, y: cp.cy })),
+        { x: this.position.x2, y: this.position.y2 },
+      ];
+
+      if (allPoints.length === 3) {
+        const controlX = MathUtils.getBezierControlPoint(
+          0.5,
+          this.position.crossPoint[0].cx,
+          this.position.x1,
+          this.position.x2
+        );
+        const controlY = MathUtils.getBezierControlPoint(
+          0.5,
+          this.position.crossPoint[0].cy,
+          this.position.y1,
+          this.position.y2
+        );
+        this.ctx.quadraticCurveTo(controlX, controlY, this.position.x2, this.position.y2);
+      } else {
+        for (let i = 0; i < allPoints.length - 1; i++) {
+          const current = allPoints[i];
+          const next = allPoints[i + 1];
+
+          if (i === 0) {
+            const controlX = current.x + (next.x - current.x) * 0.5;
+            const controlY = current.y + (next.y - current.y) * 0.5;
+            this.ctx.quadraticCurveTo(controlX, controlY, next.x, next.y);
+          } else {
+            const prev = allPoints[i - 1];
+            const controlX = current.x + (next.x - prev.x) * 0.3;
+            const controlY = current.y + (next.y - prev.y) * 0.3;
+            this.ctx.quadraticCurveTo(controlX, controlY, next.x, next.y);
+          }
+        }
+      }
+    }
+
     this.ctx.strokeStyle = this.color;
     this.ctx.stroke();
     this.ctx.closePath();
