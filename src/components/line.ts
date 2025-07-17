@@ -712,11 +712,14 @@ export class Line extends BaseComponent<LinePosition> {
       mouseY >= this.position.y1 - this.dragCornerRectSize / 2 &&
       mouseY < this.position.y1 + this.dragCornerRectSize / 2;
 
-    const isMouseOnCenterPoint =
-      mouseX >= this.position.crossPoints[0].cx - this.dragCornerRectSize / 2 &&
-      mouseX < this.position.crossPoints[0].cx + this.dragCornerRectSize / 2 &&
-      mouseY >= this.position.crossPoints[0].cy - this.dragCornerRectSize / 2 &&
-      mouseY < this.position.crossPoints[0].cy + this.dragCornerRectSize / 2;
+    const isMouseOnCenterPoint = this.position.crossPoints.some(({ cx, cy }) => {
+      return (
+        mouseX >= cx - this.dragCornerRectSize / 2 &&
+        mouseX < cx + this.dragCornerRectSize / 2 &&
+        mouseY >= cy - this.dragCornerRectSize / 2 &&
+        mouseY < cy + this.dragCornerRectSize / 2
+      );
+    });
 
     const isMouseOnEndPoint =
       mouseX >= this.position.x2 - this.dragCornerRectSize / 2 &&
