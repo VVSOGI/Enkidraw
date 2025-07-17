@@ -100,8 +100,12 @@ export class LineTool extends BaseTool {
       position: {
         x1: initX,
         y1: initY,
-        cx,
-        cy,
+        crossPoint: [
+          {
+            cx,
+            cy,
+          },
+        ],
         x2: endX,
         y2: endY,
       },
