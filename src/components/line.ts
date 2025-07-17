@@ -782,13 +782,16 @@ export class Line extends BaseComponent<LinePosition> {
       -this.dragCornerRectSize,
       4
     );
-    this.ctx.roundRect(
-      this.position.crossPoints[0].cx + this.dragCornerRectSize / 2,
-      this.position.crossPoints[0].cy + this.dragCornerRectSize / 2,
-      -this.dragCornerRectSize,
-      -this.dragCornerRectSize,
-      4
-    );
+    for (const point of this.position.crossPoints) {
+      this.ctx.roundRect(
+        point.cx + this.dragCornerRectSize / 2,
+        point.cy + this.dragCornerRectSize / 2,
+        -this.dragCornerRectSize,
+        -this.dragCornerRectSize,
+        4
+      );
+    }
+
     this.ctx.roundRect(
       this.position.x2 + this.dragCornerRectSize / 2,
       this.position.y2 + this.dragCornerRectSize / 2,
@@ -807,6 +810,7 @@ export class Line extends BaseComponent<LinePosition> {
   draw = () => {
     this.ctx.beginPath();
     this.ctx.moveTo(this.position.x1, this.position.y1);
+    const test = [];
 
     if (this.type === "line") {
       this.ctx.lineTo(this.position.x2, this.position.y2);
@@ -817,36 +821,22 @@ export class Line extends BaseComponent<LinePosition> {
         { x: this.position.x2, y: this.position.y2 },
       ];
 
-      if (allPoints.length === 3) {
-        const controlX = MathUtils.getBezierControlPoint(
-          0.5,
-          this.position.crossPoints[0].cx,
-          this.position.x1,
-          this.position.x2
-        );
-        const controlY = MathUtils.getBezierControlPoint(
-          0.5,
-          this.position.crossPoints[0].cy,
-          this.position.y1,
-          this.position.y2
-        );
-        this.ctx.quadraticCurveTo(controlX, controlY, this.position.x2, this.position.y2);
-      } else {
-        for (let i = 0; i < allPoints.length - 1; i++) {
-          const current = allPoints[i];
-          const next = allPoints[i + 1];
+      for (let i = 0; i < allPoints.length - 1; i++) {
+        const startPoint = allPoints[i];
+        const endPoint = allPoints[i + 1];
+        const tension = 0.15;
 
-          if (i === 0) {
-            const controlX = current.x + (next.x - current.x) * 0.5;
-            const controlY = current.y + (next.y - current.y) * 0.5;
-            this.ctx.quadraticCurveTo(controlX, controlY, next.x, next.y);
-          } else {
-            const prev = allPoints[i - 1];
-            const controlX = current.x + (next.x - prev.x) * 0.3;
-            const controlY = current.y + (next.y - prev.y) * 0.3;
-            this.ctx.quadraticCurveTo(controlX, controlY, next.x, next.y);
-          }
-        }
+        const prevPoint = allPoints[i - 1] || startPoint;
+        const nextPoint = allPoints[i + 2] || endPoint;
+
+        const cp1x = startPoint.x + (endPoint.x - prevPoint.x) * tension;
+        const cp1y = startPoint.y + (endPoint.y - prevPoint.y) * tension;
+        const cp2x = endPoint.x - (nextPoint.x - startPoint.x) * tension;
+        const cp2y = endPoint.y - (nextPoint.y - startPoint.y) * tension;
+
+        test.push([cp1x, cp1y, cp2x, cp2y]);
+
+        this.ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, endPoint.x, endPoint.y);
       }
     }
 
