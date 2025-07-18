@@ -689,18 +689,40 @@ export class Line extends BaseComponent<LinePosition> {
   };
 
   multiDragEffect = () => {
-    const { x1, y1, x2, y2 } = this.getPosition();
-    this.ctx.save();
-    this.ctx.beginPath();
-    this.ctx.moveTo(x1, y1);
-    this.ctx.lineTo(x2, y1);
-    this.ctx.lineTo(x2, y2);
-    this.ctx.lineTo(x1, y2);
-    this.ctx.lineTo(x1, y1);
-    this.ctx.strokeStyle = STYLE_SYSTEM.PRIMARY;
-    this.ctx.stroke();
-    this.ctx.closePath();
-    this.ctx.restore();
+    if (this.type === "line") {
+      const { x1, y1, x2, y2 } = this.getPosition();
+
+      this.ctx.save();
+      this.ctx.beginPath();
+      this.ctx.moveTo(x1, y1);
+      this.ctx.lineTo(x2, y1);
+      this.ctx.lineTo(x2, y2);
+      this.ctx.lineTo(x1, y2);
+      this.ctx.lineTo(x1, y1);
+      this.ctx.strokeStyle = STYLE_SYSTEM.PRIMARY;
+      this.ctx.stroke();
+      this.ctx.closePath();
+      this.ctx.restore();
+    }
+
+    if (this.type === "curve") {
+      const points = [
+        { x: this.position.x1, y: this.position.y1 },
+        ...this.position.crossPoints.map(({ cx, cy }) => ({ x: cx, y: cy })),
+        { x: this.position.x2, y: this.position.y2 },
+      ];
+
+      const dots = 50;
+
+      for (let i = 0; i < points.length - 1; i++) {
+        const current = points[i];
+        const next = points[i + 1];
+
+        for (let i = 0; i < dots; i++) {
+          const x = current.x + ((next.x - current.x) / dots) * i;
+        }
+      }
+    }
   };
 
   private getMouseHitControlPoint = (mousePosition: MousePoint) => {
