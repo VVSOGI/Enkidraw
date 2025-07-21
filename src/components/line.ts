@@ -113,8 +113,14 @@ export class Line extends BaseComponent<LinePosition> {
      * It means that the mouse is over the center point of the line component.
      * */
 
+    const points = [
+      { x: this.position.x1, y: this.position.y1 },
+      ...this.position.crossPoints.map(({ cx, cy }) => ({ x: cx, y: cy })),
+      { x: this.position.x2, y: this.position.y2 },
+    ];
+
     if (this.moveCornorPoint > -1) {
-      if (this.moveCornorPoint === 1) {
+      if (this.type === "line" && this.moveCornorPoint === 1) {
         const crossTargetPoint = Object.assign({}, this.originPosition.crossPoints[0]);
         this.position.crossPoints[0].cx = crossTargetPoint.cx + move.x;
         this.position.crossPoints[0].cy = crossTargetPoint.cy + move.y;
@@ -132,7 +138,20 @@ export class Line extends BaseComponent<LinePosition> {
           this.hoverPosition = { position: { x: this.position.x1, y: this.position.y1 } };
         }
 
-        if (this.moveCornorPoint === 2) {
+        if (this.moveCornorPoint > 0 && this.moveCornorPoint < points.length - 1) {
+          const currentTarget = this.position.crossPoints[this.moveCornorPoint - 1];
+          const currentOriginTarget = Object.assign({}, this.originPosition.crossPoints[this.moveCornorPoint - 1]);
+          currentTarget.cx = currentOriginTarget.cx + move.x;
+          currentTarget.cy = currentOriginTarget.cy + move.y;
+          this.hoverPosition = {
+            position: {
+              x: currentTarget.cx,
+              y: currentTarget.cy,
+            },
+          };
+        }
+
+        if (this.moveCornorPoint === points.length - 1) {
           this.position.x2 = this.originPosition.x2 + move.x;
           this.position.y2 = this.originPosition.y2 + move.y;
           this.hoverPosition = { position: { x: this.position.x1, y: this.position.y1 } };
@@ -148,7 +167,7 @@ export class Line extends BaseComponent<LinePosition> {
           this.hoverPosition = { position: { x: this.position.x1, y: this.position.y1 } };
         }
 
-        if (this.moveCornorPoint === 2) {
+        if (this.moveCornorPoint === points.length - 1) {
           this.position.x2 = this.originPosition.x2 + move.x;
           this.position.y2 = this.originPosition.y2 + move.y;
           this.hoverPosition = { position: { x: this.position.x2, y: this.position.y2 } };
@@ -839,6 +858,7 @@ export class Line extends BaseComponent<LinePosition> {
   };
 
   draw = () => {
+    this.ctx.save();
     this.ctx.beginPath();
     this.ctx.moveTo(this.position.x1, this.position.y1);
 
@@ -870,8 +890,10 @@ export class Line extends BaseComponent<LinePosition> {
     }
 
     this.ctx.strokeStyle = this.color;
+    this.ctx.lineWidth = 10;
     this.ctx.stroke();
     this.ctx.closePath();
+    this.ctx.restore();
 
     if (this.hoverPosition) {
       this.hoverPointEffect();
