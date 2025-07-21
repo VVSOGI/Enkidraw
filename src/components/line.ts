@@ -890,6 +890,7 @@ export class Line extends BaseComponent<LinePosition> {
     }
 
     this.ctx.strokeStyle = this.color;
+    this.ctx.lineCap = "round";
     this.ctx.lineWidth = 10;
     this.ctx.stroke();
     this.ctx.closePath();

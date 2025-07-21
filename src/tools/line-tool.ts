@@ -110,6 +110,7 @@ export class LineTool extends BaseTool {
     this.ctx.lineTo(this.movePoint.x, this.movePoint.y);
     this.ctx.strokeStyle = this.leftMenuManager.strokeColor;
     this.ctx.lineWidth = 10;
+    this.ctx.lineCap = "round";
     this.ctx.stroke();
     this.ctx.closePath();
 
@@ -126,8 +127,8 @@ export class LineTool extends BaseTool {
   private appendCurveComponent = () => {
     if (!this.initPoint || !this.movePoint) return;
 
-    const { x: initX, y: initY } = this.initPoint;
-    const { x: endX, y: endY } = this.movePoint;
+    const initPoint = this.points[0];
+    const endPoint = this.points[this.points.length - 1];
 
     const crossPoints = this.points.slice(1, this.points.length - 1).map((item) => ({ cx: item.x, cy: item.y }));
 
@@ -137,10 +138,10 @@ export class LineTool extends BaseTool {
       activeManager: this.activeManager,
       type: "curve",
       position: {
-        x1: initX,
-        y1: initY,
-        x2: endX,
-        y2: endY,
+        x1: initPoint.x,
+        y1: initPoint.y,
+        x2: endPoint.x,
+        y2: endPoint.y,
         crossPoints,
       },
     });
