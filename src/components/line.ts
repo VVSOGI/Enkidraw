@@ -25,7 +25,7 @@ export class Line extends BaseComponent<LinePosition> {
   private threshold = 10;
   private dragCornerRectSize = 7.5;
   private moveCornorPoint = -1;
-  private hoverPosition: MousePoint | null = null;
+  private hoverPosition: { position: MousePoint } | null = null;
 
   constructor({ canvas, ctx, position, activeManager, type = "line" }: Props) {
     super(canvas, ctx, position, activeManager);
@@ -99,7 +99,7 @@ export class Line extends BaseComponent<LinePosition> {
     const { point, coordinates } = this.getMouseHitControlPoint(move);
 
     if (point > -1) {
-      this.hoverPosition = coordinates as MousePoint;
+      this.hoverPosition = { position: coordinates as MousePoint };
       this.activeManager.setCursorStyle("pointer");
     } else {
       this.hoverPosition = null;
@@ -112,12 +112,15 @@ export class Line extends BaseComponent<LinePosition> {
      * If moveCornorPoint is greater than -1,
      * It means that the mouse is over the center point of the line component.
      * */
+
     if (this.moveCornorPoint > -1) {
       if (this.moveCornorPoint === 1) {
         const crossTargetPoint = Object.assign({}, this.originPosition.crossPoints[0]);
         this.position.crossPoints[0].cx = crossTargetPoint.cx + move.x;
         this.position.crossPoints[0].cy = crossTargetPoint.cy + move.y;
-        this.hoverPosition = { x: this.position.crossPoints[0].cx, y: this.position.crossPoints[0].cy };
+        this.hoverPosition = {
+          position: { x: this.position.crossPoints[0].cx, y: this.position.crossPoints[0].cy },
+        };
         this.type = "curve";
         return;
       }
@@ -126,13 +129,13 @@ export class Line extends BaseComponent<LinePosition> {
         if (this.moveCornorPoint === 0) {
           this.position.x1 = this.originPosition.x1 + move.x;
           this.position.y1 = this.originPosition.y1 + move.y;
-          this.hoverPosition = { x: this.position.x1, y: this.position.y1 };
+          this.hoverPosition = { position: { x: this.position.x1, y: this.position.y1 } };
         }
 
         if (this.moveCornorPoint === 2) {
           this.position.x2 = this.originPosition.x2 + move.x;
           this.position.y2 = this.originPosition.y2 + move.y;
-          this.hoverPosition = { x: this.position.x2, y: this.position.y2 };
+          this.hoverPosition = { position: { x: this.position.x1, y: this.position.y1 } };
         }
 
         return;
@@ -142,13 +145,13 @@ export class Line extends BaseComponent<LinePosition> {
         if (this.moveCornorPoint === 0) {
           this.position.x1 = this.originPosition.x1 + move.x;
           this.position.y1 = this.originPosition.y1 + move.y;
-          this.hoverPosition = { x: this.position.x1, y: this.position.y1 };
+          this.hoverPosition = { position: { x: this.position.x1, y: this.position.y1 } };
         }
 
         if (this.moveCornorPoint === 2) {
           this.position.x2 = this.originPosition.x2 + move.x;
           this.position.y2 = this.originPosition.y2 + move.y;
-          this.hoverPosition = { x: this.position.x2, y: this.position.y2 };
+          this.hoverPosition = { position: { x: this.position.x2, y: this.position.y2 } };
         }
 
         this.position.crossPoints[0].cx = (this.position.x1 + this.position.x2) / 2;
@@ -756,53 +759,28 @@ export class Line extends BaseComponent<LinePosition> {
   private getMouseHitControlPoint = (mousePosition: MousePoint) => {
     const { x: mouseX, y: mouseY } = mousePosition;
 
-    const isMouseOnStartPoint =
-      mouseX >= this.position.x1 - this.dragCornerRectSize / 2 &&
-      mouseX < this.position.x1 + this.dragCornerRectSize / 2 &&
-      mouseY >= this.position.y1 - this.dragCornerRectSize / 2 &&
-      mouseY < this.position.y1 + this.dragCornerRectSize / 2;
+    const points = [
+      { x: this.position.x1, y: this.position.y1 },
+      ...this.position.crossPoints.map(({ cx, cy }) => ({ x: cx, y: cy })),
+      { x: this.position.x2, y: this.position.y2 },
+    ];
 
-    const hoveredCenterPoint = this.position.crossPoints.find(({ cx, cy }) => {
+    const hoveredPointIndex = points.findIndex(({ x, y }) => {
       return (
-        mouseX >= cx - this.dragCornerRectSize / 2 &&
-        mouseX < cx + this.dragCornerRectSize / 2 &&
-        mouseY >= cy - this.dragCornerRectSize / 2 &&
-        mouseY < cy + this.dragCornerRectSize / 2
+        mouseX >= x - this.dragCornerRectSize / 2 &&
+        mouseX < x + this.dragCornerRectSize / 2 &&
+        mouseY >= y - this.dragCornerRectSize / 2 &&
+        mouseY < y + this.dragCornerRectSize / 2
       );
     });
 
-    const isMouseOnEndPoint =
-      mouseX >= this.position.x2 - this.dragCornerRectSize / 2 &&
-      mouseX < this.position.x2 + this.dragCornerRectSize / 2 &&
-      mouseY >= this.position.y2 - this.dragCornerRectSize / 2 &&
-      mouseY < this.position.y2 + this.dragCornerRectSize / 2;
-
-    if (isMouseOnStartPoint) {
+    if (hoveredPointIndex >= 0) {
+      const point = points[hoveredPointIndex];
       return {
-        point: 0,
+        point: hoveredPointIndex,
         coordinates: {
-          x: this.position.x1,
-          y: this.position.y1,
-        },
-      };
-    }
-
-    if (hoveredCenterPoint) {
-      return {
-        point: 1,
-        coordinates: {
-          x: hoveredCenterPoint.cx,
-          y: hoveredCenterPoint.cy,
-        },
-      };
-    }
-
-    if (isMouseOnEndPoint) {
-      return {
-        point: 2,
-        coordinates: {
-          x: this.position.x2,
-          y: this.position.y2,
+          x: point.x,
+          y: point.y,
         },
       };
     }
@@ -818,7 +796,7 @@ export class Line extends BaseComponent<LinePosition> {
 
     this.ctx.save();
     this.ctx.beginPath();
-    this.ctx.roundRect(this.hoverPosition.x - 7.5, this.hoverPosition.y - 7.5, 15, 15, 10);
+    this.ctx.roundRect(this.hoverPosition.position.x - 7.5, this.hoverPosition.position.y - 7.5, 15, 15, 10);
     this.ctx.fillStyle = STYLE_SYSTEM.PRIMARY;
     this.ctx.fill();
     this.ctx.closePath();
