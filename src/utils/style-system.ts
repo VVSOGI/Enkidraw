@@ -11,4 +11,5 @@ export const STYLE_SYSTEM = {
   BLACK: "rgba(0, 0, 0, 1)",
 
   SHADOW_PRIMARY: "0 0 5px rgba(0, 0, 0, 0.2)",
+  STROKE_WIDTH: 10,
 };

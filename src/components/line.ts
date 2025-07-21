@@ -755,10 +755,10 @@ export class Line extends BaseComponent<LinePosition> {
           const x = MathUtils.getCubicBezierCurve(t, current.x, cp1x, cp2x, next.x);
           const y = MathUtils.getCubicBezierCurve(t, current.y, cp1y, cp2y, next.y);
 
-          minX = Math.min(x, minX);
-          minY = Math.min(y, minY);
-          maxX = Math.max(x, maxX);
-          maxY = Math.max(y, maxY);
+          minX = Math.min(x - STYLE_SYSTEM.STROKE_WIDTH, minX);
+          minY = Math.min(y - STYLE_SYSTEM.STROKE_WIDTH, minY);
+          maxX = Math.max(x + STYLE_SYSTEM.STROKE_WIDTH, maxX);
+          maxY = Math.max(y + STYLE_SYSTEM.STROKE_WIDTH, maxY);
         }
       }
       this.ctx.save();
@@ -891,7 +891,7 @@ export class Line extends BaseComponent<LinePosition> {
 
     this.ctx.strokeStyle = this.color;
     this.ctx.lineCap = "round";
-    this.ctx.lineWidth = 10;
+    this.ctx.lineWidth = STYLE_SYSTEM.STROKE_WIDTH;
     this.ctx.stroke();
     this.ctx.closePath();
     this.ctx.restore();
