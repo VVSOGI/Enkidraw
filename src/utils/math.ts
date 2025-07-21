@@ -36,22 +36,33 @@ export class MathUtils {
   };
 
   static getDistanceCurveFromPoint = (mousePosition: MousePoint, position: LinePosition) => {
-    const { x, y } = mousePosition;
-
-    const controlX = MathUtils.getBezierControlPoint(0.5, position.crossPoints[0].cx, position.x1, position.x2);
-    const controlY = MathUtils.getBezierControlPoint(0.5, position.crossPoints[0].cy, position.y1, position.y2);
-
-    const dots = 100;
+    const points = [
+      { x: position.x1, y: position.y1 },
+      ...position.crossPoints.map(({ cx, cy }) => ({ x: cx, y: cy })),
+      { x: position.x2, y: position.y2 },
+    ];
+    const dots = 50;
     let minDistance = Infinity;
 
-    for (let i = 0; i <= dots; i++) {
-      const t = i / dots;
-      const curveX = MathUtils.getBezierCurve(t, position.x1, controlX, position.x2);
-      const curveY = MathUtils.getBezierCurve(t, position.y1, controlY, position.y2);
-      const distance = Math.sqrt(Math.pow(x - curveX, 2) + Math.pow(y - curveY, 2));
+    for (let i = 0; i < points.length - 1; i++) {
+      const current = points[i];
+      const next = points[i + 1];
 
-      if (distance < minDistance) {
-        minDistance = distance;
+      const prevPoint = points[i - 1] || current;
+      const nextPoint = points[i + 2] || next;
+
+      const { cp1x, cp1y, cp2x, cp2y } = this.getSmoothCurveControlPoints(current, next, prevPoint, nextPoint);
+
+      for (let j = 0; j < dots; j++) {
+        const t = j / dots;
+
+        const x = this.getCubicBezierCurve(t, current.x, cp1x, cp2x, next.x);
+        const y = this.getCubicBezierCurve(t, current.y, cp1y, cp2y, next.y);
+        const distance = Math.sqrt(Math.pow(mousePosition.x - x, 2) + Math.pow(mousePosition.y - y, 2));
+
+        if (distance < minDistance) {
+          minDistance = distance;
+        }
       }
     }
 
