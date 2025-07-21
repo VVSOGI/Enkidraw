@@ -95,6 +95,7 @@ export class LineTool extends BaseTool {
   draw = () => {
     if (!this.initPoint || !this.movePoint) return;
 
+    this.ctx.save();
     this.ctx.beginPath();
     this.ctx.arc(this.initPoint.x, this.initPoint.y, 2, 0, Math.PI * 2);
     this.ctx.fillStyle = this.leftMenuManager.strokeColor;
@@ -108,6 +109,7 @@ export class LineTool extends BaseTool {
     }
     this.ctx.lineTo(this.movePoint.x, this.movePoint.y);
     this.ctx.strokeStyle = this.leftMenuManager.strokeColor;
+    this.ctx.lineWidth = 10;
     this.ctx.stroke();
     this.ctx.closePath();
 
@@ -116,6 +118,7 @@ export class LineTool extends BaseTool {
     this.ctx.fillStyle = this.leftMenuManager.strokeColor;
     this.ctx.fill();
     this.ctx.closePath();
+    this.ctx.restore();
 
     return;
   };
