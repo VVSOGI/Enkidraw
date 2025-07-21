@@ -762,7 +762,7 @@ export class Line extends BaseComponent<LinePosition> {
       mouseY >= this.position.y1 - this.dragCornerRectSize / 2 &&
       mouseY < this.position.y1 + this.dragCornerRectSize / 2;
 
-    const isMouseOnCenterPoint = this.position.crossPoints.some(({ cx, cy }) => {
+    const hoveredCenterPoint = this.position.crossPoints.find(({ cx, cy }) => {
       return (
         mouseX >= cx - this.dragCornerRectSize / 2 &&
         mouseX < cx + this.dragCornerRectSize / 2 &&
@@ -787,12 +787,12 @@ export class Line extends BaseComponent<LinePosition> {
       };
     }
 
-    if (isMouseOnCenterPoint) {
+    if (hoveredCenterPoint) {
       return {
         point: 1,
         coordinates: {
-          x: this.position.crossPoints[0].cx,
-          y: this.position.crossPoints[0].cy,
+          x: hoveredCenterPoint.cx,
+          y: hoveredCenterPoint.cy,
         },
       };
     }
