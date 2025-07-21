@@ -711,6 +711,45 @@ export class Line extends BaseComponent<LinePosition> {
         ...this.position.crossPoints.map(({ cx, cy }) => ({ x: cx, y: cy })),
         { x: this.position.x2, y: this.position.y2 },
       ];
+
+      const dots = 30;
+      let minX = Infinity;
+      let minY = Infinity;
+      let maxX = -Infinity;
+      let maxY = -Infinity;
+
+      for (let i = 0; i < points.length - 1; i++) {
+        const current = points[i];
+        const next = points[i + 1];
+
+        const prevPoint = points[i - 1] || current;
+        const nextPoint = points[i + 2] || next;
+
+        const { cp1x, cp1y, cp2x, cp2y } = MathUtils.getSmoothCurveControlPoints(current, next, prevPoint, nextPoint);
+
+        for (let j = 0; j < dots; j++) {
+          const t = j / dots;
+
+          const x = MathUtils.getCubicBezierCurve(t, current.x, cp1x, cp2x, next.x);
+          const y = MathUtils.getCubicBezierCurve(t, current.y, cp1y, cp2y, next.y);
+
+          minX = Math.min(x, minX);
+          minY = Math.min(y, minY);
+          maxX = Math.max(x, maxX);
+          maxY = Math.max(y, maxY);
+        }
+      }
+      this.ctx.save();
+      this.ctx.beginPath();
+      this.ctx.moveTo(minX, minY);
+      this.ctx.lineTo(maxX, minY);
+      this.ctx.lineTo(maxX, maxY);
+      this.ctx.lineTo(minX, maxY);
+      this.ctx.lineTo(minX, minY);
+      this.ctx.strokeStyle = STYLE_SYSTEM.PRIMARY;
+      this.ctx.stroke();
+      this.ctx.closePath();
+      this.ctx.restore();
     }
   };
 
@@ -819,40 +858,6 @@ export class Line extends BaseComponent<LinePosition> {
     this.ctx.stroke();
     this.ctx.closePath();
     this.ctx.restore();
-
-    if (this.type === "line") return;
-
-    const points = [
-      { x: this.position.x1, y: this.position.y1 },
-      ...this.position.crossPoints.map(({ cx, cy }) => ({ x: cx, y: cy })),
-      { x: this.position.x2, y: this.position.y2 },
-    ];
-
-    const dots = 30;
-
-    for (let i = 0; i < points.length - 1; i++) {
-      const current = points[i];
-      const next = points[i + 1];
-
-      const prevPoint = points[i - 1] || current;
-      const nextPoint = points[i + 2] || next;
-
-      const { cp1x, cp1y, cp2x, cp2y } = MathUtils.getSmoothCurveControlPoints(current, next, prevPoint, nextPoint);
-
-      for (let j = 0; j < dots; j++) {
-        const t = j / dots;
-
-        const x = MathUtils.getCubicBezierCurve(t, current.x, cp1x, cp2x, next.x);
-        const y = MathUtils.getCubicBezierCurve(t, current.y, cp1y, cp2y, next.y);
-
-        this.ctx.save();
-        this.ctx.beginPath();
-        this.ctx.arc(x, y, 10, 0, Math.PI * 2);
-        this.ctx.fill();
-        this.ctx.closePath();
-        this.ctx.restore();
-      }
-    }
   };
 
   draw = () => {
