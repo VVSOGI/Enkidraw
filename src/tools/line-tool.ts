@@ -1,8 +1,13 @@
-import { BaseTool } from "./base-tool";
+import { BaseTool, BaseToolProps } from "./base-tool";
 import { MousePoint } from "../types";
 import { MouseUtils } from "../utils";
 import { Line } from "../components";
-import { ActiveManager, ComponentManager, LeftMenuManager } from "../managers";
+import { ComponentManager, LeftMenuManager } from "../managers";
+
+interface LineToolProps extends BaseToolProps {
+  componentManager: ComponentManager;
+  leftMenuManager: LeftMenuManager;
+}
 
 export class LineTool extends BaseTool {
   public readonly name = "line";
@@ -11,15 +16,13 @@ export class LineTool extends BaseTool {
   private multiPointDrawMode: boolean = false;
   private points: MousePoint[] = [];
 
-  constructor(
-    canvas: HTMLCanvasElement,
-    ctx: CanvasRenderingContext2D,
-    componentManager: ComponentManager,
-    activeManager: ActiveManager,
-    deleteCurrentTool: () => void,
-    leftMenuManager: LeftMenuManager
-  ) {
-    super(canvas, ctx, componentManager, activeManager, deleteCurrentTool, leftMenuManager);
+  protected componentManager: ComponentManager;
+  protected leftMenuManager: LeftMenuManager;
+
+  constructor({ canvas, ctx, activeManager, leftMenuManager, componentManager, deleteCurrentTool }: LineToolProps) {
+    super({ canvas, ctx, activeManager, deleteCurrentTool });
+    this.leftMenuManager = leftMenuManager;
+    this.componentManager = componentManager;
   }
 
   private reset = () => {

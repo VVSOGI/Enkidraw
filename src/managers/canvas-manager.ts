@@ -29,13 +29,12 @@ export class CanvasManager {
     this.leftMenuManager = new LeftMenuManager();
     this.activeManager = new ActiveManager(canvas, this.ctx);
     this.componentManager = new ComponentManager(canvas, this.ctx, this.activeManager, this.leftMenuManager);
-    this.dragTool = new DragTool(
-      this.canvas,
-      this.ctx,
-      this.componentManager,
-      this.activeManager,
-      this.deleteCurrentTool
-    );
+    this.dragTool = new DragTool({
+      canvas: this.canvas,
+      ctx: this.ctx,
+      activeManager: this.activeManager,
+      deleteCurrentTool: this.deleteCurrentTool,
+    });
 
     this.animationId = requestAnimationFrame(this.draw);
   }
@@ -51,14 +50,14 @@ export class CanvasManager {
   };
 
   public addTool = (ToolClass: ToolConstructor, button?: HTMLElement) => {
-    const tool = new ToolClass(
-      this.canvas,
-      this.ctx,
-      this.componentManager,
-      this.activeManager,
-      this.deleteCurrentTool,
-      this.leftMenuManager
-    );
+    const tool = new ToolClass({
+      canvas: this.canvas,
+      ctx: this.ctx,
+      componentManager: this.componentManager,
+      activeManager: this.activeManager,
+      leftMenuManager: this.leftMenuManager,
+      deleteCurrentTool: this.deleteCurrentTool,
+    });
     const toolName = tool.name as ToolNames;
 
     if (toolName === "drag") {

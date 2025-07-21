@@ -1,11 +1,17 @@
-import { ActiveManager, ComponentManager, LeftMenuManager } from "../managers";
+import { ActiveManager } from "../managers";
+
+export interface BaseToolProps {
+  canvas: HTMLCanvasElement;
+  ctx: CanvasRenderingContext2D;
+  activeManager: ActiveManager;
+  deleteCurrentTool: () => void;
+}
 
 export abstract class BaseTool {
   abstract readonly name: string; // 각 툴에서 정의해야 함
 
   protected canvas: HTMLCanvasElement;
   protected ctx: CanvasRenderingContext2D;
-  protected componentManager: ComponentManager;
   protected activeManager: ActiveManager;
   protected deleteCurrentTool: () => void;
 
@@ -13,22 +19,12 @@ export abstract class BaseTool {
   protected isActive: boolean = false;
   protected stageWidth!: number;
   protected stageHeight!: number;
-  protected leftMenuManager: LeftMenuManager;
 
-  constructor(
-    canvas: HTMLCanvasElement,
-    ctx: CanvasRenderingContext2D,
-    componentManager: ComponentManager,
-    activeManager: ActiveManager,
-    deleteCurrentTool: () => void,
-    leftMenuManager: LeftMenuManager
-  ) {
+  constructor({ canvas, ctx, activeManager, deleteCurrentTool }: BaseToolProps) {
     this.canvas = canvas;
     this.ctx = ctx;
-    this.componentManager = componentManager;
     this.activeManager = activeManager;
     this.deleteCurrentTool = deleteCurrentTool;
-    this.leftMenuManager = leftMenuManager;
   }
 
   // 툴 활성화/비활성화
