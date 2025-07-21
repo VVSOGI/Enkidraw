@@ -429,17 +429,21 @@ export class Line extends BaseComponent<LinePosition> {
         // Calculate relative positions based on end point of selection area
         const relativeX1 = this.originPosition.x1 - multiSelectRange.x2;
         const relativeX2 = this.originPosition.x2 - multiSelectRange.x2;
-        const relativeCx = this.originPosition.crossPoints[0].cx - multiSelectRange.x2;
 
-        const crossTargetPoint = Object.assign({}, this.originPosition.crossPoints[0]);
-        crossTargetPoint.cx = multiSelectRange.x2 + relativeCx * scale;
+        const crossPoints = this.originPosition.crossPoints.map((point) => {
+          const relativeCx = point.cx - multiSelectRange.x2;
+          return {
+            cx: multiSelectRange.x2 + relativeCx * scale,
+            cy: point.cy,
+          };
+        });
 
         // Adjust all points with the same scale
         this.position = {
           ...this.position,
           x1: multiSelectRange.x2 + relativeX1 * scale,
           x2: multiSelectRange.x2 + relativeX2 * scale,
-          crossPoints: [crossTargetPoint],
+          crossPoints,
         };
       }
 
@@ -451,17 +455,21 @@ export class Line extends BaseComponent<LinePosition> {
         // Calculate relative positions based on start point of selection area
         const relativeX1 = this.originPosition.x1 - multiSelectRange.x1;
         const relativeX2 = this.originPosition.x2 - multiSelectRange.x1;
-        const relativeCx = this.originPosition.crossPoints[0].cx - multiSelectRange.x1;
 
-        const crossTargetPoint = Object.assign({}, this.originPosition.crossPoints[0]);
-        crossTargetPoint.cx = multiSelectRange.x1 + relativeCx * scale;
+        const crossPoints = this.originPosition.crossPoints.map((point) => {
+          const relativeCx = point.cx - multiSelectRange.x1;
+          return {
+            cx: multiSelectRange.x1 + relativeCx * scale,
+            cy: point.cy,
+          };
+        });
 
         // Adjust all points with the same scale
         this.position = {
           ...this.position,
           x1: multiSelectRange.x1 + relativeX1 * scale,
           x2: multiSelectRange.x1 + relativeX2 * scale,
-          crossPoints: [crossTargetPoint],
+          crossPoints,
         };
       }
 
@@ -473,17 +481,21 @@ export class Line extends BaseComponent<LinePosition> {
         // Calculate relative positions based on end point of selection area
         const relativeY1 = this.originPosition.y1 - multiSelectRange.y2;
         const relativeY2 = this.originPosition.y2 - multiSelectRange.y2;
-        const relativeCy = this.originPosition.crossPoints[0].cy - multiSelectRange.y2;
 
-        const crossTargetPoint = Object.assign({}, this.originPosition.crossPoints[0]);
-        crossTargetPoint.cy = multiSelectRange.y2 + relativeCy * scale;
+        const crossPoints = this.originPosition.crossPoints.map((point) => {
+          const relativeCy = point.cy - multiSelectRange.y2;
+          return {
+            cx: point.cx,
+            cy: multiSelectRange.y2 + relativeCy * scale,
+          };
+        });
 
         // Adjust all points with the same scale
         this.position = {
           ...this.position,
           y1: multiSelectRange.y2 + relativeY1 * scale,
           y2: multiSelectRange.y2 + relativeY2 * scale,
-          crossPoints: [crossTargetPoint],
+          crossPoints,
         };
       }
 
@@ -495,17 +507,21 @@ export class Line extends BaseComponent<LinePosition> {
         // Calculate relative positions based on start point of selection area
         const relativeY1 = this.originPosition.y1 - multiSelectRange.y1;
         const relativeY2 = this.originPosition.y2 - multiSelectRange.y1;
-        const relativeCy = this.originPosition.crossPoints[0].cy - multiSelectRange.y1;
 
-        const crossTargetPoint = Object.assign({}, this.originPosition.crossPoints[0]);
-        crossTargetPoint.cy = multiSelectRange.y1 + relativeCy * scale;
+        const crossPoints = this.originPosition.crossPoints.map((point) => {
+          const relativeCy = point.cy - multiSelectRange.y1;
+          return {
+            cx: point.cx,
+            cy: multiSelectRange.y1 + relativeCy * scale,
+          };
+        });
 
         // Adjust all points with the same scale
         this.position = {
           ...this.position,
           y1: multiSelectRange.y1 + relativeY1 * scale,
           y2: multiSelectRange.y1 + relativeY2 * scale,
-          crossPoints: [crossTargetPoint],
+          crossPoints,
         };
       }
 
@@ -525,21 +541,24 @@ export class Line extends BaseComponent<LinePosition> {
         const relativeY1 = this.originPosition.y1 - multiSelectRange.y2;
         const relativeX2 = this.originPosition.x2 - multiSelectRange.x2;
         const relativeY2 = this.originPosition.y2 - multiSelectRange.y2;
-        const relativeCx = this.originPosition.crossPoints[0].cx - multiSelectRange.x2;
-        const relativeCy = this.originPosition.crossPoints[0].cy - multiSelectRange.y2;
 
-        const crossTargetPoint = Object.assign({}, this.originPosition.crossPoints[0]);
-        crossTargetPoint.cx = multiSelectRange.x2 + relativeCx * scaleX;
-        crossTargetPoint.cy = multiSelectRange.y2 + relativeCy * scaleY;
+        const crossPoints = this.originPosition.crossPoints.map((point) => {
+          const relativeCx = point.cx - multiSelectRange.x2;
+          const relativeCy = point.cy - multiSelectRange.y2;
+          return {
+            cx: multiSelectRange.x2 + relativeCx * scaleX,
+            cy: multiSelectRange.y2 + relativeCy * scaleY,
+          };
+        });
 
         // Adjust all points with both scales
         this.position = {
           ...this.position,
           x1: multiSelectRange.x2 + relativeX1 * scaleX,
           y1: multiSelectRange.y2 + relativeY1 * scaleY,
-          crossPoints: [crossTargetPoint],
           x2: multiSelectRange.x2 + relativeX2 * scaleX,
           y2: multiSelectRange.y2 + relativeY2 * scaleY,
+          crossPoints,
         };
       }
 
@@ -560,12 +579,15 @@ export class Line extends BaseComponent<LinePosition> {
         const relativeY1 = this.originPosition.y1 - multiSelectRange.y2;
         const relativeX2 = this.originPosition.x2 - multiSelectRange.x1;
         const relativeY2 = this.originPosition.y2 - multiSelectRange.y2;
-        const relativeCx = this.originPosition.crossPoints[0].cx - multiSelectRange.x1;
-        const relativeCy = this.originPosition.crossPoints[0].cy - multiSelectRange.y2;
 
-        const crossTargetPoint = Object.assign({}, this.originPosition.crossPoints[0]);
-        crossTargetPoint.cx = multiSelectRange.x1 + relativeCx * scaleX;
-        crossTargetPoint.cy = multiSelectRange.y2 + relativeCy * scaleY;
+        const crossPoints = this.originPosition.crossPoints.map((point) => {
+          const relativeCx = point.cx - multiSelectRange.x1;
+          const relativeCy = point.cy - multiSelectRange.y2;
+          return {
+            cx: multiSelectRange.x1 + relativeCx * scaleX,
+            cy: multiSelectRange.y2 + relativeCy * scaleY,
+          };
+        });
 
         // Adjust all points with both scales
         this.position = {
@@ -574,7 +596,7 @@ export class Line extends BaseComponent<LinePosition> {
           y1: multiSelectRange.y2 + relativeY1 * scaleY,
           x2: multiSelectRange.x1 + relativeX2 * scaleX,
           y2: multiSelectRange.y2 + relativeY2 * scaleY,
-          crossPoints: [crossTargetPoint],
+          crossPoints,
         };
       }
 
@@ -594,12 +616,15 @@ export class Line extends BaseComponent<LinePosition> {
         const relativeY1 = this.originPosition.y1 - multiSelectRange.y1;
         const relativeX2 = this.originPosition.x2 - multiSelectRange.x2;
         const relativeY2 = this.originPosition.y2 - multiSelectRange.y1;
-        const relativeCx = this.originPosition.crossPoints[0].cx - multiSelectRange.x2;
-        const relativeCy = this.originPosition.crossPoints[0].cy - multiSelectRange.y1;
 
-        const crossTargetPoint = Object.assign({}, this.originPosition.crossPoints[0]);
-        crossTargetPoint.cx = multiSelectRange.x2 + relativeCx * scaleX;
-        crossTargetPoint.cy = multiSelectRange.y1 + relativeCy * scaleY;
+        const crossPoints = this.originPosition.crossPoints.map((point) => {
+          const relativeCx = point.cx - multiSelectRange.x2;
+          const relativeCy = point.cy - multiSelectRange.y1;
+          return {
+            cx: multiSelectRange.x2 + relativeCx * scaleX,
+            cy: multiSelectRange.y1 + relativeCy * scaleY,
+          };
+        });
 
         // Adjust all points with both scales
         this.position = {
@@ -608,7 +633,7 @@ export class Line extends BaseComponent<LinePosition> {
           y1: multiSelectRange.y1 + relativeY1 * scaleY,
           x2: multiSelectRange.x2 + relativeX2 * scaleX,
           y2: multiSelectRange.y1 + relativeY2 * scaleY,
-          crossPoints: [crossTargetPoint],
+          crossPoints,
         };
       }
 
@@ -629,12 +654,15 @@ export class Line extends BaseComponent<LinePosition> {
         const relativeY1 = this.originPosition.y1 - multiSelectRange.y1;
         const relativeX2 = this.originPosition.x2 - multiSelectRange.x1;
         const relativeY2 = this.originPosition.y2 - multiSelectRange.y1;
-        const relativeCx = this.originPosition.crossPoints[0].cx - multiSelectRange.x1;
-        const relativeCy = this.originPosition.crossPoints[0].cy - multiSelectRange.y1;
 
-        const crossTargetPoint = Object.assign({}, this.originPosition.crossPoints[0]);
-        crossTargetPoint.cx = multiSelectRange.x1 + relativeCx * scaleX;
-        crossTargetPoint.cy = multiSelectRange.y1 + relativeCy * scaleY;
+        const crossPoints = this.originPosition.crossPoints.map((point) => {
+          const relativeCx = point.cx - multiSelectRange.x1;
+          const relativeCy = point.cy - multiSelectRange.y1;
+          return {
+            cx: multiSelectRange.x1 + relativeCx * scaleX,
+            cy: multiSelectRange.y1 + relativeCy * scaleY,
+          };
+        });
 
         // Adjust all points with both scales
         this.position = {
@@ -643,7 +671,7 @@ export class Line extends BaseComponent<LinePosition> {
           y1: multiSelectRange.y1 + relativeY1 * scaleY,
           x2: multiSelectRange.x1 + relativeX2 * scaleX,
           y2: multiSelectRange.y1 + relativeY2 * scaleY,
-          crossPoints: [crossTargetPoint],
+          crossPoints,
         };
       }
     }
