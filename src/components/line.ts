@@ -711,17 +711,6 @@ export class Line extends BaseComponent<LinePosition> {
         ...this.position.crossPoints.map(({ cx, cy }) => ({ x: cx, y: cy })),
         { x: this.position.x2, y: this.position.y2 },
       ];
-
-      const dots = 50;
-
-      for (let i = 0; i < points.length - 1; i++) {
-        const current = points[i];
-        const next = points[i + 1];
-
-        for (let i = 0; i < dots; i++) {
-          const x = current.x + ((next.x - current.x) / dots) * i;
-        }
-      }
     }
   };
 
@@ -830,12 +819,45 @@ export class Line extends BaseComponent<LinePosition> {
     this.ctx.stroke();
     this.ctx.closePath();
     this.ctx.restore();
+
+    if (this.type === "line") return;
+
+    const points = [
+      { x: this.position.x1, y: this.position.y1 },
+      ...this.position.crossPoints.map(({ cx, cy }) => ({ x: cx, y: cy })),
+      { x: this.position.x2, y: this.position.y2 },
+    ];
+
+    const dots = 30;
+
+    for (let i = 0; i < points.length - 1; i++) {
+      const current = points[i];
+      const next = points[i + 1];
+
+      const prevPoint = points[i - 1] || current;
+      const nextPoint = points[i + 2] || next;
+
+      const { cp1x, cp1y, cp2x, cp2y } = MathUtils.getSmoothCurveControlPoints(current, next, prevPoint, nextPoint);
+
+      for (let j = 0; j < dots; j++) {
+        const t = j / dots;
+
+        const x = MathUtils.getCubicBezierCurve(t, current.x, cp1x, cp2x, next.x);
+        const y = MathUtils.getCubicBezierCurve(t, current.y, cp1y, cp2y, next.y);
+
+        this.ctx.save();
+        this.ctx.beginPath();
+        this.ctx.arc(x, y, 10, 0, Math.PI * 2);
+        this.ctx.fill();
+        this.ctx.closePath();
+        this.ctx.restore();
+      }
+    }
   };
 
   draw = () => {
     this.ctx.beginPath();
     this.ctx.moveTo(this.position.x1, this.position.y1);
-    const test = [];
 
     if (this.type === "line") {
       this.ctx.lineTo(this.position.x2, this.position.y2);
@@ -849,17 +871,16 @@ export class Line extends BaseComponent<LinePosition> {
       for (let i = 0; i < allPoints.length - 1; i++) {
         const startPoint = allPoints[i];
         const endPoint = allPoints[i + 1];
-        const tension = 0.15;
 
         const prevPoint = allPoints[i - 1] || startPoint;
         const nextPoint = allPoints[i + 2] || endPoint;
 
-        const cp1x = startPoint.x + (endPoint.x - prevPoint.x) * tension;
-        const cp1y = startPoint.y + (endPoint.y - prevPoint.y) * tension;
-        const cp2x = endPoint.x - (nextPoint.x - startPoint.x) * tension;
-        const cp2y = endPoint.y - (nextPoint.y - startPoint.y) * tension;
-
-        test.push([cp1x, cp1y, cp2x, cp2y]);
+        const { cp1x, cp1y, cp2x, cp2y } = MathUtils.getSmoothCurveControlPoints(
+          startPoint,
+          endPoint,
+          prevPoint,
+          nextPoint
+        );
 
         this.ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, endPoint.x, endPoint.y);
       }
