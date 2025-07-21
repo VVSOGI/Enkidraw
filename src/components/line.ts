@@ -36,9 +36,9 @@ export class Line extends BaseComponent<LinePosition> {
     this.originPosition = {
       x1: this.position.x1,
       y1: this.position.y1,
-      crossPoints: this.position.crossPoints.map((point) => ({ ...point })),
       x2: this.position.x2,
       y2: this.position.y2,
+      crossPoints: this.position.crossPoints.map((point) => ({ ...point })),
     };
 
     this.moveCornorPoint = -1;
@@ -679,94 +679,17 @@ export class Line extends BaseComponent<LinePosition> {
 
   getPosition = (): BasePosition => {
     if (this.type === "curve") {
-      let left = Infinity;
-      let top = Infinity;
-      let right = -Infinity;
-      let bottom = -Infinity;
-
-      const dots = 100;
-      for (let i = 0; i <= dots; i++) {
-        const t = i / dots;
-
-        const controlX = MathUtils.getBezierControlPoint(
-          0.5,
-          this.position.crossPoints[0].cx,
-          this.position.x1,
-          this.position.x2
-        );
-        const controlY = MathUtils.getBezierControlPoint(
-          0.5,
-          this.position.crossPoints[0].cy,
-          this.position.y1,
-          this.position.y2
-        );
-
-        const x =
-          Math.pow(1 - t, 2) * this.position.x1 + 2 * (1 - t) * t * controlX + Math.pow(t, 2) * this.position.x2;
-
-        const y =
-          Math.pow(1 - t, 2) * this.position.y1 + 2 * (1 - t) * t * controlY + Math.pow(t, 2) * this.position.y2;
-
-        left = Math.min(left, x);
-        top = Math.min(top, y);
-        right = Math.max(right, x);
-        bottom = Math.max(bottom, y);
-      }
-
-      return {
-        x1: left,
-        y1: top,
-        x2: right,
-        y2: bottom,
-      };
-    }
-
-    const left = Math.min(this.position.x1, this.position.x2);
-    const top = Math.min(this.position.y1, this.position.y2);
-    const right = Math.max(this.position.x1, this.position.x2);
-    const bottom = Math.max(this.position.y1, this.position.y2);
-
-    return {
-      x1: left,
-      y1: top,
-      x2: right,
-      y2: bottom,
-    };
-  };
-
-  multiDragMode = (mode: boolean) => {
-    this.isMultiDrag = mode;
-  };
-
-  multiDragEffect = () => {
-    if (this.type === "line") {
-      const { x1, y1, x2, y2 } = this.getPosition();
-
-      this.ctx.save();
-      this.ctx.beginPath();
-      this.ctx.moveTo(x1, y1);
-      this.ctx.lineTo(x2, y1);
-      this.ctx.lineTo(x2, y2);
-      this.ctx.lineTo(x1, y2);
-      this.ctx.lineTo(x1, y1);
-      this.ctx.strokeStyle = STYLE_SYSTEM.PRIMARY;
-      this.ctx.stroke();
-      this.ctx.closePath();
-      this.ctx.restore();
-    }
-
-    if (this.type === "curve") {
       const points = [
         { x: this.position.x1, y: this.position.y1 },
         ...this.position.crossPoints.map(({ cx, cy }) => ({ x: cx, y: cy })),
         { x: this.position.x2, y: this.position.y2 },
       ];
 
-      const dots = 30;
-      let minX = Infinity;
-      let minY = Infinity;
-      let maxX = -Infinity;
-      let maxY = -Infinity;
+      const dots = 50;
+      let left = Infinity;
+      let top = Infinity;
+      let right = -Infinity;
+      let bottom = -Infinity;
 
       for (let i = 0; i < points.length - 1; i++) {
         const current = points[i];
@@ -783,24 +706,52 @@ export class Line extends BaseComponent<LinePosition> {
           const x = MathUtils.getCubicBezierCurve(t, current.x, cp1x, cp2x, next.x);
           const y = MathUtils.getCubicBezierCurve(t, current.y, cp1y, cp2y, next.y);
 
-          minX = Math.min(x - STYLE_SYSTEM.STROKE_WIDTH, minX);
-          minY = Math.min(y - STYLE_SYSTEM.STROKE_WIDTH, minY);
-          maxX = Math.max(x + STYLE_SYSTEM.STROKE_WIDTH, maxX);
-          maxY = Math.max(y + STYLE_SYSTEM.STROKE_WIDTH, maxY);
+          left = Math.min(x - STYLE_SYSTEM.STROKE_WIDTH, left);
+          top = Math.min(y - STYLE_SYSTEM.STROKE_WIDTH, top);
+          right = Math.max(x + STYLE_SYSTEM.STROKE_WIDTH, right);
+          bottom = Math.max(y + STYLE_SYSTEM.STROKE_WIDTH, bottom);
         }
       }
-      this.ctx.save();
-      this.ctx.beginPath();
-      this.ctx.moveTo(minX, minY);
-      this.ctx.lineTo(maxX, minY);
-      this.ctx.lineTo(maxX, maxY);
-      this.ctx.lineTo(minX, maxY);
-      this.ctx.lineTo(minX, minY);
-      this.ctx.strokeStyle = STYLE_SYSTEM.PRIMARY;
-      this.ctx.stroke();
-      this.ctx.closePath();
-      this.ctx.restore();
+
+      return {
+        x1: left,
+        y1: top,
+        x2: right,
+        y2: bottom,
+      };
     }
+
+    const left = Math.min(this.position.x1, this.position.x2);
+    const top = Math.min(this.position.y1, this.position.y2);
+    const right = Math.max(this.position.x1, this.position.x2);
+    const bottom = Math.max(this.position.y1, this.position.y2);
+
+    return {
+      x1: left - STYLE_SYSTEM.STROKE_WIDTH,
+      y1: top - STYLE_SYSTEM.STROKE_WIDTH,
+      x2: right + STYLE_SYSTEM.STROKE_WIDTH,
+      y2: bottom + STYLE_SYSTEM.STROKE_WIDTH,
+    };
+  };
+
+  multiDragMode = (mode: boolean) => {
+    this.isMultiDrag = mode;
+  };
+
+  multiDragEffect = () => {
+    const { x1, y1, x2, y2 } = this.getPosition();
+
+    this.ctx.save();
+    this.ctx.beginPath();
+    this.ctx.moveTo(x1, y1);
+    this.ctx.lineTo(x2, y1);
+    this.ctx.lineTo(x2, y2);
+    this.ctx.lineTo(x1, y2);
+    this.ctx.lineTo(x1, y1);
+    this.ctx.strokeStyle = STYLE_SYSTEM.PRIMARY;
+    this.ctx.stroke();
+    this.ctx.closePath();
+    this.ctx.restore();
   };
 
   private getMouseHitControlPoint = (mousePosition: MousePoint) => {
