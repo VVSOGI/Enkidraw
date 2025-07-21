@@ -57,4 +57,33 @@ export class MathUtils {
 
     return minDistance;
   };
+
+  // 3차 베지어 곡선 (Cubic Bézier Curve)
+  // B(t) = (1-t)³P₀ + 3(1-t)²tP₁ + 3(1-t)t²P₂ + t³P₃
+  static getCubicBezierCurve = (t: number, p0: number, p1: number, p2: number, p3: number) => {
+    const oneMinusT = 1 - t;
+    return (
+      Math.pow(oneMinusT, 3) * p0 +
+      3 * Math.pow(oneMinusT, 2) * t * p1 +
+      3 * oneMinusT * Math.pow(t, 2) * p2 +
+      Math.pow(t, 3) * p3
+    );
+  };
+
+  // Smooth curve를 위한 tension 기반 제어점 계산
+  static getSmoothCurveControlPoints = (
+    startPoint: { x: number; y: number },
+    endPoint: { x: number; y: number },
+    prevPoint: { x: number; y: number },
+    nextPoint: { x: number; y: number }
+  ) => {
+    const tension = 0.15;
+
+    return {
+      cp1x: startPoint.x + (endPoint.x - prevPoint.x) * tension,
+      cp1y: startPoint.y + (endPoint.y - prevPoint.y) * tension,
+      cp2x: endPoint.x - (nextPoint.x - startPoint.x) * tension,
+      cp2y: endPoint.y - (nextPoint.y - startPoint.y) * tension,
+    };
+  };
 }
