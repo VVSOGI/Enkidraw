@@ -17,7 +17,8 @@ export class ComponentManager {
     canvas: HTMLCanvasElement,
     ctx: CanvasRenderingContext2D,
     activeManager: ActiveManager,
-    leftMenuManager: LeftMenuManager
+    leftMenuManager: LeftMenuManager,
+    getZoomTransform?: () => { zoom: number; translateX: number; translateY: number }
   ) {
     this.canvas = canvas;
     this.ctx = ctx;
@@ -40,7 +41,8 @@ export class ComponentManager {
       this.activeManager,
       this.selectedComponentManager,
       this.components,
-      this.removeSelected
+      this.removeSelected,
+      getZoomTransform
     );
   }
 
