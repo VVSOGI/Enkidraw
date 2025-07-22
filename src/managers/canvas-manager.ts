@@ -1,5 +1,5 @@
 import { ComponentManager, ActiveManager, LeftMenuManager } from ".";
-import { BaseTool, DragTool } from "../tools";
+import { BaseTool, DragTool, ZoomTool } from "../tools";
 import { ToolConstructor, ToolNames } from "../types";
 
 export class CanvasManager {
@@ -12,6 +12,7 @@ export class CanvasManager {
   private tools: Map<ToolNames, BaseTool> = new Map();
   private currentTool: BaseTool | null = null;
   private dragTool: DragTool;
+  private zoomTool: ZoomTool;
   private activeManager: ActiveManager;
   private componentManager: ComponentManager;
   private leftMenuManager: LeftMenuManager;
@@ -28,25 +29,45 @@ export class CanvasManager {
 
     this.leftMenuManager = new LeftMenuManager();
     this.activeManager = new ActiveManager(canvas, this.ctx);
-    this.componentManager = new ComponentManager(canvas, this.ctx, this.activeManager, this.leftMenuManager);
-    this.dragTool = new DragTool({
+    this.componentManager = new ComponentManager(
+      canvas,
+      this.ctx,
+      this.activeManager,
+      this.leftMenuManager,
+      this.getZoomTransform
+    );
+    this.zoomTool = new ZoomTool({
       canvas: this.canvas,
       ctx: this.ctx,
       activeManager: this.activeManager,
       deleteCurrentTool: this.deleteCurrentTool,
     });
+    this.dragTool = new DragTool({
+      canvas: this.canvas,
+      ctx: this.ctx,
+      activeManager: this.activeManager,
+      deleteCurrentTool: this.deleteCurrentTool,
+      getZoomTransform: this.getZoomTransform,
+    });
 
+    this.zoomTool.activate();
     this.animationId = requestAnimationFrame(this.draw);
   }
 
   public destroy = () => {
     window.removeEventListener("resize", this.resize);
     this.dragTool.deactivate();
+    this.zoomTool.deactivate();
     this.activeManager.deactivate();
 
     if (this.animationId) {
       cancelAnimationFrame(this.animationId);
     }
+  };
+
+  // 줌 변환 정보를 다른 도구들이 접근할 수 있도록 하는 메서드
+  public getZoomTransform = () => {
+    return this.zoomTool.getTransform();
   };
 
   public addTool = (ToolClass: ToolConstructor, button?: HTMLElement) => {
@@ -57,11 +78,12 @@ export class CanvasManager {
       activeManager: this.activeManager,
       leftMenuManager: this.leftMenuManager,
       deleteCurrentTool: this.deleteCurrentTool,
+      getZoomTransform: this.getZoomTransform,
     });
     const toolName = tool.name as ToolNames;
 
-    if (toolName === "drag") {
-      console.info("Drag is automatically applied without buttons.");
+    if (toolName === "drag" || toolName === "zoom") {
+      console.info(`${toolName} is automatically applied without buttons.`);
       return;
     }
 
@@ -103,7 +125,19 @@ export class CanvasManager {
 
   private draw = (t: number) => {
     requestAnimationFrame(this.draw);
+
+    // 컨텍스트 상태 저장
+    this.ctx.save();
+
+    // 캔버스 초기화
+    this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+    this.ctx.scale(2, 2); // 기본 레티나 디스플레이 스케일
     this.ctx.clearRect(0, 0, this.stageWidth, this.stageHeight);
+
+    // 줌 변환 적용
+    const transform = this.zoomTool.getTransform();
+    this.ctx.translate(transform.translateX, transform.translateY);
+    this.ctx.scale(transform.zoom, transform.zoom);
 
     if (!this.currentTool && this.activeManager.currentActive === "drag") {
       const dragRange = this.dragTool.draw();
@@ -117,5 +151,8 @@ export class CanvasManager {
     }
 
     this.componentManager.draw();
+
+    // 컨텍스트 상태 복원
+    this.ctx.restore();
   };
 }
