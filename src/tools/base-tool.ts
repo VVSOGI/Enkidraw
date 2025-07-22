@@ -5,6 +5,7 @@ export interface BaseToolProps {
   ctx: CanvasRenderingContext2D;
   activeManager: ActiveManager;
   deleteCurrentTool: () => void;
+  getZoomTransform?: () => { zoom: number; translateX: number; translateY: number };
 }
 
 export abstract class BaseTool {
@@ -14,18 +15,37 @@ export abstract class BaseTool {
   protected ctx: CanvasRenderingContext2D;
   protected activeManager: ActiveManager;
   protected deleteCurrentTool: () => void;
+  protected getZoomTransform?: () => { zoom: number; translateX: number; translateY: number };
 
   protected isDrawing: boolean = false;
   protected isActive: boolean = false;
   protected stageWidth!: number;
   protected stageHeight!: number;
 
-  constructor({ canvas, ctx, activeManager, deleteCurrentTool }: BaseToolProps) {
+  constructor({ canvas, ctx, activeManager, deleteCurrentTool, getZoomTransform }: BaseToolProps) {
     this.canvas = canvas;
     this.ctx = ctx;
     this.activeManager = activeManager;
     this.deleteCurrentTool = deleteCurrentTool;
+    this.getZoomTransform = getZoomTransform;
   }
+
+  // 줌을 고려한 마우스 좌표 계산
+  protected getLogicalMousePos = (e: MouseEvent) => {
+    const rect = this.canvas.getBoundingClientRect();
+    const screenX = e.clientX - rect.left;
+    const screenY = e.clientY - rect.top;
+
+    const transform = this.getZoomTransform?.();
+    if (!transform) {
+      return { x: screenX, y: screenY };
+    }
+
+    return {
+      x: (screenX - transform.translateX) / transform.zoom,
+      y: (screenY - transform.translateY) / transform.zoom,
+    };
+  };
 
   // 툴 활성화/비활성화
   activate = () => {

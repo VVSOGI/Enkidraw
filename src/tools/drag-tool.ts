@@ -1,5 +1,4 @@
 import { DragRange, MousePoint } from "../types/common";
-import { MouseUtils } from "../utils";
 import { BaseTool, BaseToolProps } from "./base-tool";
 
 interface DragToolProps extends BaseToolProps {}
@@ -9,13 +8,13 @@ export class DragTool extends BaseTool {
   private initPoint: MousePoint | null = null;
   private movePoint: MousePoint | null = null;
 
-  constructor({ canvas, ctx, activeManager, deleteCurrentTool }: DragToolProps) {
-    super({ canvas, ctx, activeManager, deleteCurrentTool });
+  constructor({ canvas, ctx, activeManager, deleteCurrentTool, getZoomTransform }: DragToolProps) {
+    super({ canvas, ctx, activeManager, deleteCurrentTool, getZoomTransform });
     this.activate();
   }
 
   onMouseDown = (e: MouseEvent) => {
-    const position = MouseUtils.getMousePos(e, this.canvas);
+    const position = this.getLogicalMousePos(e);
 
     this.isDrawing = true;
     this.initPoint = position;
@@ -25,7 +24,7 @@ export class DragTool extends BaseTool {
   onMouseMove = (e: MouseEvent) => {
     if (!this.initPoint || !this.movePoint) return null;
 
-    this.movePoint = MouseUtils.getMousePos(e, this.canvas);
+    this.movePoint = this.getLogicalMousePos(e);
 
     const { x: initX, y: initY } = this.initPoint;
     const { x: moveX, y: moveY } = this.movePoint;
@@ -56,9 +55,9 @@ export class DragTool extends BaseTool {
     this.ctx.lineTo(initX, initY);
     this.ctx.lineTo(moveX, initY);
     this.ctx.lineTo(moveX, moveY);
-    this.ctx.fill();
     this.ctx.fillStyle = "rgba(105, 105, 230, 0.1)";
     this.ctx.strokeStyle = "rgba(105, 105, 230)";
+    this.ctx.fill();
     this.ctx.stroke();
     this.ctx.closePath();
 
