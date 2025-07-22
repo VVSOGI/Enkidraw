@@ -1,6 +1,5 @@
 import { BaseComponent } from "../components";
 import { DragRange, EdgeDirection, MousePoint } from "../types";
-import { MouseUtils } from "../utils";
 import { ActiveManager, SelectedComponentManager } from ".";
 
 export class ComponentInteractionManager {
@@ -9,6 +8,7 @@ export class ComponentInteractionManager {
   private selectionManager: SelectedComponentManager;
   private components: Set<BaseComponent>;
   private removeSelectedComponents: () => void;
+  private getZoomTransform?: () => { zoom: number; translateX: number; translateY: number };
 
   private tempPosition: MousePoint | null = null;
   private resizeEdge: EdgeDirection | null = null;
@@ -18,18 +18,37 @@ export class ComponentInteractionManager {
     activeManager: ActiveManager,
     selectionManager: SelectedComponentManager,
     components: Set<BaseComponent>,
-    removeSelectedComponents: () => void
+    removeSelectedComponents: () => void,
+    getZoomTransform?: () => { zoom: number; translateX: number; translateY: number }
   ) {
     this.canvas = canvas;
     this.activeManager = activeManager;
     this.selectionManager = selectionManager;
     this.components = components;
     this.removeSelectedComponents = removeSelectedComponents;
+    this.getZoomTransform = getZoomTransform;
     this.addEventListeners();
   }
 
+  // 줌을 고려한 마우스 좌표 계산
+  private getLogicalMousePos = (e: MouseEvent): MousePoint => {
+    const rect = this.canvas.getBoundingClientRect();
+    const screenX = e.clientX - rect.left;
+    const screenY = e.clientY - rect.top;
+
+    const transform = this.getZoomTransform?.();
+    if (!transform) {
+      return { x: screenX, y: screenY };
+    }
+
+    return {
+      x: (screenX - transform.translateX) / transform.zoom,
+      y: (screenY - transform.translateY) / transform.zoom,
+    };
+  };
+
   public onMouseMove = (e: MouseEvent) => {
-    const mousePos = MouseUtils.getMousePos(e, this.canvas);
+    const mousePos = this.getLogicalMousePos(e);
 
     // 1. Handle multi-drag mode
     if (this.activeManager.currentActive === "drag") {
@@ -51,7 +70,7 @@ export class ComponentInteractionManager {
   };
 
   public onMouseDown = (e: MouseEvent) => {
-    const mousePos = MouseUtils.getMousePos(e, this.canvas);
+    const mousePos = this.getLogicalMousePos(e);
 
     // Handle multi-select range interactions
     const multiSelectRange = this.selectionManager.getMultiSelectRange();

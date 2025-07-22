@@ -1,6 +1,5 @@
 import { BaseTool, BaseToolProps } from "./base-tool";
 import { MousePoint } from "../types";
-import { MouseUtils } from "../utils";
 import { Line } from "../components";
 import { ComponentManager, LeftMenuManager } from "../managers";
 
@@ -19,8 +18,16 @@ export class LineTool extends BaseTool {
   protected componentManager: ComponentManager;
   protected leftMenuManager: LeftMenuManager;
 
-  constructor({ canvas, ctx, activeManager, leftMenuManager, componentManager, deleteCurrentTool }: LineToolProps) {
-    super({ canvas, ctx, activeManager, deleteCurrentTool });
+  constructor({
+    canvas,
+    ctx,
+    activeManager,
+    leftMenuManager,
+    componentManager,
+    deleteCurrentTool,
+    getZoomTransform,
+  }: LineToolProps) {
+    super({ canvas, ctx, activeManager, deleteCurrentTool, getZoomTransform });
     this.leftMenuManager = leftMenuManager;
     this.componentManager = componentManager;
   }
@@ -34,7 +41,7 @@ export class LineTool extends BaseTool {
   };
 
   onMouseDown = (e: MouseEvent) => {
-    const position = MouseUtils.getMousePos(e, this.canvas);
+    const position = this.getLogicalMousePos(e);
 
     if (!this.isDrawing) {
       this.isDrawing = true;
@@ -45,7 +52,7 @@ export class LineTool extends BaseTool {
   };
 
   onMouseMove = (e: MouseEvent) => {
-    this.movePoint = MouseUtils.getMousePos(e, this.canvas);
+    this.movePoint = this.getLogicalMousePos(e);
   };
 
   onMouseUp = (e: MouseEvent) => {
