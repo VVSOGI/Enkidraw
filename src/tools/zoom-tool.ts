@@ -111,6 +111,15 @@ export class ZoomTool extends BaseTool {
     };
   };
 
+  // 변환 상태 설정 (패닝 도구에서 사용)
+  setTransform = (translateX: number, translateY: number, zoom?: number) => {
+    this.transformX = translateX;
+    this.transformY = translateY;
+    if (zoom !== undefined) {
+      this.zoomLevel = Math.max(this.minZoom, Math.min(this.maxZoom, zoom));
+    }
+  };
+
   // 마우스 좌표를 논리 좌표로 역변환
   screenToLogical = (screenX: number, screenY: number) => {
     return {
