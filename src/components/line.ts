@@ -1,7 +1,6 @@
-import { ActiveManager } from "../managers";
 import { DragRange, EdgeDirection, MousePoint } from "../types";
 import { MathUtils, MouseUtils, STYLE_SYSTEM } from "../utils";
-import { BaseComponent, BasePosition } from "./base-component";
+import { BaseComponent, BaseComponentProps, BasePosition } from "./base-component";
 
 export interface LinePosition extends BasePosition {
   crossPoints: {
@@ -10,11 +9,7 @@ export interface LinePosition extends BasePosition {
   }[];
 }
 
-interface Props {
-  canvas: HTMLCanvasElement;
-  ctx: CanvasRenderingContext2D;
-  position: LinePosition;
-  activeManager: ActiveManager;
+interface Props<T> extends BaseComponentProps<T> {
   type?: "line" | "curve";
 }
 
@@ -27,8 +22,8 @@ export class Line extends BaseComponent<LinePosition> {
   private moveCornorPoint = -1;
   private hoverPosition: { position: MousePoint } | null = null;
 
-  constructor({ canvas, ctx, position, activeManager, type = "line" }: Props) {
-    super(canvas, ctx, position, activeManager);
+  constructor({ canvas, ctx, position, activeManager, type = "line", getZoomTransform }: Props<LinePosition>) {
+    super({ canvas, ctx, position, activeManager, getZoomTransform });
     this.type = type;
   }
 

@@ -10,6 +10,14 @@ export interface BasePosition {
   y2: number;
 }
 
+export interface BaseComponentProps<T> {
+  canvas: HTMLCanvasElement;
+  ctx: CanvasRenderingContext2D;
+  position: T;
+  activeManager: ActiveManager;
+  getZoomTransform: () => { zoom: number; translateX: number; translateY: number };
+}
+
 export abstract class BaseComponent<T extends BasePosition = BasePosition> {
   abstract readonly name: string;
 
@@ -24,13 +32,15 @@ export abstract class BaseComponent<T extends BasePosition = BasePosition> {
   protected ctx: CanvasRenderingContext2D;
   protected activeManager: ActiveManager;
   protected multiDragPadding = 5;
+  protected getZoomTransform?: () => { zoom: number; translateX: number; translateY: number };
 
-  constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, position: T, activeManager: ActiveManager) {
+  constructor({ canvas, ctx, position, activeManager, getZoomTransform }: BaseComponentProps<T>) {
     this.canvas = canvas;
     this.ctx = ctx;
     this.position = position;
     this.activeManager = activeManager;
     this.originPosition = position;
+    this.getZoomTransform = getZoomTransform;
   }
 
   public activate = () => {
