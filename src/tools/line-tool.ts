@@ -135,7 +135,7 @@ export class LineTool extends BaseTool {
   };
 
   private appendCurveComponent = () => {
-    if (!this.initPoint || !this.movePoint) return;
+    if (!this.initPoint || !this.movePoint || !this.getZoomTransform) return;
 
     const initPoint = this.points[0];
     const endPoint = this.points[this.points.length - 1];
@@ -154,6 +154,7 @@ export class LineTool extends BaseTool {
         y2: endPoint.y,
         crossPoints,
       },
+      getZoomTransform: this.getZoomTransform,
     });
 
     line.color = this.leftMenuManager.strokeColor;
@@ -161,6 +162,8 @@ export class LineTool extends BaseTool {
   };
 
   private appendLineComponent = (init: MousePoint, end: MousePoint) => {
+    if (!this.getZoomTransform) return;
+
     const { x: initX, y: initY } = init;
     const { x: endX, y: endY } = end;
 
@@ -183,6 +186,7 @@ export class LineTool extends BaseTool {
         y2: endY,
       },
       activeManager: this.activeManager,
+      getZoomTransform: this.getZoomTransform,
     });
 
     line.color = this.leftMenuManager.strokeColor;

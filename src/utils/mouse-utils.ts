@@ -13,18 +13,15 @@ export class MouseUtils {
     canvas: HTMLCanvasElement,
     transform?: { zoom: number; translateX: number; translateY: number }
   ) => {
-    const rect = canvas.getBoundingClientRect();
-    const screenX = e.clientX - rect.left;
-    const screenY = e.clientY - rect.top;
+    const { x, y } = this.getMousePos(e, canvas);
 
     if (!transform) {
-      return { x: screenX, y: screenY };
+      return { x, y };
     }
 
-    // 줌과 이동 변환을 역으로 적용하여 논리 좌표 계산
     return {
-      x: (screenX - transform.translateX) / transform.zoom,
-      y: (screenY - transform.translateY) / transform.zoom,
+      x: (x - transform.translateX) / transform.zoom,
+      y: (y - transform.translateY) / transform.zoom,
     };
   };
 }
