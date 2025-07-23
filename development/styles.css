@@ -22,9 +22,12 @@ canvas {
   height: 100%;
 }
 
-#line-button {
+#button-container {
   position: absolute;
-  top: 0;
-  left: 0;
-  padding: 10px 30px;
+  display: flex;
+  height: fit-content;
+
+  button {
+    padding: 10px 30px;
+  }
 }
