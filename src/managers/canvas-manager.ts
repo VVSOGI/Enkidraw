@@ -126,15 +126,12 @@ export class CanvasManager {
   private draw = (t: number) => {
     requestAnimationFrame(this.draw);
 
-    // 컨텍스트 상태 저장
     this.ctx.save();
 
-    // 캔버스 초기화
     this.ctx.setTransform(1, 0, 0, 1, 0, 0);
-    this.ctx.scale(2, 2); // 기본 레티나 디스플레이 스케일
+    this.ctx.scale(2, 2);
     this.ctx.clearRect(0, 0, this.stageWidth, this.stageHeight);
 
-    // 줌 변환 적용
     const transform = this.zoomTool.getTransform();
     this.ctx.translate(transform.translateX, transform.translateY);
     this.ctx.scale(transform.zoom, transform.zoom);
@@ -152,7 +149,6 @@ export class CanvasManager {
 
     this.componentManager.draw();
 
-    // 컨텍스트 상태 복원
     this.ctx.restore();
   };
 }
