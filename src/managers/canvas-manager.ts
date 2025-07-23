@@ -1,5 +1,5 @@
 import { ComponentManager, ActiveManager, LeftMenuManager } from ".";
-import { BaseTool, DragTool, ZoomTool } from "../tools";
+import { BaseTool, DragTool, ZoomTool, HandTool } from "../tools";
 import { ToolConstructor, ToolNames } from "../types";
 
 export class CanvasManager {
@@ -13,6 +13,7 @@ export class CanvasManager {
   private currentTool: BaseTool | null = null;
   private dragTool: DragTool;
   private zoomTool: ZoomTool;
+  private handTool: HandTool;
   private activeManager: ActiveManager;
   private componentManager: ComponentManager;
   private leftMenuManager: LeftMenuManager;
@@ -49,6 +50,14 @@ export class CanvasManager {
       deleteCurrentTool: this.deleteCurrentTool,
       getZoomTransform: this.getZoomTransform,
     });
+    this.handTool = new HandTool({
+      canvas: this.canvas,
+      ctx: this.ctx,
+      activeManager: this.activeManager,
+      deleteCurrentTool: this.deleteCurrentTool,
+      getZoomTransform: this.getZoomTransform,
+      setZoomTransform: this.zoomTool.setTransform,
+    });
 
     this.zoomTool.activate();
     this.animationId = requestAnimationFrame(this.draw);
@@ -58,7 +67,12 @@ export class CanvasManager {
     window.removeEventListener("resize", this.resize);
     this.dragTool.deactivate();
     this.zoomTool.deactivate();
+    this.handTool.deactivate();
     this.activeManager.deactivate();
+
+    for (const [toolname, tool] of this.tools) {
+      tool.deactivate();
+    }
 
     if (this.animationId) {
       cancelAnimationFrame(this.animationId);
@@ -82,7 +96,7 @@ export class CanvasManager {
     });
     const toolName = tool.name as ToolNames;
 
-    if (toolName === "drag" || toolName === "zoom") {
+    if (toolName === "drag" || toolName === "zoom" || toolName === "hand") {
       console.info(`${toolName} is automatically applied without buttons.`);
       return;
     }
