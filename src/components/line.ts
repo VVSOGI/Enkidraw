@@ -41,8 +41,11 @@ export class Line extends BaseComponent<LinePosition> {
   };
 
   isHover = (e: MouseEvent) => {
+    if (!this.getZoomTransform) return false;
+    const zoomTransform = this.getZoomTransform();
+
     if (this.type === "curve") {
-      const mousePosition = MouseUtils.getMousePos(e, this.canvas);
+      const mousePosition = MouseUtils.getLogicalMousePos(e, this.canvas, zoomTransform);
       const distance = MathUtils.getDistanceCurveFromPoint(mousePosition, this.position);
       if (distance <= this.threshold) {
         return true;
@@ -50,7 +53,7 @@ export class Line extends BaseComponent<LinePosition> {
     }
 
     if (this.type === "line") {
-      const mousePosition = MouseUtils.getMousePos(e, this.canvas);
+      const mousePosition = MouseUtils.getLogicalMousePos(e, this.canvas, zoomTransform);
       const distance = MathUtils.getDistanceLineFromPoint(mousePosition, this.threshold, this.position);
       if (distance <= this.threshold) {
         return true;
@@ -61,7 +64,10 @@ export class Line extends BaseComponent<LinePosition> {
   };
 
   isClicked = (e: MouseEvent) => {
-    const mousePosition = MouseUtils.getMousePos(e, this.canvas);
+    if (!this.getZoomTransform) return false;
+    const zoomTransform = this.getZoomTransform();
+    const mousePosition = MouseUtils.getLogicalMousePos(e, this.canvas, zoomTransform);
+
     const distance =
       this.type === "curve"
         ? MathUtils.getDistanceCurveFromPoint(mousePosition, this.position)
