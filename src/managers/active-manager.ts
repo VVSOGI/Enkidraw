@@ -1,7 +1,9 @@
 import { CursorStyle } from "../types";
 
+type ActiveMode = "default" | "move" | "pointer" | "drag" | "resize" | "hand";
+
 export class ActiveManager {
-  public currentActive: "default" | "move" | "pointer" | "drag" | "resize" = "default";
+  public currentActive: ActiveMode = "default";
 
   protected canvas: HTMLCanvasElement;
   protected ctx: CanvasRenderingContext2D;
@@ -16,24 +18,12 @@ export class ActiveManager {
     this.removeEventListeners();
   };
 
-  public setDefault = () => {
-    this.currentActive = "default";
+  public setMode = (mode: ActiveMode) => {
+    this.currentActive = mode;
   };
 
   public setCursorStyle = (style: CursorStyle) => {
     this.canvas.style.cursor = style;
-  };
-
-  public setDrag = () => {
-    this.currentActive = "drag";
-  };
-
-  public setMove = () => {
-    this.currentActive = "move";
-  };
-
-  public setResize = () => {
-    this.currentActive = "resize";
   };
 
   private activate = () => {

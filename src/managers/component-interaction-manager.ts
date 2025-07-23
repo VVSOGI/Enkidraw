@@ -82,11 +82,11 @@ export class ComponentInteractionManager {
 
         // Set appropriate mode based on zone
         if (zone === "inside") {
-          this.activeManager.setMove();
+          this.activeManager.setMode("move");
         } else {
           // Handle resize modes for edges
           this.resizeEdge = zone;
-          this.activeManager.setResize();
+          this.activeManager.setMode("resize");
         }
 
         return;
@@ -98,17 +98,17 @@ export class ComponentInteractionManager {
 
     if (component && selectedComponents.has(component)) {
       this.tempPosition = mousePos;
-      this.activeManager.setMove();
+      this.activeManager.setMode("move");
       return;
     }
 
     if (component) {
       this.selectionManager.selectComponent(component);
-      this.activeManager.setMove();
+      this.activeManager.setMode("move");
       this.tempPosition = mousePos;
     } else {
       this.selectionManager.clearSelection();
-      this.activeManager.setDefault();
+      this.activeManager.setMode("default");
     }
   };
 

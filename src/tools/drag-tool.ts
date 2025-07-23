@@ -30,7 +30,7 @@ export class DragTool extends BaseTool {
     const { x: moveX, y: moveY } = this.movePoint;
 
     if (this.activeManager.currentActive === "default" && (initX !== moveX || initY !== moveY)) {
-      this.activeManager.setDrag();
+      this.activeManager.setMode("drag");
     }
   };
 
@@ -38,7 +38,7 @@ export class DragTool extends BaseTool {
     this.isDrawing = false;
     this.initPoint = null;
     this.movePoint = null;
-    this.activeManager.setDefault();
+    this.activeManager.setMode("default");
   };
 
   onKeyDown = (e: KeyboardEvent) => {};

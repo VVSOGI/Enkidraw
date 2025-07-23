@@ -22,7 +22,7 @@ export class HandTool extends BaseTool {
 
   activate = () => {
     this.isActive = true;
-    this.activeManager.setDefault;
+    this.activeManager.setMode("default");
     this.addHandEventListeners();
     this.setHandCursor();
   };
