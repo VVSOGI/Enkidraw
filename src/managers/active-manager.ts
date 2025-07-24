@@ -41,8 +41,6 @@ export class ActiveManager {
 
       return;
     }
-
-    this.setCursorStyle("default");
   };
 
   private onMouseDown = (e: MouseEvent) => {
