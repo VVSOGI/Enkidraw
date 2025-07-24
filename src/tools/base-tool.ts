@@ -1,9 +1,11 @@
 import { ActiveManager } from "../managers";
+import { ToolNames } from "../types";
 
 export interface BaseToolProps {
   canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
   activeManager: ActiveManager;
+  selectTool: (name: ToolNames) => void;
   deleteCurrentTool: () => void;
   getZoomTransform?: () => { zoom: number; translateX: number; translateY: number };
 }
@@ -11,21 +13,23 @@ export interface BaseToolProps {
 export abstract class BaseTool {
   abstract readonly name: string; // 각 툴에서 정의해야 함
 
-  protected canvas: HTMLCanvasElement;
-  protected ctx: CanvasRenderingContext2D;
-  protected activeManager: ActiveManager;
-  protected deleteCurrentTool: () => void;
-  protected getZoomTransform?: () => { zoom: number; translateX: number; translateY: number };
+  protected canvas: BaseToolProps["canvas"];
+  protected ctx: BaseToolProps["ctx"];
+  protected activeManager: BaseToolProps["activeManager"];
+  protected selectTool: BaseToolProps["selectTool"];
+  protected deleteCurrentTool: BaseToolProps["deleteCurrentTool"];
+  protected getZoomTransform?: BaseToolProps["getZoomTransform"];
 
   protected isDrawing: boolean = false;
   protected isActive: boolean = false;
   protected stageWidth!: number;
   protected stageHeight!: number;
 
-  constructor({ canvas, ctx, activeManager, deleteCurrentTool, getZoomTransform }: BaseToolProps) {
+  constructor({ canvas, ctx, activeManager, selectTool, deleteCurrentTool, getZoomTransform }: BaseToolProps) {
     this.canvas = canvas;
     this.ctx = ctx;
     this.activeManager = activeManager;
+    this.selectTool = selectTool;
     this.deleteCurrentTool = deleteCurrentTool;
     this.getZoomTransform = getZoomTransform;
   }
@@ -72,13 +76,11 @@ export abstract class BaseTool {
     this.canvas.addEventListener("mousedown", this.onMouseDown);
     this.canvas.addEventListener("mousemove", this.onMouseMove);
     this.canvas.addEventListener("mouseup", this.onMouseUp);
-    document.addEventListener("keydown", this.onKeyDown);
   };
 
   protected removeEventListeners = () => {
     this.canvas.removeEventListener("mousedown", this.onMouseDown);
     this.canvas.removeEventListener("mousemove", this.onMouseMove);
     this.canvas.removeEventListener("mouseup", this.onMouseUp);
-    document.removeEventListener("keydown", this.onKeyDown);
   };
 }

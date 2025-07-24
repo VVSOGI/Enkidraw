@@ -1,6 +1,6 @@
 import { ComponentManager, ActiveManager, LeftMenuManager } from ".";
-import { BaseTool, DragTool, ZoomTool, HandTool } from "../tools";
-import { ToolConstructor, ToolNames } from "../types";
+import { BaseTool, DragTool, ZoomTool, HandTool, LineTool } from "../tools";
+import { ToolNames } from "../types";
 
 export class CanvasManager {
   private canvas: HTMLCanvasElement;
@@ -14,6 +14,7 @@ export class CanvasManager {
   private dragTool: DragTool;
   private zoomTool: ZoomTool;
   private handTool: HandTool;
+  private lineTool: LineTool;
   private activeManager: ActiveManager;
   private componentManager: ComponentManager;
   private leftMenuManager: LeftMenuManager;
@@ -41,12 +42,14 @@ export class CanvasManager {
       canvas: this.canvas,
       ctx: this.ctx,
       activeManager: this.activeManager,
+      selectTool: this.selectTool,
       deleteCurrentTool: this.deleteCurrentTool,
     });
     this.dragTool = new DragTool({
       canvas: this.canvas,
       ctx: this.ctx,
       activeManager: this.activeManager,
+      selectTool: this.selectTool,
       deleteCurrentTool: this.deleteCurrentTool,
       getZoomTransform: this.getZoomTransform,
     });
@@ -54,11 +57,24 @@ export class CanvasManager {
       canvas: this.canvas,
       ctx: this.ctx,
       activeManager: this.activeManager,
+      selectTool: this.selectTool,
       deleteCurrentTool: this.deleteCurrentTool,
       getZoomTransform: this.getZoomTransform,
       setZoomTransform: this.zoomTool.setTransform,
     });
+    this.lineTool = new LineTool({
+      canvas: this.canvas,
+      ctx: this.ctx,
+      activeManager: this.activeManager,
+      leftMenuManager: this.leftMenuManager,
+      componentManager: this.componentManager,
+      deleteCurrentTool: this.deleteCurrentTool,
+      getZoomTransform: this.getZoomTransform,
+      selectTool: this.selectTool,
+    });
 
+    this.tools.set("hand", this.handTool);
+    this.tools.set("line", this.lineTool);
     this.zoomTool.activate();
     this.animationId = requestAnimationFrame(this.draw);
   }
@@ -82,33 +98,6 @@ export class CanvasManager {
   // 줌 변환 정보를 다른 도구들이 접근할 수 있도록 하는 메서드
   public getZoomTransform = () => {
     return this.zoomTool.getTransform();
-  };
-
-  public addTool = (ToolClass: ToolConstructor, button?: HTMLElement) => {
-    const tool = new ToolClass({
-      canvas: this.canvas,
-      ctx: this.ctx,
-      componentManager: this.componentManager,
-      activeManager: this.activeManager,
-      leftMenuManager: this.leftMenuManager,
-      deleteCurrentTool: this.deleteCurrentTool,
-      getZoomTransform: this.getZoomTransform,
-    });
-    const toolName = tool.name as ToolNames;
-
-    if (toolName === "drag" || toolName === "zoom" || toolName === "hand") {
-      console.info(`${toolName} is automatically applied without buttons.`);
-      return;
-    }
-
-    tool.resize(this.stageWidth, this.stageHeight);
-    this.tools.set(toolName, tool);
-
-    if (button) {
-      button.addEventListener("click", () => this.selectTool(toolName));
-    }
-
-    return this;
   };
 
   private deleteCurrentTool = () => {

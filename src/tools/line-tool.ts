@@ -24,12 +24,15 @@ export class LineTool extends BaseTool {
     activeManager,
     leftMenuManager,
     componentManager,
+    selectTool,
     deleteCurrentTool,
     getZoomTransform,
   }: LineToolProps) {
-    super({ canvas, ctx, activeManager, deleteCurrentTool, getZoomTransform });
+    super({ canvas, ctx, activeManager, selectTool, deleteCurrentTool, getZoomTransform });
     this.leftMenuManager = leftMenuManager;
     this.componentManager = componentManager;
+
+    document.addEventListener("keydown", this.onKeyDown);
   }
 
   private reset = () => {
@@ -38,9 +41,11 @@ export class LineTool extends BaseTool {
     this.movePoint = null;
     this.multiPointDrawMode = false;
     this.points = [];
+    this.deactivate();
   };
 
   deactivate = () => {
+    this.isActive = false;
     this.removeEventListeners();
   };
 
@@ -80,6 +85,11 @@ export class LineTool extends BaseTool {
   };
 
   onKeyDown = (e: KeyboardEvent) => {
+    console.log(this.isActive);
+    if (!this.isActive && e.key === "1") {
+      this.selectTool(this.name);
+    }
+
     if (!this.isActive || (e.key !== "Esc" && e.key !== "Escape")) {
       return;
     }
