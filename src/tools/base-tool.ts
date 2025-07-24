@@ -55,8 +55,6 @@ export abstract class BaseTool {
 
   deactivate = () => {
     this.isActive = false;
-    this.removeEventListeners();
-    this.deleteCurrentTool();
   };
 
   resize = (stageWidth: number, stageHeight: number) => {

@@ -7,4 +7,6 @@ export type CursorStyle =
   | "nw-resize"
   | "ne-resize"
   | "sw-resize"
-  | "se-resize";
+  | "se-resize"
+  | "grab"
+  | "grabbing";

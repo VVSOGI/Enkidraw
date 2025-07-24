@@ -17,21 +17,19 @@ export class HandTool extends BaseTool {
     super({ canvas, ctx, activeManager, deleteCurrentTool });
     this.setZoomTransform = setZoomTransform;
     this.getZoomTransform = getZoomTransform;
-    this.activate();
+    document.addEventListener("keydown", this.onKeyDown);
   }
 
   activate = () => {
     this.isActive = true;
-    this.activeManager.setMode("default");
     this.addHandEventListeners();
-    this.setHandCursor();
+    this.activeManager.setMode("hand");
+    this.activeManager.setCursorStyle("grab");
   };
 
   deactivate = () => {
     this.isActive = false;
-    this.removeHandEventListeners();
-    this.resetCursor();
-    this.deleteCurrentTool();
+    this.lastMousePos = null;
   };
 
   onMouseDown = (e: MouseEvent) => {
@@ -43,14 +41,16 @@ export class HandTool extends BaseTool {
       x: e.clientX - rect.left,
       y: e.clientY - rect.top,
     };
-
-    this.setGrabbingCursor();
-    e.preventDefault();
   };
 
   onMouseMove = (e: MouseEvent) => {
-    if (!this.isActive || !this.isDragging || !this.lastMousePos) return;
+    if (!this.isActive) return;
 
+    this.activeManager.setCursorStyle("grab");
+
+    if (!this.isDragging || !this.lastMousePos) return;
+
+    this.activeManager.setCursorStyle("grabbing");
     const rect = this.canvas.getBoundingClientRect();
     const currentMousePos = {
       x: e.clientX - rect.left,
@@ -63,8 +63,6 @@ export class HandTool extends BaseTool {
     const currentTransform = this.getZoomTransform();
     this.setZoomTransform(currentTransform.translateX + deltaX, currentTransform.translateY + deltaY);
     this.lastMousePos = currentMousePos;
-
-    e.preventDefault();
   };
 
   onMouseUp = (e: MouseEvent) => {
@@ -72,40 +70,28 @@ export class HandTool extends BaseTool {
 
     this.isDragging = false;
     this.lastMousePos = null;
-    this.setHandCursor();
-    e.preventDefault();
+    this.activeManager.setCursorStyle("grab");
   };
 
   onKeyDown = (e: KeyboardEvent) => {
     if (e.key === "h") {
+      this.activate();
     }
 
-    if (e.key === "Escape") {
+    if (this.activeManager.currentActive === "hand" && e.key === "Escape") {
       e.preventDefault();
       this.deactivate();
+      this.activeManager.setMode("default");
+      this.activeManager.setCursorStyle("default");
     }
   };
 
   draw = () => {};
 
-  private setHandCursor = () => {
-    this.canvas.style.cursor = "grab";
-  };
-
-  private setGrabbingCursor = () => {
-    this.canvas.style.cursor = "grabbing";
-  };
-
-  // 커서 리셋
-  private resetCursor = () => {
-    this.canvas.style.cursor = "default";
-  };
-
   private addHandEventListeners = () => {
     this.canvas.addEventListener("mousedown", this.onMouseDown);
     this.canvas.addEventListener("mousemove", this.onMouseMove);
     this.canvas.addEventListener("mouseup", this.onMouseUp);
-    document.addEventListener("keydown", this.onKeyDown);
   };
 
   private removeHandEventListeners = () => {

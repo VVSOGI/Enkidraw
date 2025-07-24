@@ -30,9 +30,7 @@ export class ActiveManager {
     this.addEventListeners();
   };
 
-  private onMouseMove = (e: MouseEvent) => {
-    this.canvas.style.cursor = "default";
-  };
+  private onMouseMove = (e: MouseEvent) => {};
 
   private onMouseDown = (e: MouseEvent) => {};
 
