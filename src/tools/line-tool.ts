@@ -40,6 +40,10 @@ export class LineTool extends BaseTool {
     this.points = [];
   };
 
+  deactivate = () => {
+    this.removeEventListeners();
+  };
+
   onMouseDown = (e: MouseEvent) => {
     const position = this.getLogicalMousePos(e);
 
@@ -52,6 +56,7 @@ export class LineTool extends BaseTool {
   };
 
   onMouseMove = (e: MouseEvent) => {
+    console.log(this.points);
     this.movePoint = this.getLogicalMousePos(e);
   };
 
@@ -81,7 +86,6 @@ export class LineTool extends BaseTool {
     }
 
     if (!this.initPoint || !this.movePoint || !this.multiPointDrawMode) {
-      e.preventDefault();
       this.deleteCurrentTool();
       this.deactivate();
       this.reset();
@@ -96,7 +100,6 @@ export class LineTool extends BaseTool {
       this.appendLineComponent(this.initPoint, this.points[this.points.length - 1]);
     }
 
-    e.preventDefault();
     this.deleteCurrentTool();
     this.deactivate();
     this.reset();

@@ -38,7 +38,6 @@ export class DragTool extends BaseTool {
     this.isDrawing = false;
     this.initPoint = null;
     this.movePoint = null;
-    this.activeManager.setMode("default");
   };
 
   onKeyDown = (e: KeyboardEvent) => {};

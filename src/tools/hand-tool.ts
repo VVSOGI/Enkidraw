@@ -44,13 +44,8 @@ export class HandTool extends BaseTool {
   };
 
   onMouseMove = (e: MouseEvent) => {
-    if (!this.isActive) return;
+    if (!this.isActive || !this.isDragging || !this.lastMousePos) return;
 
-    this.activeManager.setCursorStyle("grab");
-
-    if (!this.isDragging || !this.lastMousePos) return;
-
-    this.activeManager.setCursorStyle("grabbing");
     const rect = this.canvas.getBoundingClientRect();
     const currentMousePos = {
       x: e.clientX - rect.left,
@@ -70,7 +65,6 @@ export class HandTool extends BaseTool {
 
     this.isDragging = false;
     this.lastMousePos = null;
-    this.activeManager.setCursorStyle("grab");
   };
 
   onKeyDown = (e: KeyboardEvent) => {
