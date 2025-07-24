@@ -56,7 +56,6 @@ export class LineTool extends BaseTool {
   };
 
   onMouseMove = (e: MouseEvent) => {
-    console.log(this.points);
     this.movePoint = this.getLogicalMousePos(e);
   };
 

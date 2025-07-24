@@ -7,6 +7,7 @@ export class ActiveManager {
 
   protected canvas: HTMLCanvasElement;
   protected ctx: CanvasRenderingContext2D;
+  protected isMouseDown: boolean = false;
 
   constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) {
     this.canvas = canvas;
@@ -30,11 +31,43 @@ export class ActiveManager {
     this.addEventListeners();
   };
 
-  private onMouseMove = (e: MouseEvent) => {};
+  private onMouseMove = (e: MouseEvent) => {
+    if (this.currentActive === "hand") {
+      if (this.isMouseDown) {
+        this.setCursorStyle("grabbing");
+      } else {
+        this.setCursorStyle("grab");
+      }
 
-  private onMouseDown = (e: MouseEvent) => {};
+      return;
+    }
 
-  private onMouseUp = (e: MouseEvent) => {};
+    this.setCursorStyle("default");
+  };
+
+  private onMouseDown = (e: MouseEvent) => {
+    this.isMouseDown = true;
+
+    switch (this.currentActive) {
+      case "hand":
+        this.setCursorStyle("grabbing");
+        return;
+    }
+  };
+
+  private onMouseUp = (e: MouseEvent) => {
+    this.isMouseDown = false;
+
+    switch (this.currentActive) {
+      case "hand":
+        this.setCursorStyle("grab");
+        return;
+
+      case "drag":
+        this.setMode("default");
+        return;
+    }
+  };
 
   private addEventListeners = () => {
     this.canvas.addEventListener("mousedown", this.onMouseDown);
