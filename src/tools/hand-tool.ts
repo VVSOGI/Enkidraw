@@ -17,7 +17,6 @@ export class HandTool extends BaseTool {
     super({ canvas, ctx, activeManager, deleteCurrentTool });
     this.setZoomTransform = setZoomTransform;
     this.getZoomTransform = getZoomTransform;
-    this.activate();
   }
 
   activate = () => {

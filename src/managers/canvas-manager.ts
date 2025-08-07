@@ -37,12 +37,14 @@ export class CanvasManager {
       this.leftMenuManager,
       this.getZoomTransform
     );
+
     this.zoomTool = new ZoomTool({
       canvas: this.canvas,
       ctx: this.ctx,
       activeManager: this.activeManager,
       deleteCurrentTool: this.deleteCurrentTool,
     });
+
     this.dragTool = new DragTool({
       canvas: this.canvas,
       ctx: this.ctx,
@@ -50,6 +52,7 @@ export class CanvasManager {
       deleteCurrentTool: this.deleteCurrentTool,
       getZoomTransform: this.getZoomTransform,
     });
+
     this.handTool = new HandTool({
       canvas: this.canvas,
       ctx: this.ctx,
@@ -59,7 +62,6 @@ export class CanvasManager {
       setZoomTransform: this.zoomTool.setTransform,
     });
 
-    this.zoomTool.activate();
     this.animationId = requestAnimationFrame(this.draw);
   }
 
