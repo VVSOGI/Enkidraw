@@ -1,6 +1,5 @@
 import { ComponentManager, ActiveManager, LeftMenuManager } from ".";
 import { BaseTool, DragTool, ZoomTool, HandTool } from "../tools";
-import { ToolConstructor, ToolNames } from "../types";
 
 export class CanvasManager {
   private canvas: HTMLCanvasElement;
@@ -9,7 +8,6 @@ export class CanvasManager {
   private stageHeight!: number;
   private animationId: number | null = null;
 
-  private tools: Map<ToolNames, BaseTool> = new Map();
   private currentTool: BaseTool | null = null;
   private dragTool: DragTool;
   private zoomTool: ZoomTool;
@@ -74,10 +72,6 @@ export class CanvasManager {
     this.zoomTool.deactivate();
     this.handTool.deactivate();
     this.activeManager.deactivate();
-
-    for (const [toolname, tool] of this.tools) {
-      tool.deactivate();
-    }
 
     if (this.animationId) {
       cancelAnimationFrame(this.animationId);
