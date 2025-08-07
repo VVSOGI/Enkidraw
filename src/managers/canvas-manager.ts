@@ -42,6 +42,7 @@ export class CanvasManager {
       canvas: this.canvas,
       ctx: this.ctx,
       activeManager: this.activeManager,
+      selectTool: this.selectTool,
       deleteCurrentTool: this.deleteCurrentTool,
     });
 
@@ -49,6 +50,7 @@ export class CanvasManager {
       canvas: this.canvas,
       ctx: this.ctx,
       activeManager: this.activeManager,
+      selectTool: this.selectTool,
       deleteCurrentTool: this.deleteCurrentTool,
       getZoomTransform: this.getZoomTransform,
     });
@@ -57,6 +59,7 @@ export class CanvasManager {
       canvas: this.canvas,
       ctx: this.ctx,
       activeManager: this.activeManager,
+      selectTool: this.selectTool,
       deleteCurrentTool: this.deleteCurrentTool,
       getZoomTransform: this.getZoomTransform,
       setZoomTransform: this.zoomTool.setTransform,
@@ -86,43 +89,14 @@ export class CanvasManager {
     return this.zoomTool.getTransform();
   };
 
-  public addTool = (ToolClass: ToolConstructor, button?: HTMLElement) => {
-    const tool = new ToolClass({
-      canvas: this.canvas,
-      ctx: this.ctx,
-      componentManager: this.componentManager,
-      activeManager: this.activeManager,
-      leftMenuManager: this.leftMenuManager,
-      deleteCurrentTool: this.deleteCurrentTool,
-      getZoomTransform: this.getZoomTransform,
-    });
-    const toolName = tool.name as ToolNames;
-
-    if (toolName === "drag" || toolName === "zoom" || toolName === "hand") {
-      console.info(`${toolName} is automatically applied without buttons.`);
-      return;
-    }
-
-    tool.resize(this.stageWidth, this.stageHeight);
-    this.tools.set(toolName, tool);
-
-    if (button) {
-      button.addEventListener("click", () => this.selectTool(toolName));
-    }
-
-    return this;
-  };
-
   private deleteCurrentTool = () => {
     this.currentTool = null;
   };
 
-  private selectTool = (name: ToolNames) => {
+  private selectTool = (tool: BaseTool) => {
     if (this.currentTool) {
       this.currentTool.deactivate();
     }
-
-    const tool = this.tools.get(name);
 
     if (tool) {
       this.currentTool = tool;
