@@ -29,15 +29,13 @@ export class HandTool extends BaseTool {
 
   activate = () => {
     this.isActive = true;
-    this.activeManager.setMode("default");
     this.addHandEventListeners();
-    this.setHandCursor();
+    this.selectTool(this);
   };
 
   deactivate = () => {
     this.isActive = false;
     this.removeHandEventListeners();
-    this.resetCursor();
     this.deleteCurrentTool();
   };
 
@@ -51,7 +49,7 @@ export class HandTool extends BaseTool {
       y: e.clientY - rect.top,
     };
 
-    this.setGrabbingCursor();
+    this.canvas.style.cursor = "grabbing";
     e.preventDefault();
   };
 
@@ -79,7 +77,7 @@ export class HandTool extends BaseTool {
 
     this.isDragging = false;
     this.lastMousePos = null;
-    this.setHandCursor();
+    this.canvas.style.cursor = "grab";
     e.preventDefault();
   };
 
@@ -94,19 +92,6 @@ export class HandTool extends BaseTool {
   };
 
   draw = () => {};
-
-  private setHandCursor = () => {
-    this.canvas.style.cursor = "grab";
-  };
-
-  private setGrabbingCursor = () => {
-    this.canvas.style.cursor = "grabbing";
-  };
-
-  // 커서 리셋
-  private resetCursor = () => {
-    this.canvas.style.cursor = "default";
-  };
 
   private addHandEventListeners = () => {
     this.canvas.addEventListener("mousedown", this.onMouseDown);

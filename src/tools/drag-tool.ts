@@ -13,6 +13,11 @@ export class DragTool extends BaseTool {
     this.activate();
   }
 
+  activate = () => {
+    this.isActive = true;
+    this.addEventListeners();
+  };
+
   onMouseDown = (e: MouseEvent) => {
     const position = this.getLogicalMousePos(e);
 

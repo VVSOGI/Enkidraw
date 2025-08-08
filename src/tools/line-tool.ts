@@ -78,11 +78,12 @@ export class LineTool extends BaseTool {
 
   onKeyDown = (e: KeyboardEvent) => {
     if (!this.isActive || (e.key !== "Esc" && e.key !== "Escape")) {
+      this.deleteCurrentTool();
+      this.deactivate();
       return;
     }
 
     if (!this.initPoint || !this.movePoint || !this.multiPointDrawMode) {
-      e.preventDefault();
       this.deleteCurrentTool();
       this.deactivate();
       this.reset();

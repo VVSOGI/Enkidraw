@@ -54,6 +54,7 @@ export abstract class BaseTool {
   activate = () => {
     this.isActive = true;
     this.addEventListeners();
+    this.selectTool(this);
   };
 
   deactivate = () => {
@@ -73,14 +74,14 @@ export abstract class BaseTool {
   abstract onMouseUp(e: MouseEvent): void;
   abstract draw(...props: any): void;
 
-  private addEventListeners = () => {
+  protected addEventListeners = () => {
     this.canvas.addEventListener("mousedown", this.onMouseDown);
     this.canvas.addEventListener("mousemove", this.onMouseMove);
     this.canvas.addEventListener("mouseup", this.onMouseUp);
     document.addEventListener("keydown", this.onKeyDown);
   };
 
-  private removeEventListeners = () => {
+  protected removeEventListeners = () => {
     this.canvas.removeEventListener("mousedown", this.onMouseDown);
     this.canvas.removeEventListener("mousemove", this.onMouseMove);
     this.canvas.removeEventListener("mouseup", this.onMouseUp);

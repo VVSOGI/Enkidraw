@@ -1,5 +1,5 @@
 import { ComponentManager, ActiveManager, LeftMenuManager } from ".";
-import { BaseTool, DragTool, ZoomTool, HandTool } from "../tools";
+import { BaseTool, DragTool, ZoomTool, HandTool, LineTool } from "../tools";
 
 export class CanvasManager {
   private canvas: HTMLCanvasElement;
@@ -12,6 +12,8 @@ export class CanvasManager {
   private dragTool: DragTool;
   private zoomTool: ZoomTool;
   private handTool: HandTool;
+  private lineTool: LineTool;
+
   private activeManager: ActiveManager;
   private componentManager: ComponentManager;
   private leftMenuManager: LeftMenuManager;
@@ -63,7 +65,33 @@ export class CanvasManager {
       setZoomTransform: this.zoomTool.setTransform,
     });
 
+    this.lineTool = new LineTool({
+      canvas: this.canvas,
+      ctx: this.ctx,
+      activeManager: this.activeManager,
+      leftMenuManager: this.leftMenuManager,
+      componentManager: this.componentManager,
+      selectTool: this.selectTool,
+      deleteCurrentTool: this.deleteCurrentTool,
+      getZoomTransform: this.getZoomTransform,
+    });
+
     this.animationId = requestAnimationFrame(this.draw);
+
+    this.zoomTool.activate();
+
+    document.addEventListener("keydown", (e) => {
+      this.canvas.style.cursor = "default";
+
+      if (e.key === "1") {
+        this.lineTool.activate();
+      }
+
+      if (e.key === "h") {
+        this.handTool.activate();
+        this.canvas.style.cursor = "grab";
+      }
+    });
   }
 
   public destroy = () => {
@@ -71,7 +99,6 @@ export class CanvasManager {
     this.dragTool.deactivate();
     this.zoomTool.deactivate();
     this.handTool.deactivate();
-    this.activeManager.deactivate();
 
     if (this.animationId) {
       cancelAnimationFrame(this.animationId);
@@ -88,13 +115,8 @@ export class CanvasManager {
   };
 
   private selectTool = (tool: BaseTool) => {
-    if (this.currentTool) {
-      this.currentTool.deactivate();
-    }
-
     if (tool) {
       this.currentTool = tool;
-      tool.activate();
     }
   };
 
