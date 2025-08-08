@@ -55,6 +55,8 @@ export class DragTool extends BaseTool {
     const { x: initX, y: initY } = this.initPoint;
     const { x: moveX, y: moveY } = this.movePoint;
 
+    if (initX === moveX && initY === moveY) return null;
+
     this.ctx.beginPath();
     this.ctx.moveTo(moveX, moveY);
     this.ctx.lineTo(initX, moveY);
