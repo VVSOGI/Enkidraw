@@ -1,4 +1,3 @@
-import { ActiveManager } from "../managers";
 import { v4 } from "uuid";
 import { DragRange, EdgeDirection, MousePoint } from "../types";
 import { STYLE_SYSTEM } from "../utils";
@@ -14,7 +13,6 @@ export interface BaseComponentProps<T> {
   canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
   position: T;
-  activeManager: ActiveManager;
   getZoomTransform: () => { zoom: number; translateX: number; translateY: number };
 }
 
@@ -30,15 +28,13 @@ export abstract class BaseComponent<T extends BasePosition = BasePosition> {
 
   protected canvas: HTMLCanvasElement;
   protected ctx: CanvasRenderingContext2D;
-  protected activeManager: ActiveManager;
   protected multiDragPadding = 5;
   protected getZoomTransform?: () => { zoom: number; translateX: number; translateY: number };
 
-  constructor({ canvas, ctx, position, activeManager, getZoomTransform }: BaseComponentProps<T>) {
+  constructor({ canvas, ctx, position, getZoomTransform }: BaseComponentProps<T>) {
     this.canvas = canvas;
     this.ctx = ctx;
     this.position = position;
-    this.activeManager = activeManager;
     this.originPosition = position;
     this.getZoomTransform = getZoomTransform;
   }

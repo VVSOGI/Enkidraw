@@ -7,9 +7,10 @@ export class DragTool extends BaseTool {
   public readonly name = "drag";
   private initPoint: MousePoint | null = null;
   private movePoint: MousePoint | null = null;
+  private isDrag: boolean = false;
 
-  constructor({ canvas, ctx, activeManager, selectTool, deleteCurrentTool, getZoomTransform }: DragToolProps) {
-    super({ canvas, ctx, activeManager, selectTool, deleteCurrentTool, getZoomTransform });
+  constructor({ canvas, ctx, selectTool, deleteCurrentTool, getZoomTransform }: DragToolProps) {
+    super({ canvas, ctx, selectTool, deleteCurrentTool, getZoomTransform });
     this.activate();
   }
 
@@ -34,8 +35,8 @@ export class DragTool extends BaseTool {
     const { x: initX, y: initY } = this.initPoint;
     const { x: moveX, y: moveY } = this.movePoint;
 
-    if (this.activeManager.currentActive === "default" && (initX !== moveX || initY !== moveY)) {
-      this.activeManager.setMode("drag");
+    if (!this.isDrag && (initX !== moveX || initY !== moveY)) {
+      this.isDrag = true;
     }
   };
 
@@ -43,7 +44,7 @@ export class DragTool extends BaseTool {
     this.isDrawing = false;
     this.initPoint = null;
     this.movePoint = null;
-    this.activeManager.setMode("default");
+    this.isDrag = false;
   };
 
   onKeyDown = (e: KeyboardEvent) => {};

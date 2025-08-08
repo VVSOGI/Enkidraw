@@ -21,14 +21,13 @@ export class LineTool extends BaseTool {
   constructor({
     canvas,
     ctx,
-    activeManager,
     leftMenuManager,
     componentManager,
     selectTool,
     deleteCurrentTool,
     getZoomTransform,
   }: LineToolProps) {
-    super({ canvas, ctx, activeManager, selectTool, deleteCurrentTool, getZoomTransform });
+    super({ canvas, ctx, selectTool, deleteCurrentTool, getZoomTransform });
     this.leftMenuManager = leftMenuManager;
     this.componentManager = componentManager;
   }
@@ -147,7 +146,6 @@ export class LineTool extends BaseTool {
     const line = new Line({
       canvas: this.canvas,
       ctx: this.ctx,
-      activeManager: this.activeManager,
       type: "curve",
       position: {
         x1: initPoint.x,
@@ -187,7 +185,6 @@ export class LineTool extends BaseTool {
         x2: endX,
         y2: endY,
       },
-      activeManager: this.activeManager,
       getZoomTransform: this.getZoomTransform,
     });
 

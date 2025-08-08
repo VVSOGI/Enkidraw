@@ -1,10 +1,9 @@
 import { BaseComponent } from "../components";
 import { DragRange, EdgeDirection, MousePoint } from "../types";
-import { ActiveManager, SelectedComponentManager } from ".";
+import { SelectedComponentManager } from ".";
 
 export class ComponentInteractionManager {
   private canvas: HTMLCanvasElement;
-  private activeManager: ActiveManager;
   private selectionManager: SelectedComponentManager;
   private components: Set<BaseComponent>;
   private removeSelectedComponents: () => void;
@@ -12,17 +11,16 @@ export class ComponentInteractionManager {
 
   private tempPosition: MousePoint | null = null;
   private resizeEdge: EdgeDirection | null = null;
+  private currentInteraction: "default" | "drag" | "resize" | "move" = "default";
 
   constructor(
     canvas: HTMLCanvasElement,
-    activeManager: ActiveManager,
     selectionManager: SelectedComponentManager,
     components: Set<BaseComponent>,
     removeSelectedComponents: () => void,
     getZoomTransform?: () => { zoom: number; translateX: number; translateY: number }
   ) {
     this.canvas = canvas;
-    this.activeManager = activeManager;
     this.selectionManager = selectionManager;
     this.components = components;
     this.removeSelectedComponents = removeSelectedComponents;
@@ -51,13 +49,13 @@ export class ComponentInteractionManager {
     const mousePos = this.getLogicalMousePos(e);
 
     // 1. Handle multi-drag mode
-    if (this.activeManager.currentActive === "drag") {
+    if (this.currentInteraction === "drag") {
       this.handleMultiDragMode();
       return;
     }
 
     // 2. Handle component resizing
-    if (this.activeManager.currentActive === "resize") {
+    if (this.currentInteraction === "resize") {
       this.handleComponentResize(mousePos);
       return;
     }
@@ -82,11 +80,11 @@ export class ComponentInteractionManager {
 
         // Set appropriate mode based on zone
         if (zone === "inside") {
-          this.activeManager.setMode("move");
+          this.currentInteraction = "move";
         } else {
           // Handle resize modes for edges
           this.resizeEdge = zone;
-          this.activeManager.setMode("resize");
+          this.currentInteraction = "resize";
         }
 
         return;
@@ -98,17 +96,18 @@ export class ComponentInteractionManager {
 
     if (component && selectedComponents.has(component)) {
       this.tempPosition = mousePos;
-      this.activeManager.setMode("move");
+      this.currentInteraction = "move";
       return;
     }
 
     if (component) {
       this.selectionManager.selectComponent(component);
-      this.activeManager.setMode("move");
+      this.currentInteraction = "move";
+
       this.tempPosition = mousePos;
     } else {
       this.selectionManager.clearSelection();
-      this.activeManager.setMode("default");
+      this.currentInteraction = "default";
     }
   };
 
@@ -116,7 +115,7 @@ export class ComponentInteractionManager {
     this.tempPosition = null;
     this.selectionManager.resetOriginMultiSelectRange();
 
-    if (this.activeManager.currentActive === "resize") {
+    if (this.currentInteraction === "resize") {
       this.selectionManager.updateMultiSelectMode();
     }
 
@@ -143,7 +142,7 @@ export class ComponentInteractionManager {
 
     const selectedComponents = this.selectionManager.getSelectedComponents();
     for (const component of selectedComponents) {
-      if (this.activeManager.currentActive === "move") {
+      if (this.currentInteraction === "move") {
         component.moveComponent(e, delta);
       }
     }
@@ -235,7 +234,6 @@ export class ComponentInteractionManager {
       const zone = this.selectionManager.getMultiSelectHoverZone(mouse);
       if (zone !== "outside") {
         const cursorStyle = this.selectionManager.getCursorStyleForZone(zone);
-        this.activeManager.setCursorStyle(cursorStyle);
         return;
       }
     }
@@ -244,13 +242,11 @@ export class ComponentInteractionManager {
     for (const component of this.components) {
       if (component.isHover(e)) {
         component.hoverComponent(e, mouse);
-        this.activeManager.setCursorStyle("pointer");
         return;
       }
     }
 
     // Default cursor when not hovering anything
-    this.activeManager.setCursorStyle("default");
   }
 
   private findComponentWithPosition(e: MouseEvent): BaseComponent | null {

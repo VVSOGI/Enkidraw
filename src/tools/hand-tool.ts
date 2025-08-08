@@ -13,16 +13,8 @@ export class HandTool extends BaseTool {
   private setZoomTransform: (translateX: number, translateY: number, zoom?: number) => void;
   protected getZoomTransform: () => { zoom: number; translateX: number; translateY: number };
 
-  constructor({
-    canvas,
-    ctx,
-    activeManager,
-    selectTool,
-    deleteCurrentTool,
-    setZoomTransform,
-    getZoomTransform,
-  }: HandToolProps) {
-    super({ canvas, ctx, activeManager, selectTool, deleteCurrentTool });
+  constructor({ canvas, ctx, selectTool, deleteCurrentTool, setZoomTransform, getZoomTransform }: HandToolProps) {
+    super({ canvas, ctx, selectTool, deleteCurrentTool });
     this.setZoomTransform = setZoomTransform;
     this.getZoomTransform = getZoomTransform;
   }

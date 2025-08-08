@@ -1,4 +1,4 @@
-import { ComponentManager, ActiveManager, LeftMenuManager } from ".";
+import { ComponentManager, LeftMenuManager } from ".";
 import { BaseTool, DragTool, ZoomTool, HandTool, LineTool } from "../tools";
 
 export class CanvasManager {
@@ -14,7 +14,6 @@ export class CanvasManager {
   private handTool: HandTool;
   private lineTool: LineTool;
 
-  private activeManager: ActiveManager;
   private componentManager: ComponentManager;
   private leftMenuManager: LeftMenuManager;
 
@@ -29,19 +28,11 @@ export class CanvasManager {
     window.addEventListener("resize", this.resize);
 
     this.leftMenuManager = new LeftMenuManager();
-    this.activeManager = new ActiveManager(canvas, this.ctx);
-    this.componentManager = new ComponentManager(
-      canvas,
-      this.ctx,
-      this.activeManager,
-      this.leftMenuManager,
-      this.getZoomTransform
-    );
+    this.componentManager = new ComponentManager(canvas, this.ctx, this.leftMenuManager, this.getZoomTransform);
 
     this.zoomTool = new ZoomTool({
       canvas: this.canvas,
       ctx: this.ctx,
-      activeManager: this.activeManager,
       selectTool: this.selectTool,
       deleteCurrentTool: this.deleteCurrentTool,
     });
@@ -49,7 +40,6 @@ export class CanvasManager {
     this.dragTool = new DragTool({
       canvas: this.canvas,
       ctx: this.ctx,
-      activeManager: this.activeManager,
       selectTool: this.selectTool,
       deleteCurrentTool: this.deleteCurrentTool,
       getZoomTransform: this.getZoomTransform,
@@ -58,7 +48,6 @@ export class CanvasManager {
     this.handTool = new HandTool({
       canvas: this.canvas,
       ctx: this.ctx,
-      activeManager: this.activeManager,
       selectTool: this.selectTool,
       deleteCurrentTool: this.deleteCurrentTool,
       getZoomTransform: this.getZoomTransform,
@@ -68,7 +57,6 @@ export class CanvasManager {
     this.lineTool = new LineTool({
       canvas: this.canvas,
       ctx: this.ctx,
-      activeManager: this.activeManager,
       leftMenuManager: this.leftMenuManager,
       componentManager: this.componentManager,
       selectTool: this.selectTool,
@@ -142,7 +130,7 @@ export class CanvasManager {
     this.ctx.translate(transform.translateX, transform.translateY);
     this.ctx.scale(transform.zoom, transform.zoom);
 
-    if (!this.currentTool && this.activeManager.currentActive === "drag") {
+    if (!this.currentTool) {
       const dragRange = this.dragTool.draw();
       if (dragRange) {
         this.componentManager.dragComponents(dragRange);

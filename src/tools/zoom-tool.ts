@@ -13,8 +13,8 @@ export class ZoomTool extends BaseTool {
   private transformX: number = 0;
   private transformY: number = 0;
 
-  constructor({ canvas, ctx, activeManager, selectTool, deleteCurrentTool }: ZoomToolProps) {
-    super({ canvas, ctx, activeManager, selectTool, deleteCurrentTool });
+  constructor({ canvas, ctx, selectTool, deleteCurrentTool }: ZoomToolProps) {
+    super({ canvas, ctx, selectTool, deleteCurrentTool });
   }
 
   activate = () => {

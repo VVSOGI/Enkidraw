@@ -22,8 +22,8 @@ export class Line extends BaseComponent<LinePosition> {
   private moveCornorPoint = -1;
   private hoverPosition: { position: MousePoint } | null = null;
 
-  constructor({ canvas, ctx, position, activeManager, type = "line", getZoomTransform }: Props<LinePosition>) {
-    super({ canvas, ctx, position, activeManager, getZoomTransform });
+  constructor({ canvas, ctx, position, type = "line", getZoomTransform }: Props<LinePosition>) {
+    super({ canvas, ctx, position, getZoomTransform });
     this.type = type;
   }
 
@@ -88,12 +88,10 @@ export class Line extends BaseComponent<LinePosition> {
 
     if (!isHovered) {
       this.hoverPosition = null;
-      this.activeManager.setCursorStyle("default");
       return;
     }
 
     if (!this.isActive) {
-      this.activeManager.setCursorStyle("pointer");
       return;
     }
 
@@ -101,10 +99,8 @@ export class Line extends BaseComponent<LinePosition> {
 
     if (point > -1) {
       this.hoverPosition = { position: coordinates as MousePoint };
-      this.activeManager.setCursorStyle("pointer");
     } else {
       this.hoverPosition = null;
-      this.activeManager.setCursorStyle("move");
     }
   };
 
