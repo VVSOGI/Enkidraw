@@ -243,6 +243,8 @@ export class ComponentInteractionManager {
       if (component.isHover(e)) {
         component.hoverComponent(e, mouse);
         return;
+      } else {
+        this.canvas.style.cursor = "default";
       }
     }
 
