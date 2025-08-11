@@ -286,6 +286,8 @@ export class ComponentInteractionManager {
       if (selectedComponents.size > 0) {
         this.removeSelectedComponents();
       }
+
+      this.activeManager.selectCurrentActive("default");
     }
   };
 
