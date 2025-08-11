@@ -41,7 +41,6 @@ export class HandTool extends BaseTool {
       y: e.clientY - rect.top,
     };
 
-    this.canvas.style.cursor = "grabbing";
     e.preventDefault();
   };
 
@@ -69,7 +68,6 @@ export class HandTool extends BaseTool {
 
     this.isDragging = false;
     this.lastMousePos = null;
-    this.canvas.style.cursor = "grab";
     e.preventDefault();
   };
 

@@ -1,16 +1,21 @@
+import { ActiveManager } from "../managers/active-manager";
 import { DragRange, MousePoint } from "../types/common";
 import { BaseTool, BaseToolProps } from "./base-tool";
 
-interface DragToolProps extends BaseToolProps {}
+interface DragToolProps extends BaseToolProps {
+  activeManager: ActiveManager;
+}
 
 export class DragTool extends BaseTool {
   public readonly name = "drag";
   private initPoint: MousePoint | null = null;
   private movePoint: MousePoint | null = null;
   private isDrag: boolean = false;
+  private activeManager: ActiveManager;
 
-  constructor({ canvas, ctx, selectTool, deleteCurrentTool, getZoomTransform }: DragToolProps) {
+  constructor({ canvas, ctx, selectTool, deleteCurrentTool, getZoomTransform, activeManager }: DragToolProps) {
     super({ canvas, ctx, selectTool, deleteCurrentTool, getZoomTransform });
+    this.activeManager = activeManager;
     this.activate();
   }
 
@@ -20,15 +25,18 @@ export class DragTool extends BaseTool {
   };
 
   onMouseDown = (e: MouseEvent) => {
-    const position = this.getLogicalMousePos(e);
+    if (this.activeManager.currentActive === "default") {
+      const position = this.getLogicalMousePos(e);
 
-    this.isDrawing = true;
-    this.initPoint = position;
-    this.movePoint = position;
+      this.isDrawing = true;
+      this.initPoint = position;
+      this.movePoint = position;
+      this.activeManager.selectCurrentActive("drag");
+    }
   };
 
   onMouseMove = (e: MouseEvent) => {
-    if (!this.initPoint || !this.movePoint) return null;
+    if (!this.initPoint || !this.movePoint || this.activeManager.currentActive !== "drag") return null;
 
     this.movePoint = this.getLogicalMousePos(e);
 
