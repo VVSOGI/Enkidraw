@@ -124,24 +124,10 @@ export class CanvasManager {
     this.ctx.scale(2, 2);
   };
 
-  private setCursorStyle = () => {
-    if (this.activeManager.currentActive === "default") {
-      this.canvas.style.cursor = "default";
-    }
-
-    if (this.activeManager.currentActive === "pointer") {
-      this.canvas.style.cursor = "pointer";
-    }
-
-    if (this.activeManager.currentActive === "move") {
-      this.canvas.style.cursor = "move";
-    }
-  };
-
   private draw = (t: number) => {
     requestAnimationFrame(this.draw);
 
-    this.setCursorStyle();
+    this.canvas.style.cursor = this.activeManager.currentActive;
 
     this.ctx.save();
     this.ctx.setTransform(1, 0, 0, 1, 0, 0);

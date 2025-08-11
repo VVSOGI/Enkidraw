@@ -52,7 +52,7 @@ export class ComponentInteractionManager {
     const mousePos = this.getLogicalMousePos(e);
 
     // 1. Handle multi-drag mode
-    if (this.activeManager.currentActive === "default") {
+    if (this.activeManager.currentActive === "drag") {
       this.handleMultiDragMode();
       return;
     }
@@ -64,11 +64,11 @@ export class ComponentInteractionManager {
       return;
     }
 
-    // 3. Handle component movement
-    this.handleComponentMove(e, mousePos);
-
-    // 4. Handle hover effects
+    // 3. Handle hover effects
     this.handleHoverEffects(e, mousePos);
+
+    // 4. Handle component movement
+    this.handleComponentMove(e, mousePos);
   };
 
   public onMouseDown = (e: MouseEvent) => {
@@ -147,9 +147,7 @@ export class ComponentInteractionManager {
 
     const selectedComponents = this.selectionManager.getSelectedComponents();
     for (const component of selectedComponents) {
-      if (this.activeManager.currentActive === "move") {
-        component.moveComponent(e, delta);
-      }
+      component.moveComponent(e, delta);
     }
 
     this.selectionManager.updateMultiSelectRange(delta);
@@ -239,19 +237,23 @@ export class ComponentInteractionManager {
       const zone = this.selectionManager.getMultiSelectHoverZone(mouse);
       if (zone !== "outside") {
         const cursorStyle = this.selectionManager.getCursorStyleForZone(zone);
+        this.activeManager.selectCurrentActive(cursorStyle);
         return;
+      } else {
+        this.activeManager.selectCurrentActive("default");
       }
     }
 
     // Handle individual component hover
     for (const component of this.components) {
       if (component.isHover(e)) {
+        this.activeManager.selectCurrentActive("pointer");
         component.hoverComponent(e, mouse);
         return;
+      } else {
+        this.activeManager.selectCurrentActive("default");
       }
     }
-
-    // Default cursor when not hovering anything
   }
 
   private findComponentWithPosition(e: MouseEvent): BaseComponent | null {
