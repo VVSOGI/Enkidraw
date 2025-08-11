@@ -1,5 +1,6 @@
 import { ComponentManager, LeftMenuManager } from ".";
 import { BaseTool, DragTool, ZoomTool, HandTool, LineTool } from "../tools";
+import { ActiveManager } from "./active-manager";
 
 export class CanvasManager {
   private canvas: HTMLCanvasElement;
@@ -14,6 +15,7 @@ export class CanvasManager {
   private handTool: HandTool;
   private lineTool: LineTool;
 
+  private activeManager: ActiveManager;
   private componentManager: ComponentManager;
   private leftMenuManager: LeftMenuManager;
 
@@ -27,8 +29,15 @@ export class CanvasManager {
     this.resize();
     window.addEventListener("resize", this.resize);
 
+    this.activeManager = new ActiveManager();
     this.leftMenuManager = new LeftMenuManager();
-    this.componentManager = new ComponentManager(canvas, this.ctx, this.leftMenuManager, this.getZoomTransform);
+    this.componentManager = new ComponentManager(
+      canvas,
+      this.ctx,
+      this.leftMenuManager,
+      this.activeManager,
+      this.getZoomTransform
+    );
 
     this.zoomTool = new ZoomTool({
       canvas: this.canvas,
@@ -43,6 +52,7 @@ export class CanvasManager {
       selectTool: this.selectTool,
       deleteCurrentTool: this.deleteCurrentTool,
       getZoomTransform: this.getZoomTransform,
+      activeManager: this.activeManager,
     });
 
     this.handTool = new HandTool({
@@ -69,15 +79,12 @@ export class CanvasManager {
     this.zoomTool.activate();
 
     document.addEventListener("keydown", (e) => {
-      this.canvas.style.cursor = "default";
-
       if (e.key === "1") {
         this.lineTool.activate();
       }
 
       if (e.key === "h") {
         this.handTool.activate();
-        this.canvas.style.cursor = "grab";
       }
     });
   }
@@ -117,11 +124,26 @@ export class CanvasManager {
     this.ctx.scale(2, 2);
   };
 
+  private setCursorStyle = () => {
+    if (this.activeManager.currentActive === "default") {
+      this.canvas.style.cursor = "default";
+    }
+
+    if (this.activeManager.currentActive === "pointer") {
+      this.canvas.style.cursor = "pointer";
+    }
+
+    if (this.activeManager.currentActive === "move") {
+      this.canvas.style.cursor = "move";
+    }
+  };
+
   private draw = (t: number) => {
     requestAnimationFrame(this.draw);
 
-    this.ctx.save();
+    this.setCursorStyle();
 
+    this.ctx.save();
     this.ctx.setTransform(1, 0, 0, 1, 0, 0);
     this.ctx.scale(2, 2);
     this.ctx.clearRect(0, 0, this.stageWidth, this.stageHeight);
@@ -130,7 +152,7 @@ export class CanvasManager {
     this.ctx.translate(transform.translateX, transform.translateY);
     this.ctx.scale(transform.zoom, transform.zoom);
 
-    if (!this.currentTool) {
+    if (this.activeManager.currentActive === "drag") {
       const dragRange = this.dragTool.draw();
       if (dragRange) {
         this.componentManager.dragComponents(dragRange);

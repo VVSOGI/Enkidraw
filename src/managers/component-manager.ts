@@ -1,7 +1,8 @@
 import { ComponentInteractionManager, LeftMenuManager, SelectedComponentManager } from ".";
 import { BaseComponent } from "../components";
-import { DragRange } from "../types";
+import { Active, DragRange } from "../types";
 import { STYLE_SYSTEM } from "../utils";
+import { ActiveManager } from "./active-manager";
 
 export class ComponentManager {
   public components: Set<BaseComponent>;
@@ -11,17 +12,20 @@ export class ComponentManager {
   protected selectedComponentManager: SelectedComponentManager;
   protected componentInteractionManager: ComponentInteractionManager;
   protected leftMenuManager: LeftMenuManager;
+  protected activeManager: ActiveManager;
 
   constructor(
     canvas: HTMLCanvasElement,
     ctx: CanvasRenderingContext2D,
     leftMenuManager: LeftMenuManager,
-    getZoomTransform?: () => { zoom: number; translateX: number; translateY: number }
+    activeManager: ActiveManager,
+    getZoomTransform: () => { zoom: number; translateX: number; translateY: number }
   ) {
     this.canvas = canvas;
     this.ctx = ctx;
     this.components = new Set();
     this.leftMenuManager = leftMenuManager;
+    this.activeManager = activeManager;
 
     this.selectedComponentManager = new SelectedComponentManager();
     this.selectedComponentManager.on("menuActivate", () => {
@@ -35,6 +39,7 @@ export class ComponentManager {
 
     this.componentInteractionManager = new ComponentInteractionManager(
       this.canvas,
+      this.activeManager,
       this.selectedComponentManager,
       this.components,
       this.removeSelected,

@@ -19,3 +19,5 @@ export type EdgeDirection =
   | "top-right"
   | "bottom-left"
   | "bottom-right";
+
+export type Active = "default" | "line" | "move" | "resize" | "pointer" | "drag";
