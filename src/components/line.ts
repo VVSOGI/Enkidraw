@@ -85,7 +85,6 @@ export class Line extends BaseComponent<LinePosition> {
 
   hoverComponent = (e: MouseEvent, move: MousePoint) => {
     if (!this.isActive) {
-      this.canvas.style.cursor = "pointer";
       return;
     }
 
