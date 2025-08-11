@@ -9,6 +9,7 @@ export class ActiveManager {
 
   public setCursorStyle = () => {
     if (this.currentActive === "drag") return "default";
+    if (this.currentActive === "hand") return "grab";
 
     return this.currentActive;
   };

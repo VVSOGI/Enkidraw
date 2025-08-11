@@ -27,6 +27,7 @@ export type Active =
   | "resize"
   | "pointer"
   | "drag"
+  | "hand"
   | "ew-resize"
   | "ns-resize"
   | "nw-resize"

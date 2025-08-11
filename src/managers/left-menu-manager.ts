@@ -110,7 +110,6 @@ export class LeftMenuManager {
     button.style.outline = "none";
     button.style.border = "none";
     button.style.borderRadius = "4px";
-    button.style.transition = "0.2s";
 
     button.addEventListener("mouseover", () => {
       button.style.scale = "1.05";

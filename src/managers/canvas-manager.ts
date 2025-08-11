@@ -42,6 +42,7 @@ export class CanvasManager {
     this.zoomTool = new ZoomTool({
       canvas: this.canvas,
       ctx: this.ctx,
+      activeManager: this.activeManager,
       selectTool: this.selectTool,
       deleteCurrentTool: this.deleteCurrentTool,
     });
@@ -58,6 +59,7 @@ export class CanvasManager {
     this.handTool = new HandTool({
       canvas: this.canvas,
       ctx: this.ctx,
+      activeManager: this.activeManager,
       selectTool: this.selectTool,
       deleteCurrentTool: this.deleteCurrentTool,
       getZoomTransform: this.getZoomTransform,
@@ -67,6 +69,7 @@ export class CanvasManager {
     this.lineTool = new LineTool({
       canvas: this.canvas,
       ctx: this.ctx,
+      activeManager: this.activeManager,
       leftMenuManager: this.leftMenuManager,
       componentManager: this.componentManager,
       selectTool: this.selectTool,
@@ -127,7 +130,8 @@ export class CanvasManager {
   private draw = (t: number) => {
     requestAnimationFrame(this.draw);
 
-    this.canvas.style.cursor = this.activeManager.currentActive;
+    console.log(this.activeManager.currentActive);
+    this.canvas.style.cursor = this.activeManager.setCursorStyle();
 
     this.ctx.save();
     this.ctx.setTransform(1, 0, 0, 1, 0, 0);
