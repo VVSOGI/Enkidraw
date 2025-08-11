@@ -6,4 +6,10 @@ export class ActiveManager {
   public selectCurrentActive = (act: Active) => {
     this.currentActive = act;
   };
+
+  public setCursorStyle = () => {
+    if (this.currentActive === "drag") return "default";
+
+    return this.currentActive;
+  };
 }

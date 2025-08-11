@@ -20,4 +20,16 @@ export type EdgeDirection =
   | "bottom-left"
   | "bottom-right";
 
-export type Active = "default" | "line" | "move" | "resize" | "pointer" | "drag";
+export type Active =
+  | "default"
+  | "line"
+  | "move"
+  | "resize"
+  | "pointer"
+  | "drag"
+  | "ew-resize"
+  | "ns-resize"
+  | "nw-resize"
+  | "ne-resize"
+  | "sw-resize"
+  | "se-resize";
