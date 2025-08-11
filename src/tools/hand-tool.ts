@@ -31,7 +31,7 @@ export class HandTool extends BaseTool {
     this.isActive = true;
     this.addHandEventListeners();
     this.selectTool(this);
-    this.activeManager.selectCurrentActive("hand");
+    this.activeManager.selectCurrentActive("grab");
   };
 
   deactivate = () => {
@@ -49,6 +49,8 @@ export class HandTool extends BaseTool {
       x: e.clientX - rect.left,
       y: e.clientY - rect.top,
     };
+
+    this.activeManager.selectCurrentActive("grabbing");
 
     e.preventDefault();
   };
@@ -77,13 +79,15 @@ export class HandTool extends BaseTool {
 
     this.isDragging = false;
     this.lastMousePos = null;
+
+    this.activeManager.selectCurrentActive("grab");
     e.preventDefault();
   };
 
   onKeyDown = (e: KeyboardEvent) => {
     if (e.key === "Escape") {
-      e.preventDefault();
       this.deactivate();
+      this.activeManager.selectCurrentActive("default");
     }
   };
 

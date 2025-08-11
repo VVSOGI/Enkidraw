@@ -130,8 +130,9 @@ export class CanvasManager {
   private draw = (t: number) => {
     requestAnimationFrame(this.draw);
 
-    console.log(this.activeManager.currentActive);
     this.canvas.style.cursor = this.activeManager.setCursorStyle();
+
+    console.log(this.activeManager.currentActive);
 
     this.ctx.save();
     this.ctx.setTransform(1, 0, 0, 1, 0, 0);

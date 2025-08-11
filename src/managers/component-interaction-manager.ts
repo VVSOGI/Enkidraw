@@ -13,6 +13,7 @@ export class ComponentInteractionManager {
 
   private tempPosition: MousePoint | null = null;
   private resizeEdge: EdgeDirection | null = null;
+  private nonDefaultStates: Set<string> = new Set<string>(["grab", "grabbing"]);
 
   constructor(
     canvas: HTMLCanvasElement,
@@ -49,6 +50,10 @@ export class ComponentInteractionManager {
   };
 
   public onMouseMove = (e: MouseEvent) => {
+    if (this.nonDefaultStates.has(this.activeManager.currentActive)) {
+      return;
+    }
+
     const mousePos = this.getLogicalMousePos(e);
 
     // 1. Handle multi-drag mode
@@ -72,6 +77,10 @@ export class ComponentInteractionManager {
   };
 
   public onMouseDown = (e: MouseEvent) => {
+    if (this.nonDefaultStates.has(this.activeManager.currentActive)) {
+      return;
+    }
+
     const mousePos = this.getLogicalMousePos(e);
 
     // Handle multi-select range interactions
@@ -115,6 +124,10 @@ export class ComponentInteractionManager {
   };
 
   public onMouseUp = (e: MouseEvent) => {
+    if (this.nonDefaultStates.has(this.activeManager.currentActive)) {
+      return;
+    }
+
     this.tempPosition = null;
     this.selectionManager.resetOriginMultiSelectRange();
 
