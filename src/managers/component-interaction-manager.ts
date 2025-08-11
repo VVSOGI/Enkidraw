@@ -279,7 +279,7 @@ export class ComponentInteractionManager {
   }
 
   private onKeyDown = (e: KeyboardEvent) => {
-    if (e.key === "Backspace" || e.key === "Delete") {
+    if (e.code === "Backspace" || e.code === "Delete") {
       e.preventDefault();
       const selectedComponents = this.selectionManager.getSelectedComponents();
 

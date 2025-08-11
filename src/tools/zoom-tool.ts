@@ -56,7 +56,7 @@ export class ZoomTool extends BaseTool {
   onKeyDown = (e: KeyboardEvent) => {
     if (!this.isActive) return;
 
-    if (e.key === "0") {
+    if (e.code === "Digit0") {
       e.preventDefault();
       this.resetZoom();
     }

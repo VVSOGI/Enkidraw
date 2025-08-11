@@ -82,11 +82,11 @@ export class CanvasManager {
     this.zoomTool.activate();
 
     document.addEventListener("keydown", (e) => {
-      if (e.key === "1") {
+      if (e.code === "Digit1") {
         this.lineTool.activate();
       }
 
-      if (e.key === "h") {
+      if (e.code === "KeyH") {
         this.handTool.activate();
       }
     });
@@ -131,8 +131,6 @@ export class CanvasManager {
     requestAnimationFrame(this.draw);
 
     this.canvas.style.cursor = this.activeManager.setCursorStyle();
-
-    console.log(this.activeManager.currentActive);
 
     this.ctx.save();
     this.ctx.setTransform(1, 0, 0, 1, 0, 0);

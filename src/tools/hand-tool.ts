@@ -85,7 +85,7 @@ export class HandTool extends BaseTool {
   };
 
   onKeyDown = (e: KeyboardEvent) => {
-    if (e.key === "Escape") {
+    if (e.code === "Escape") {
       this.deactivate();
       this.activeManager.selectCurrentActive("default");
     }
