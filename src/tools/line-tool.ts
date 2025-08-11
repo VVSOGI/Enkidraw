@@ -21,13 +21,14 @@ export class LineTool extends BaseTool {
   constructor({
     canvas,
     ctx,
+    activeManager,
     leftMenuManager,
     componentManager,
     selectTool,
     deleteCurrentTool,
     getZoomTransform,
   }: LineToolProps) {
-    super({ canvas, ctx, selectTool, deleteCurrentTool, getZoomTransform });
+    super({ canvas, ctx, activeManager, selectTool, deleteCurrentTool, getZoomTransform });
     this.leftMenuManager = leftMenuManager;
     this.componentManager = componentManager;
   }

@@ -13,8 +13,16 @@ export class HandTool extends BaseTool {
   private setZoomTransform: (translateX: number, translateY: number, zoom?: number) => void;
   protected getZoomTransform: () => { zoom: number; translateX: number; translateY: number };
 
-  constructor({ canvas, ctx, selectTool, deleteCurrentTool, setZoomTransform, getZoomTransform }: HandToolProps) {
-    super({ canvas, ctx, selectTool, deleteCurrentTool });
+  constructor({
+    canvas,
+    ctx,
+    activeManager,
+    selectTool,
+    deleteCurrentTool,
+    setZoomTransform,
+    getZoomTransform,
+  }: HandToolProps) {
+    super({ canvas, ctx, activeManager, selectTool, deleteCurrentTool });
     this.setZoomTransform = setZoomTransform;
     this.getZoomTransform = getZoomTransform;
   }
@@ -23,6 +31,7 @@ export class HandTool extends BaseTool {
     this.isActive = true;
     this.addHandEventListeners();
     this.selectTool(this);
+    this.activeManager.selectCurrentActive("hand");
   };
 
   deactivate = () => {
@@ -72,9 +81,6 @@ export class HandTool extends BaseTool {
   };
 
   onKeyDown = (e: KeyboardEvent) => {
-    if (e.key === "h") {
-    }
-
     if (e.key === "Escape") {
       e.preventDefault();
       this.deactivate();

@@ -1,21 +1,16 @@
-import { ActiveManager } from "../managers/active-manager";
 import { DragRange, MousePoint } from "../types/common";
 import { BaseTool, BaseToolProps } from "./base-tool";
 
-interface DragToolProps extends BaseToolProps {
-  activeManager: ActiveManager;
-}
+interface DragToolProps extends BaseToolProps {}
 
 export class DragTool extends BaseTool {
   public readonly name = "drag";
   private initPoint: MousePoint | null = null;
   private movePoint: MousePoint | null = null;
   private isDrag: boolean = false;
-  private activeManager: ActiveManager;
 
   constructor({ canvas, ctx, selectTool, deleteCurrentTool, getZoomTransform, activeManager }: DragToolProps) {
-    super({ canvas, ctx, selectTool, deleteCurrentTool, getZoomTransform });
-    this.activeManager = activeManager;
+    super({ canvas, ctx, activeManager, selectTool, deleteCurrentTool, getZoomTransform });
     this.activate();
   }
 

@@ -1,6 +1,9 @@
+import { ActiveManager } from "../managers/active-manager";
+
 export interface BaseToolProps {
   canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
+  activeManager: ActiveManager;
   selectTool: (tool: BaseTool) => void;
   deleteCurrentTool: () => void;
   getZoomTransform?: () => { zoom: number; translateX: number; translateY: number };
@@ -11,6 +14,7 @@ export abstract class BaseTool {
 
   protected canvas: HTMLCanvasElement;
   protected ctx: CanvasRenderingContext2D;
+  protected activeManager: ActiveManager;
   protected deleteCurrentTool: () => void;
   protected getZoomTransform?: () => { zoom: number; translateX: number; translateY: number };
   protected selectTool: (tool: BaseTool) => void;
@@ -20,9 +24,10 @@ export abstract class BaseTool {
   protected stageWidth!: number;
   protected stageHeight!: number;
 
-  constructor({ canvas, ctx, selectTool, deleteCurrentTool, getZoomTransform }: BaseToolProps) {
+  constructor({ canvas, ctx, activeManager, selectTool, deleteCurrentTool, getZoomTransform }: BaseToolProps) {
     this.canvas = canvas;
     this.ctx = ctx;
+    this.activeManager = activeManager;
     this.selectTool = selectTool;
     this.deleteCurrentTool = deleteCurrentTool;
     this.getZoomTransform = getZoomTransform;
