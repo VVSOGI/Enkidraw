@@ -12,6 +12,8 @@ export interface BaseToolProps {
 export abstract class BaseTool {
   abstract readonly name: string; // 각 툴에서 정의해야 함
 
+  public isActive: boolean = false;
+
   protected canvas: HTMLCanvasElement;
   protected ctx: CanvasRenderingContext2D;
   protected activeManager: ActiveManager;
@@ -20,7 +22,6 @@ export abstract class BaseTool {
   protected selectTool: (tool: BaseTool) => void;
 
   protected isDrawing: boolean = false;
-  protected isActive: boolean = false;
   protected stageWidth!: number;
   protected stageHeight!: number;
 
@@ -61,6 +62,7 @@ export abstract class BaseTool {
     this.isActive = false;
     this.removeEventListeners();
     this.deleteCurrentTool();
+    this.reset();
   };
 
   resize = (stageWidth: number, stageHeight: number) => {
@@ -73,6 +75,7 @@ export abstract class BaseTool {
   abstract onMouseMove(e: MouseEvent): void;
   abstract onMouseUp(e: MouseEvent): void;
   abstract draw(...props: any): void;
+  abstract reset(): void;
 
   protected addEventListeners = () => {
     this.canvas.addEventListener("mousedown", this.onMouseDown);

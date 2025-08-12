@@ -33,12 +33,13 @@ export class LineTool extends BaseTool {
     this.componentManager = componentManager;
   }
 
-  private reset = () => {
+  reset = () => {
     this.isDrawing = false;
     this.initPoint = null;
     this.movePoint = null;
     this.multiPointDrawMode = false;
     this.points = [];
+    console.log("things");
   };
 
   onMouseDown = (e: MouseEvent) => {
@@ -79,31 +80,27 @@ export class LineTool extends BaseTool {
   };
 
   onKeyDown = (e: KeyboardEvent) => {
-    if (!this.isActive || (e.code !== "Escape" && e.code !== "Escape")) {
-      this.deleteCurrentTool();
-      this.deactivate();
-      return;
-    }
+    if (e.code === "Escape") {
+      if (!this.initPoint || !this.movePoint || !this.multiPointDrawMode) {
+        this.deleteCurrentTool();
+        this.deactivate();
+        this.reset();
+        return;
+      }
 
-    if (!this.initPoint || !this.movePoint || !this.multiPointDrawMode) {
+      if (this.points.length > 2) {
+        this.appendCurveComponent();
+      }
+
+      if (this.points.length === 2) {
+        this.appendLineComponent(this.initPoint, this.points[this.points.length - 1]);
+      }
+
+      e.preventDefault();
       this.deleteCurrentTool();
       this.deactivate();
       this.reset();
-      return;
     }
-
-    if (this.points.length > 2) {
-      this.appendCurveComponent();
-    }
-
-    if (this.points.length === 2) {
-      this.appendLineComponent(this.initPoint, this.points[this.points.length - 1]);
-    }
-
-    e.preventDefault();
-    this.deleteCurrentTool();
-    this.deactivate();
-    this.reset();
   };
 
   draw = () => {

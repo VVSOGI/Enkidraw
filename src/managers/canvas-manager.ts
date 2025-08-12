@@ -1,5 +1,6 @@
 import { ComponentManager, LeftMenuManager } from ".";
 import { BaseTool, DragTool, ZoomTool, HandTool, LineTool } from "../tools";
+import { RectTool } from "../tools/rect-tool";
 import { ActiveManager } from "./active-manager";
 
 export class CanvasManager {
@@ -14,6 +15,7 @@ export class CanvasManager {
   private zoomTool: ZoomTool;
   private handTool: HandTool;
   private lineTool: LineTool;
+  private rectTool: RectTool;
 
   private activeManager: ActiveManager;
   private componentManager: ComponentManager;
@@ -77,13 +79,28 @@ export class CanvasManager {
       getZoomTransform: this.getZoomTransform,
     });
 
+    this.rectTool = new RectTool({
+      canvas: this.canvas,
+      ctx: this.ctx,
+      selectTool: this.selectTool,
+      deleteCurrentTool: this.deleteCurrentTool,
+      getZoomTransform: this.getZoomTransform,
+      activeManager: this.activeManager,
+    });
+
     this.animationId = requestAnimationFrame(this.draw);
 
     this.zoomTool.activate();
 
     document.addEventListener("keydown", (e) => {
-      if (e.code === "Digit1") {
+      this.currentTool?.deactivate();
+
+      if (e.code === "Digit1" && !this.lineTool.isActive) {
         this.lineTool.activate();
+      }
+
+      if (e.code === "Digit2") {
+        this.rectTool.activate();
       }
 
       if (e.code === "KeyH") {
