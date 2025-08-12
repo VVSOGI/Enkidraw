@@ -70,9 +70,7 @@ export class ComponentInteractionManager {
     }
 
     // 3. Handle hover effects
-    if (this.activeManager.currentActive !== "move") {
-      this.handleHoverEffects(e, mousePos);
-    }
+    this.handleHoverEffects(e, mousePos);
 
     // 4. Handle component movement
     this.handleComponentMove(e, mousePos);
@@ -258,6 +256,8 @@ export class ComponentInteractionManager {
         this.activeManager.selectCurrentActive("default");
       }
     }
+
+    if (this.activeManager.currentActive === "move") return;
 
     // Handle individual component hover
     for (const component of this.components) {

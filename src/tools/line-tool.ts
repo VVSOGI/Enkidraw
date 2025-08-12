@@ -42,6 +42,7 @@ export class LineTool extends BaseTool {
   };
 
   onMouseDown = (e: MouseEvent) => {
+    this.activeManager.selectCurrentActive("line");
     const position = this.getLogicalMousePos(e);
 
     if (!this.isDrawing) {
@@ -62,7 +63,7 @@ export class LineTool extends BaseTool {
     const { x: initX, y: initY } = this.initPoint;
     const { x: endX, y: endY } = this.movePoint;
 
-    if (Math.abs(initX - endX) <= 10 && Math.abs(initY - endY) <= 10) {
+    if (Math.abs(initX - endX) <= 10 && Math.abs(initY - endY) <= 10 && !this.multiPointDrawMode) {
       this.multiPointDrawMode = true;
       return;
     }
@@ -70,6 +71,7 @@ export class LineTool extends BaseTool {
     if (this.multiPointDrawMode) {
       this.points.push(this.movePoint);
     } else {
+      this.activeManager.selectCurrentActive("default");
       this.appendLineComponent(this.initPoint, this.movePoint);
       this.deactivate();
       this.reset();

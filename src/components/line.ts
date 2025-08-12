@@ -78,6 +78,10 @@ export class Line extends BaseComponent<LinePosition> {
     const { x1, y1, x2, y2 } = this.getPosition();
 
     if (this.isActive) {
+      if (this.type === "curve") {
+        this.multiDragMode(true);
+      }
+
       const { point } = this.getMouseHitControlPoint(mousePosition);
       if (point > -1) {
         this.moveCornorPoint = point;
@@ -93,6 +97,10 @@ export class Line extends BaseComponent<LinePosition> {
           : MathUtils.getDistanceLineFromPoint(mousePosition, this.threshold, this.position);
 
       if (distance <= this.threshold) {
+        if (this.type === "curve") {
+          this.multiDragMode(true);
+        }
+
         if (this.position.crossPoints.length > 1) {
           this.multiDragMode(true);
         }
@@ -133,7 +141,6 @@ export class Line extends BaseComponent<LinePosition> {
         this.hoverPosition = {
           position: { x: this.position.crossPoints[0].cx, y: this.position.crossPoints[0].cy },
         };
-        this.multiDragMode(true);
         this.type = "curve";
         return;
       }
