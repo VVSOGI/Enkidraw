@@ -14,6 +14,8 @@ export class DragTool extends BaseTool {
     this.activate();
   }
 
+  reset = () => {};
+
   activate = () => {
     this.isActive = true;
     this.addEventListeners();

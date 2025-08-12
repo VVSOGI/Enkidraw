@@ -39,7 +39,6 @@ export class LineTool extends BaseTool {
     this.movePoint = null;
     this.multiPointDrawMode = false;
     this.points = [];
-    console.log("things");
   };
 
   onMouseDown = (e: MouseEvent) => {

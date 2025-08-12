@@ -41,7 +41,7 @@ export class ZoomTool extends BaseTool {
   };
 
   // 줌 리셋 (100%)
-  resetZoom = () => {
+  reset = () => {
     this.zoomLevel = 1;
     this.transformX = 0;
     this.transformY = 0;
@@ -58,7 +58,7 @@ export class ZoomTool extends BaseTool {
 
     if (e.code === "Digit0") {
       e.preventDefault();
-      this.resetZoom();
+      this.reset();
     }
   };
 
