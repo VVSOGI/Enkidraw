@@ -16,20 +16,31 @@ export class RectTool extends BaseTool {
   };
 
   onKeyDown = (e: KeyboardEvent) => {
-    if (!this.isActive || (e.code !== "Escape" && e.code !== "Escape")) {
-      this.deleteCurrentTool();
+    if (e.code === "Escape") {
       this.deactivate();
-      return;
     }
   };
 
   reset = () => {};
 
-  onMouseDown = (e: MouseEvent) => {};
+  onMouseDown = (e: MouseEvent) => {
+    console.log("Rect Down");
+    this.isDrawing = true;
+    this.activeManager.selectCurrentActive("line");
+  };
 
-  onMouseMove = (e: MouseEvent) => {};
+  onMouseMove = (e: MouseEvent) => {
+    if (this.isDrawing) {
+      console.log("Rect Drawing");
+    } else {
+      console.log("Rect move");
+    }
+  };
 
-  onMouseUp = (e: MouseEvent) => {};
+  onMouseUp = (e: MouseEvent) => {
+    console.log("Rect up");
+    this.isDrawing = false;
+  };
 
   draw = () => {};
 }

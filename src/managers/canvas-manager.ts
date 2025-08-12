@@ -1,6 +1,5 @@
 import { ComponentManager, LeftMenuManager } from ".";
-import { BaseTool, DragTool, ZoomTool, HandTool, LineTool } from "../tools";
-import { RectTool } from "../tools/rect-tool";
+import { BaseTool, DragTool, ZoomTool, HandTool, LineTool, RectTool } from "../tools";
 import { ActiveManager } from "./active-manager";
 
 export class CanvasManager {
@@ -121,7 +120,6 @@ export class CanvasManager {
     }
   };
 
-  // 줌 변환 정보를 다른 도구들이 접근할 수 있도록 하는 메서드
   public getZoomTransform = () => {
     return this.zoomTool.getTransform();
   };
