@@ -45,8 +45,16 @@ export class Line extends BaseComponent<LinePosition> {
     const zoomTransform = this.getZoomTransform();
 
     if (this.type === "curve") {
+      const { x1, y1, x2, y2 } = this.getPosition();
       const mousePosition = MouseUtils.getLogicalMousePos(e, this.canvas, zoomTransform);
       const distance = MathUtils.getDistanceCurveFromPoint(mousePosition, this.position);
+
+      if (this.isActive) {
+        if (mousePosition.x >= x1 && mousePosition.x <= x2 && mousePosition.y >= y1 && mousePosition.y <= y2) {
+          return true;
+        }
+      }
+
       if (distance <= this.threshold) {
         return true;
       }
@@ -67,17 +75,30 @@ export class Line extends BaseComponent<LinePosition> {
     if (!this.getZoomTransform) return false;
     const zoomTransform = this.getZoomTransform();
     const mousePosition = MouseUtils.getLogicalMousePos(e, this.canvas, zoomTransform);
+    const { x1, y1, x2, y2 } = this.getPosition();
 
-    const distance =
-      this.type === "curve"
-        ? MathUtils.getDistanceCurveFromPoint(mousePosition, this.position)
-        : MathUtils.getDistanceLineFromPoint(mousePosition, this.threshold, this.position);
-    if (distance <= this.threshold) {
+    if (this.isActive) {
       const { point } = this.getMouseHitControlPoint(mousePosition);
       if (point > -1) {
         this.moveCornorPoint = point;
       }
-      return true;
+
+      return mousePosition.x >= x1 && mousePosition.x <= x2 && mousePosition.y >= y1 && mousePosition.y <= y2;
+    }
+
+    if (!this.isActive) {
+      const distance =
+        this.type === "curve"
+          ? MathUtils.getDistanceCurveFromPoint(mousePosition, this.position)
+          : MathUtils.getDistanceLineFromPoint(mousePosition, this.threshold, this.position);
+
+      if (distance <= this.threshold) {
+        if (this.position.crossPoints.length > 1) {
+          this.multiDragMode(true);
+        }
+
+        return true;
+      }
     }
 
     return false;
@@ -98,11 +119,6 @@ export class Line extends BaseComponent<LinePosition> {
   };
 
   moveComponent = (e: MouseEvent, move: MousePoint) => {
-    /**
-     * If moveCornorPoint is greater than -1,
-     * It means that the mouse is over the center point of the line component.
-     * */
-
     const points = [
       { x: this.position.x1, y: this.position.y1 },
       ...this.position.crossPoints.map(({ cx, cy }) => ({ x: cx, y: cy })),
@@ -117,6 +133,7 @@ export class Line extends BaseComponent<LinePosition> {
         this.hoverPosition = {
           position: { x: this.position.crossPoints[0].cx, y: this.position.crossPoints[0].cy },
         };
+        this.multiDragMode(true);
         this.type = "curve";
         return;
       }
