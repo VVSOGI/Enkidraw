@@ -93,6 +93,7 @@ export class CanvasManager {
     this.zoomTool.activate();
 
     document.addEventListener("keydown", (e) => {
+      if (e.code === "Escape") return;
       this.currentTool?.deactivate();
 
       if (e.code === "Digit1" && !this.lineTool.isActive) {
