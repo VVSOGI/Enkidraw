@@ -1,3 +1,4 @@
+import { Rect } from "../components";
 import { MousePoint } from "../types";
 import { BaseTool, BaseToolProps } from "./base-tool";
 
@@ -11,8 +12,16 @@ export class RectTool extends BaseTool {
   private lineWidth = 4;
   private borderRadius = 10;
 
-  constructor({ canvas, ctx, selectTool, deleteCurrentTool, getZoomTransform, activeManager }: RectToolProps) {
-    super({ canvas, ctx, selectTool, deleteCurrentTool, getZoomTransform, activeManager });
+  constructor({
+    canvas,
+    ctx,
+    activeManager,
+    componentManager,
+    selectTool,
+    deleteCurrentTool,
+    getZoomTransform,
+  }: RectToolProps) {
+    super({ canvas, ctx, activeManager, componentManager, selectTool, deleteCurrentTool, getZoomTransform });
   }
 
   activate = () => {
@@ -58,6 +67,8 @@ export class RectTool extends BaseTool {
     if (startX === endX && startY === endY) {
       return;
     }
+
+    this.appendComponent(this.initPoint, this.movePoint);
   };
 
   draw = () => {
@@ -78,5 +89,19 @@ export class RectTool extends BaseTool {
     this.ctx.stroke();
     this.ctx.closePath();
     this.ctx.restore();
+  };
+
+  private appendComponent = (start: MousePoint, end: MousePoint) => {
+    const { x: startX, y: startY } = start;
+    const { x: endX, y: endY } = end;
+    const position = {
+      x1: startX,
+      y1: startY,
+      x2: endX,
+      y2: endY,
+    };
+
+    const rect = new Rect({ canvas: this.canvas, ctx: this.ctx, position, getZoomTransform: this.getZoomTransform });
+    this.componentManager.add(rect);
   };
 }
