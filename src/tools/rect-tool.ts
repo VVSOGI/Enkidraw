@@ -49,8 +49,14 @@ export class RectTool extends BaseTool {
   };
 
   onMouseUp = (e: MouseEvent) => {
-    if (this.isDrawing) {
-      this.isDrawing = false;
+    if (!this.isDrawing || !this.initPoint || !this.movePoint) return;
+
+    const { x: startX, y: startY } = this.initPoint;
+    const { x: endX, y: endY } = this.movePoint;
+    this.isDrawing = false;
+
+    if (startX === endX && startY === endY) {
+      return;
     }
   };
 
