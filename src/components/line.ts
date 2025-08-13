@@ -113,9 +113,7 @@ export class Line extends BaseComponent<LinePosition> {
   };
 
   hoverComponent = (e: MouseEvent, move: MousePoint) => {
-    if (!this.isActive) {
-      return;
-    }
+    if (!this.isActive) return;
 
     const { point, coordinates } = this.getMouseHitControlPoint(move);
 
