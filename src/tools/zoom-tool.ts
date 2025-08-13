@@ -1,6 +1,8 @@
 import { BaseTool, BaseToolProps } from "./base-tool";
 
-interface ZoomToolProps extends BaseToolProps {}
+interface ZoomToolProps extends BaseToolProps {
+  getZoomTransform: () => any;
+}
 
 export class ZoomTool extends BaseTool {
   public readonly name = "zoom";
@@ -13,8 +15,16 @@ export class ZoomTool extends BaseTool {
   private transformX: number = 0;
   private transformY: number = 0;
 
-  constructor({ canvas, ctx, activeManager, selectTool, deleteCurrentTool }: ZoomToolProps) {
-    super({ canvas, ctx, activeManager, selectTool, deleteCurrentTool });
+  constructor({
+    canvas,
+    ctx,
+    activeManager,
+    componentManager,
+    selectTool,
+    deleteCurrentTool,
+    getZoomTransform,
+  }: ZoomToolProps) {
+    super({ canvas, ctx, activeManager, componentManager, selectTool, deleteCurrentTool, getZoomTransform });
   }
 
   activate = () => {

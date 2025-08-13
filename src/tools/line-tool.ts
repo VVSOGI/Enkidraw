@@ -15,7 +15,6 @@ export class LineTool extends BaseTool {
   private multiPointDrawMode: boolean = false;
   private points: MousePoint[] = [];
 
-  protected componentManager: ComponentManager;
   protected leftMenuManager: LeftMenuManager;
 
   constructor({
@@ -28,9 +27,8 @@ export class LineTool extends BaseTool {
     deleteCurrentTool,
     getZoomTransform,
   }: LineToolProps) {
-    super({ canvas, ctx, activeManager, selectTool, deleteCurrentTool, getZoomTransform });
+    super({ canvas, ctx, activeManager, componentManager, selectTool, deleteCurrentTool, getZoomTransform });
     this.leftMenuManager = leftMenuManager;
-    this.componentManager = componentManager;
   }
 
   reset = () => {

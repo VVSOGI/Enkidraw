@@ -44,23 +44,27 @@ export class CanvasManager {
       canvas: this.canvas,
       ctx: this.ctx,
       activeManager: this.activeManager,
+      componentManager: this.componentManager,
       selectTool: this.selectTool,
       deleteCurrentTool: this.deleteCurrentTool,
+      getZoomTransform: () => {},
     });
 
     this.dragTool = new DragTool({
       canvas: this.canvas,
       ctx: this.ctx,
+      activeManager: this.activeManager,
+      componentManager: this.componentManager,
       selectTool: this.selectTool,
       deleteCurrentTool: this.deleteCurrentTool,
       getZoomTransform: this.getZoomTransform,
-      activeManager: this.activeManager,
     });
 
     this.handTool = new HandTool({
       canvas: this.canvas,
       ctx: this.ctx,
       activeManager: this.activeManager,
+      componentManager: this.componentManager,
       selectTool: this.selectTool,
       deleteCurrentTool: this.deleteCurrentTool,
       getZoomTransform: this.getZoomTransform,
@@ -81,10 +85,11 @@ export class CanvasManager {
     this.rectTool = new RectTool({
       canvas: this.canvas,
       ctx: this.ctx,
+      activeManager: this.activeManager,
+      componentManager: this.componentManager,
       selectTool: this.selectTool,
       deleteCurrentTool: this.deleteCurrentTool,
       getZoomTransform: this.getZoomTransform,
-      activeManager: this.activeManager,
     });
 
     this.animationId = requestAnimationFrame(this.draw);
