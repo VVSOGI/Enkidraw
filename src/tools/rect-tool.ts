@@ -50,11 +50,10 @@ export class RectTool extends BaseTool {
   };
 
   onMouseMove = (e: MouseEvent) => {
-    if (this.isDrawing) {
-      const position = this.getLogicalMousePos(e);
-      this.movePoint = position;
-    } else {
-    }
+    if (!this.isDrawing) return;
+
+    const position = this.getLogicalMousePos(e);
+    this.movePoint = position;
   };
 
   onMouseUp = (e: MouseEvent) => {
@@ -69,6 +68,7 @@ export class RectTool extends BaseTool {
     }
 
     this.appendComponent(this.initPoint, this.movePoint);
+    this.deactivate();
   };
 
   draw = () => {

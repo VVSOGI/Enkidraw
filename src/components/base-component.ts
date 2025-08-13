@@ -29,7 +29,7 @@ export abstract class BaseComponent<T extends BasePosition = BasePosition> {
   protected canvas: HTMLCanvasElement;
   protected ctx: CanvasRenderingContext2D;
   protected multiDragPadding = 5;
-  protected getZoomTransform?: () => { zoom: number; translateX: number; translateY: number };
+  protected getZoomTransform: () => { zoom: number; translateX: number; translateY: number };
 
   constructor({ canvas, ctx, position, getZoomTransform }: BaseComponentProps<T>) {
     this.canvas = canvas;

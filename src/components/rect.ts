@@ -1,6 +1,6 @@
 import { v4 } from "uuid";
 import { BaseComponent, BaseComponentProps, BasePosition } from "./base-component";
-import { DragRange, EdgeDirection, MousePoint } from "..";
+import { DragRange, EdgeDirection, MousePoint, MouseUtils } from "..";
 
 export class Rect extends BaseComponent {
   public id: string = v4();
@@ -18,6 +18,14 @@ export class Rect extends BaseComponent {
   multiDragMode = (mode: boolean) => {};
 
   isHover = (e: MouseEvent) => {
+    const { x1, y1, x2, y2 } = this.getPosition();
+    const transform = this.getZoomTransform();
+    const { x: mouseX, y: mouseY } = MouseUtils.getLogicalMousePos(e, this.canvas, transform);
+
+    if (mouseX >= x1 && mouseX <= x2 && mouseY >= y1 && mouseY <= y2) {
+      return true;
+    }
+
     return false;
   };
 
