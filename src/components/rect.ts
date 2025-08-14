@@ -17,7 +17,7 @@ export class Rect extends BaseComponent {
 
   constructor({ canvas, ctx, position, getZoomTransform }: BaseComponentProps<BasePosition>) {
     super({ canvas, ctx, position, getZoomTransform });
-    this.isMultiDrag = true;
+    this.isTransformSelect = true;
   }
 
   getPosition = () => {

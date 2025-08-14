@@ -21,6 +21,7 @@ export abstract class BaseComponent<T extends BasePosition = BasePosition> {
 
   public readonly id = v4();
   public isActive: boolean = false;
+  public isTransformSelect: boolean = false;
   public isMultiDrag: boolean = false;
   public position: T;
   public originPosition: T;

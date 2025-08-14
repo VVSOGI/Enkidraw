@@ -110,7 +110,7 @@ export class ComponentInteractionManager {
     if (component && selectedComponents.has(component)) {
       this.tempPosition = mousePos;
 
-      if (component.isMultiDrag) {
+      if (component.isTransformSelect) {
         const zone = component.getMultiSelectHoverZone(mousePos);
 
         if (zone === "outside") return;
@@ -271,6 +271,8 @@ export class ComponentInteractionManager {
       } else {
         this.activeManager.selectCurrentActive("default");
       }
+
+      return;
     }
 
     if (this.activeManager.currentActive === "move") return;
