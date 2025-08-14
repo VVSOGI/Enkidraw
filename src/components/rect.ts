@@ -89,7 +89,158 @@ export class Rect extends BaseComponent {
   };
 
   resizeComponent = (mouseDistance: MousePoint, multiSelectRange: DragRange, edgeDirection: EdgeDirection) => {
-    console.log(edgeDirection);
+    if (edgeDirection === "right") {
+      const totalRangeX = Math.abs(multiSelectRange.x2 - multiSelectRange.x1);
+      const newTotalRangeX = totalRangeX + mouseDistance.x;
+      const scale = newTotalRangeX / totalRangeX;
+
+      const relativeX1 = this.originPosition.x1 - multiSelectRange.x1;
+      const relativeX2 = this.originPosition.x2 - multiSelectRange.x1;
+
+      this.position = {
+        ...this.position,
+        x1: Math.min(multiSelectRange.x1 + relativeX1 * scale, multiSelectRange.x1 + relativeX2 * scale),
+        x2: Math.max(multiSelectRange.x1 + relativeX1 * scale, multiSelectRange.x1 + relativeX2 * scale),
+      };
+    }
+
+    if (edgeDirection === "left") {
+      const totalRangeX = Math.abs(multiSelectRange.x2 - multiSelectRange.x1);
+      const newTotalRangeX = totalRangeX - mouseDistance.x;
+      const scale = newTotalRangeX / totalRangeX;
+
+      const relativeX1 = this.originPosition.x1 - multiSelectRange.x2;
+      const relativeX2 = this.originPosition.x2 - multiSelectRange.x2;
+
+      this.position = {
+        ...this.position,
+        x1: Math.min(multiSelectRange.x2 + relativeX1 * scale, multiSelectRange.x2 + relativeX2 * scale),
+        x2: Math.max(multiSelectRange.x2 + relativeX1 * scale, multiSelectRange.x2 + relativeX2 * scale),
+      };
+    }
+
+    if (edgeDirection === "top") {
+      const totalRangeY = Math.abs(multiSelectRange.y2 - multiSelectRange.y1);
+      const newTotalRangeY = totalRangeY - mouseDistance.y;
+      const scale = newTotalRangeY / totalRangeY;
+
+      const relativeY1 = this.originPosition.y1 - multiSelectRange.y2;
+      const relativeY2 = this.originPosition.y2 - multiSelectRange.y2;
+
+      // Adjust all points with the same scale
+      this.position = {
+        ...this.position,
+        y1: Math.min(multiSelectRange.y2 + relativeY1 * scale, multiSelectRange.y2 + relativeY2 * scale),
+        y2: Math.max(multiSelectRange.y2 + relativeY1 * scale, multiSelectRange.y2 + relativeY2 * scale),
+      };
+    }
+
+    if (edgeDirection === "bottom") {
+      const totalRangeY = Math.abs(multiSelectRange.y2 - multiSelectRange.y1);
+      const newTotalRangeY = totalRangeY + mouseDistance.y;
+      const scale = newTotalRangeY / totalRangeY;
+
+      const relativeY1 = this.originPosition.y1 - multiSelectRange.y1;
+      const relativeY2 = this.originPosition.y2 - multiSelectRange.y1;
+
+      this.position = {
+        ...this.position,
+        y1: Math.min(multiSelectRange.y1 + relativeY1 * scale, multiSelectRange.y1 + relativeY2 * scale),
+        y2: Math.max(multiSelectRange.y1 + relativeY1 * scale, multiSelectRange.y1 + relativeY2 * scale),
+      };
+    }
+
+    if (edgeDirection === "top-left") {
+      const totalRangeX = Math.abs(multiSelectRange.x2 - multiSelectRange.x1);
+      const newTotalRangeX = totalRangeX - mouseDistance.x;
+      const scaleX = newTotalRangeX / totalRangeX;
+
+      const totalRangeY = Math.abs(multiSelectRange.y2 - multiSelectRange.y1);
+      const newTotalRangeY = totalRangeY - mouseDistance.y;
+      const scaleY = newTotalRangeY / totalRangeY;
+
+      const relativeX1 = this.originPosition.x1 - multiSelectRange.x2;
+      const relativeX2 = this.originPosition.x2 - multiSelectRange.x2;
+      const relativeY1 = this.originPosition.y1 - multiSelectRange.y2;
+      const relativeY2 = this.originPosition.y2 - multiSelectRange.y2;
+
+      this.position = {
+        ...this.position,
+        x1: Math.min(multiSelectRange.x2 + relativeX1 * scaleX, multiSelectRange.x2 + relativeX2 * scaleX),
+        y1: Math.min(multiSelectRange.y2 + relativeY1 * scaleY, multiSelectRange.y2 + relativeY2 * scaleY),
+        x2: Math.max(multiSelectRange.x2 + relativeX1 * scaleX, multiSelectRange.x2 + relativeX2 * scaleX),
+        y2: Math.max(multiSelectRange.y2 + relativeY1 * scaleY, multiSelectRange.y2 + relativeY2 * scaleY),
+      };
+    }
+
+    if (edgeDirection === "top-right") {
+      const totalRangeX = Math.abs(multiSelectRange.x2 - multiSelectRange.x1);
+      const newTotalRangeX = totalRangeX + mouseDistance.x;
+      const scaleX = newTotalRangeX / totalRangeX;
+
+      const totalRangeY = Math.abs(multiSelectRange.y2 - multiSelectRange.y1);
+      const newTotalRangeY = totalRangeY - mouseDistance.y;
+      const scaleY = newTotalRangeY / totalRangeY;
+
+      const relativeX1 = this.originPosition.x1 - multiSelectRange.x1;
+      const relativeX2 = this.originPosition.x2 - multiSelectRange.x1;
+      const relativeY1 = this.originPosition.y1 - multiSelectRange.y2;
+      const relativeY2 = this.originPosition.y2 - multiSelectRange.y2;
+
+      this.position = {
+        ...this.position,
+        x1: Math.min(multiSelectRange.x1 + relativeX1 * scaleX, multiSelectRange.x1 + relativeX2 * scaleX),
+        y1: Math.min(multiSelectRange.y2 + relativeY1 * scaleY, multiSelectRange.y2 + relativeY2 * scaleY),
+        x2: Math.max(multiSelectRange.x1 + relativeX1 * scaleX, multiSelectRange.x1 + relativeX2 * scaleX),
+        y2: Math.max(multiSelectRange.y2 + relativeY1 * scaleY, multiSelectRange.y2 + relativeY2 * scaleY),
+      };
+    }
+
+    if (edgeDirection === "bottom-left") {
+      const totalRangeX = Math.abs(multiSelectRange.x2 - multiSelectRange.x1);
+      const newTotalRangeX = totalRangeX - mouseDistance.x;
+      const scaleX = newTotalRangeX / totalRangeX;
+
+      const totalRangeY = Math.abs(multiSelectRange.y2 - multiSelectRange.y1);
+      const newTotalRangeY = totalRangeY + mouseDistance.y;
+      const scaleY = newTotalRangeY / totalRangeY;
+
+      const relativeX1 = this.originPosition.x1 - multiSelectRange.x2;
+      const relativeX2 = this.originPosition.x2 - multiSelectRange.x2;
+      const relativeY1 = this.originPosition.y1 - multiSelectRange.y1;
+      const relativeY2 = this.originPosition.y2 - multiSelectRange.y1;
+
+      this.position = {
+        ...this.position,
+        x1: Math.min(multiSelectRange.x2 + relativeX1 * scaleX, multiSelectRange.x2 + relativeX2 * scaleX),
+        y1: Math.min(multiSelectRange.y1 + relativeY1 * scaleY, multiSelectRange.y1 + relativeY2 * scaleY),
+        x2: Math.max(multiSelectRange.x2 + relativeX1 * scaleX, multiSelectRange.x2 + relativeX2 * scaleX),
+        y2: Math.max(multiSelectRange.y1 + relativeY1 * scaleY, multiSelectRange.y1 + relativeY2 * scaleY),
+      };
+    }
+
+    if (edgeDirection === "bottom-right") {
+      const totalRangeX = Math.abs(multiSelectRange.x2 - multiSelectRange.x1);
+      const newTotalRangeX = totalRangeX + mouseDistance.x;
+      const scaleX = newTotalRangeX / totalRangeX;
+
+      const totalRangeY = Math.abs(multiSelectRange.y2 - multiSelectRange.y1);
+      const newTotalRangeY = totalRangeY + mouseDistance.y;
+      const scaleY = newTotalRangeY / totalRangeY;
+
+      const relativeX1 = this.originPosition.x1 - multiSelectRange.x1;
+      const relativeX2 = this.originPosition.x2 - multiSelectRange.x1;
+      const relativeY1 = this.originPosition.y1 - multiSelectRange.y1;
+      const relativeY2 = this.originPosition.y2 - multiSelectRange.y1;
+
+      this.position = {
+        ...this.position,
+        x1: Math.min(multiSelectRange.x1 + relativeX1 * scaleX, multiSelectRange.x1 + relativeX2 * scaleX),
+        y1: Math.min(multiSelectRange.y1 + relativeY1 * scaleY, multiSelectRange.y1 + relativeY2 * scaleY),
+        x2: Math.max(multiSelectRange.x1 + relativeX1 * scaleX, multiSelectRange.x1 + relativeX2 * scaleX),
+        y2: Math.max(multiSelectRange.y1 + relativeY1 * scaleY, multiSelectRange.y1 + relativeY2 * scaleY),
+      };
+    }
   };
 
   initialPosition = () => {
@@ -99,22 +250,6 @@ export class Rect extends BaseComponent {
       x2: this.position.x2,
       y2: this.position.y2,
     };
-  };
-
-  hoverCornorEffect = () => {
-    this.ctx.save();
-    this.ctx.beginPath();
-    this.ctx.roundRect(
-      this.hoverCornor.coordinates.x - this.dragCornorRectSize,
-      this.hoverCornor.coordinates.y - this.dragCornorRectSize,
-      this.dragCornorRectSize * 2,
-      this.dragCornorRectSize * 2,
-      10
-    );
-    this.ctx.fillStyle = STYLE_SYSTEM.SECONDARY;
-    this.ctx.fill();
-    this.ctx.closePath();
-    this.ctx.restore();
   };
 
   multiDragEffect = () => {
@@ -197,10 +332,6 @@ export class Rect extends BaseComponent {
     this.ctx.stroke();
     this.ctx.closePath();
     this.ctx.restore();
-
-    if (this.hoverCornor.point >= 0) {
-      this.hoverCornorEffect();
-    }
 
     if (this.isActive) {
       this.dragEffect();
