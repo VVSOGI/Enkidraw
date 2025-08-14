@@ -48,9 +48,12 @@ export abstract class BaseComponent<T extends BasePosition = BasePosition> {
     this.isActive = false;
   };
 
+  public multiDragMode = (mode: boolean) => {
+    this.isMultiDrag = mode;
+  };
+
   abstract getMultiSelectHoverZone(mouse: MousePoint): EdgeDirection | "inside" | "outside";
   abstract multiDragEffect(): void;
-  abstract multiDragMode(mode: boolean): void;
   abstract isHover(e: MouseEvent): boolean;
   abstract isClicked(e: MouseEvent): boolean;
   abstract hoverComponent(e: MouseEvent, move: MousePoint): void;

@@ -1,5 +1,6 @@
 import { Rect } from "../components";
 import { MousePoint } from "../types";
+import { STYLE_SYSTEM } from "../utils";
 import { BaseTool, BaseToolProps } from "./base-tool";
 
 interface RectToolProps extends BaseToolProps {}
@@ -82,7 +83,7 @@ export class RectTool extends BaseTool {
 
     this.ctx.save();
     this.ctx.beginPath();
-    this.ctx.lineWidth = this.lineWidth;
+    this.ctx.lineWidth = STYLE_SYSTEM.STROKE_WIDTH;
     this.ctx.lineCap = "round";
     this.ctx.strokeStyle = "black";
     this.ctx.roundRect(startX, startY, width, height, this.borderRadius);

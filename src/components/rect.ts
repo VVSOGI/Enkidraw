@@ -21,12 +21,13 @@ export class Rect extends BaseComponent {
   }
 
   getPosition = () => {
-    return this.position;
+    const x1 = Math.min(this.position.x1 - STYLE_SYSTEM.STROKE_WIDTH, this.position.x2 + STYLE_SYSTEM.STROKE_WIDTH);
+    const x2 = Math.max(this.position.x1 - STYLE_SYSTEM.STROKE_WIDTH, this.position.x2 + STYLE_SYSTEM.STROKE_WIDTH);
+    const y1 = Math.min(this.position.y1 - STYLE_SYSTEM.STROKE_WIDTH, this.position.y2 + STYLE_SYSTEM.STROKE_WIDTH);
+    const y2 = Math.max(this.position.y1 - STYLE_SYSTEM.STROKE_WIDTH, this.position.y2 + STYLE_SYSTEM.STROKE_WIDTH);
+
+    return { x1, y1, x2, y2 };
   };
-
-  multiDragEffect = () => {};
-
-  multiDragMode = (mode: boolean) => {};
 
   isHover = (e: MouseEvent) => {
     const { x1, y1, x2, y2 } = this.getPosition();
@@ -117,6 +118,20 @@ export class Rect extends BaseComponent {
     this.ctx.restore();
   };
 
+  multiDragEffect = () => {
+    this.ctx.save();
+    this.ctx.beginPath();
+
+    const width = this.position.x2 - this.position.x1 + this.totalPadding * 2;
+    const height = this.position.y2 - this.position.y1 + this.totalPadding * 2;
+
+    this.ctx.strokeStyle = STYLE_SYSTEM.PRIMARY;
+    this.ctx.rect(this.position.x1 - this.totalPadding, this.position.y1 - this.totalPadding, width, height);
+    this.ctx.stroke();
+    this.ctx.closePath();
+    this.ctx.restore();
+  };
+
   dragEffect = () => {
     this.ctx.save();
     this.ctx.beginPath();
@@ -176,7 +191,7 @@ export class Rect extends BaseComponent {
 
     this.ctx.save();
     this.ctx.beginPath();
-    this.ctx.lineWidth = this.lineWidth;
+    this.ctx.lineWidth = STYLE_SYSTEM.STROKE_WIDTH;
     this.ctx.lineCap = "round";
     this.ctx.strokeStyle = "black";
     this.ctx.roundRect(startX, startY, width, height, this.borderRadius);
@@ -190,6 +205,10 @@ export class Rect extends BaseComponent {
 
     if (this.isActive) {
       this.dragEffect();
+    }
+
+    if (this.isMultiDrag) {
+      this.multiDragEffect();
     }
   };
 

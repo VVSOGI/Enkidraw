@@ -746,10 +746,6 @@ export class Line extends BaseComponent<LinePosition> {
     };
   };
 
-  multiDragMode = (mode: boolean) => {
-    this.isMultiDrag = mode;
-  };
-
   multiDragEffect = () => {
     const { x1, y1, x2, y2 } = this.getPosition();
 
