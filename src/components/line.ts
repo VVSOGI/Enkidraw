@@ -766,6 +766,10 @@ export class Line extends BaseComponent<LinePosition> {
     this.ctx.restore();
   };
 
+  getMultiSelectHoverZone(mouse: MousePoint): EdgeDirection | "inside" | "outside" {
+    return "inside";
+  }
+
   private getMouseHitControlPoint = (mousePosition: MousePoint) => {
     const { x: mouseX, y: mouseY } = mousePosition;
 

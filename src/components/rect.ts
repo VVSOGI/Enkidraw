@@ -17,6 +17,7 @@ export class Rect extends BaseComponent {
 
   constructor({ canvas, ctx, position, getZoomTransform }: BaseComponentProps<BasePosition>) {
     super({ canvas, ctx, position, getZoomTransform });
+    this.isMultiDrag = true;
   }
 
   getPosition = () => {
@@ -33,10 +34,10 @@ export class Rect extends BaseComponent {
     const { x: mouseX, y: mouseY } = MouseUtils.getLogicalMousePos(e, this.canvas, transform);
 
     if (
-      mouseX >= x1 - this.totalPadding * 2 &&
-      mouseX <= x2 + this.totalPadding * 2 &&
-      mouseY >= y1 - this.totalPadding * 2 &&
-      mouseY <= y2 + this.totalPadding * 2
+      mouseX >= x1 - this.totalPadding - this.dragCornorRectSize / 2 &&
+      mouseX <= x2 + this.totalPadding + this.dragCornorRectSize / 2 &&
+      mouseY >= y1 - this.totalPadding - this.dragCornorRectSize / 2 &&
+      mouseY <= y2 + this.totalPadding + this.dragCornorRectSize / 2
     ) {
       return true;
     }
@@ -50,10 +51,10 @@ export class Rect extends BaseComponent {
     const { x: mouseX, y: mouseY } = MouseUtils.getLogicalMousePos(e, this.canvas, transform);
 
     if (
-      mouseX >= x1 - this.totalPadding &&
-      mouseX <= x2 + this.totalPadding &&
-      mouseY >= y1 - this.totalPadding &&
-      mouseY <= y2 + this.totalPadding
+      mouseX >= x1 - this.totalPadding - this.dragCornorRectSize / 2 &&
+      mouseX <= x2 + this.totalPadding + this.dragCornorRectSize / 2 &&
+      mouseY >= y1 - this.totalPadding - this.dragCornorRectSize / 2 &&
+      mouseY <= y2 + this.totalPadding + this.dragCornorRectSize / 2
     ) {
       return true;
     }
@@ -87,7 +88,9 @@ export class Rect extends BaseComponent {
     this.position = nextPosition;
   };
 
-  resizeComponent = (mouseDistance: MousePoint, multiSelectRange: DragRange, edgeDirection: EdgeDirection) => {};
+  resizeComponent = (mouseDistance: MousePoint, multiSelectRange: DragRange, edgeDirection: EdgeDirection) => {
+    console.log(edgeDirection);
+  };
 
   initialPosition = () => {
     this.originPosition = {
@@ -189,6 +192,102 @@ export class Rect extends BaseComponent {
       this.dragEffect();
     }
   };
+
+  getMultiSelectHoverZone(mouse: MousePoint): EdgeDirection | "inside" | "outside" {
+    const { x1: left, x2: right, y1: top, y2: bottom } = this.getPosition();
+
+    // Top-left corner
+    if (
+      mouse.x >= left - (this.multiDragPadding + this.dragCornorRectSize) &&
+      mouse.x <= left - this.multiDragPadding &&
+      mouse.y >= top - (this.multiDragPadding + this.dragCornorRectSize) &&
+      mouse.y <= top - this.multiDragPadding
+    ) {
+      return "top-left";
+    }
+
+    // Top-right corner
+    if (
+      mouse.x >= right + this.multiDragPadding &&
+      mouse.x <= right + this.multiDragPadding + this.dragCornorRectSize &&
+      mouse.y >= top - (this.multiDragPadding + this.dragCornorRectSize) &&
+      mouse.y <= top - this.multiDragPadding
+    ) {
+      return "top-right";
+    }
+
+    // Bottom-left corner
+    if (
+      mouse.x >= left - (this.multiDragPadding + this.dragCornorRectSize) &&
+      mouse.x <= left - this.multiDragPadding &&
+      mouse.y >= bottom + this.multiDragPadding &&
+      mouse.y <= bottom + this.multiDragPadding + this.dragCornorRectSize
+    ) {
+      return "bottom-left";
+    }
+
+    // Bottom-right corner
+    if (
+      mouse.x >= right + this.multiDragPadding &&
+      mouse.x <= right + this.multiDragPadding + this.dragCornorRectSize &&
+      mouse.y >= bottom + this.multiDragPadding &&
+      mouse.y <= bottom + this.multiDragPadding + this.dragCornorRectSize
+    ) {
+      return "bottom-right";
+    }
+
+    // Left edge
+    if (
+      mouse.x >= left - (this.multiDragPadding + this.dragCornorRectSize) &&
+      mouse.x <= left - this.multiDragPadding &&
+      mouse.y > top - this.multiDragPadding &&
+      mouse.y < bottom + this.multiDragPadding
+    ) {
+      return "left";
+    }
+
+    // Right edge
+    if (
+      mouse.x >= right + this.multiDragPadding &&
+      mouse.x <= right + this.multiDragPadding + this.dragCornorRectSize &&
+      mouse.y > top - this.multiDragPadding &&
+      mouse.y < bottom + this.multiDragPadding
+    ) {
+      return "right";
+    }
+
+    // Top edge
+    if (
+      mouse.x > left - this.multiDragPadding &&
+      mouse.x < right + this.multiDragPadding &&
+      mouse.y >= top - (this.multiDragPadding + this.dragCornorRectSize) &&
+      mouse.y <= top - this.multiDragPadding
+    ) {
+      return "top";
+    }
+
+    // Bottom edge
+    if (
+      mouse.x > left - this.multiDragPadding &&
+      mouse.x < right + this.multiDragPadding &&
+      mouse.y >= bottom + this.multiDragPadding &&
+      mouse.y <= bottom + this.multiDragPadding + this.dragCornorRectSize
+    ) {
+      return "bottom";
+    }
+
+    // Inside
+    if (
+      mouse.x >= left - this.multiDragPadding &&
+      mouse.x <= right + this.multiDragPadding &&
+      mouse.y >= top - this.multiDragPadding &&
+      mouse.y <= bottom + this.multiDragPadding
+    ) {
+      return "inside";
+    }
+
+    return "outside";
+  }
 
   private getMouseHitControlPoint = (mouse: MousePoint) => {
     const { x: mouseX, y: mouseY } = mouse;
