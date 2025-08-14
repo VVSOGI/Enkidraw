@@ -86,7 +86,7 @@ export class SelectedComponentManager extends EventEmitter {
   }
 
   public updateMultiSelectMode(): boolean {
-    if (this.selectedComponents.size > 1) {
+    if (this.selectedComponents.size >= 1) {
       const multiRange = this.calculateMultiSelectBounds();
       this.multiSelectRange = Object.assign({}, multiRange);
       this.originMultiSelectRange = Object.assign({}, multiRange);

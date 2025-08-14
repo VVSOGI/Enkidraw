@@ -29,7 +29,7 @@ export class Rect extends BaseComponent {
   };
 
   isHover = (e: MouseEvent) => {
-    const { x1, y1, x2, y2 } = this.getPosition();
+    const { x1, y1, x2, y2 } = this.position;
     const transform = this.getZoomTransform();
     const { x: mouseX, y: mouseY } = MouseUtils.getLogicalMousePos(e, this.canvas, transform);
 
@@ -46,7 +46,7 @@ export class Rect extends BaseComponent {
   };
 
   isClicked = (e: MouseEvent) => {
-    const { x1, y1, x2, y2 } = this.getPosition();
+    const { x1, y1, x2, y2 } = this.position;
     const transform = this.getZoomTransform();
     const { x: mouseX, y: mouseY } = MouseUtils.getLogicalMousePos(e, this.canvas, transform);
 
@@ -212,7 +212,7 @@ export class Rect extends BaseComponent {
   };
 
   getMultiSelectHoverZone(mouse: MousePoint): EdgeDirection | "inside" | "outside" {
-    const { x1: left, x2: right, y1: top, y2: bottom } = this.getPosition();
+    const { x1: left, x2: right, y1: top, y2: bottom } = this.position;
 
     // Top-left corner
     if (
@@ -310,7 +310,7 @@ export class Rect extends BaseComponent {
   private getMouseHitControlPoint = (mouse: MousePoint) => {
     const { x: mouseX, y: mouseY } = mouse;
 
-    const currentPosition = this.getPosition();
+    const currentPosition = this.position;
 
     const leftTop = {
       x: currentPosition.x1 - this.dragCornorRectSize,

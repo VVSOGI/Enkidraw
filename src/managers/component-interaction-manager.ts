@@ -121,6 +121,7 @@ export class ComponentInteractionManager {
         } else {
           this.resizeEdge = zone;
           this.activeManager.selectCurrentActive("resize");
+          this.selectionManager.updateMultiSelectMode();
           return;
         }
       }
