@@ -6,7 +6,6 @@ export class Rect extends BaseComponent {
   public id: string = v4();
   public name: string = "rect";
 
-  private lineWidth = 4;
   private borderRadius = 10;
   private totalPadding = 10;
   private dragCornorRectSize = 10;

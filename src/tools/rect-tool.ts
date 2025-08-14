@@ -10,7 +10,6 @@ export class RectTool extends BaseTool {
 
   private initPoint: MousePoint | null = null;
   private movePoint: MousePoint | null = null;
-  private lineWidth = 4;
   private borderRadius = 10;
 
   constructor({
