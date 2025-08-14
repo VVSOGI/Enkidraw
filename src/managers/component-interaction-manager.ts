@@ -64,7 +64,6 @@ export class ComponentInteractionManager {
 
     // 2. Handle component resizing
     if (this.activeManager.currentActive === "resize") {
-      this.activeManager.selectCurrentActive("resize");
       this.handleComponentResize(mousePos);
       return;
     }
@@ -85,6 +84,7 @@ export class ComponentInteractionManager {
 
     // Handle multi-select range interactions
     const multiSelectRange = this.selectionManager.getMultiSelectRange();
+
     if (multiSelectRange) {
       const zone = this.selectionManager.getMultiSelectHoverZone(mousePos);
 
@@ -109,6 +109,22 @@ export class ComponentInteractionManager {
 
     if (component && selectedComponents.has(component)) {
       this.tempPosition = mousePos;
+
+      if (component.isMultiDrag) {
+        const zone = component.getMultiSelectHoverZone(mousePos);
+
+        if (zone === "outside") return;
+
+        if (zone === "inside") {
+          this.activeManager.selectCurrentActive("move");
+          return;
+        } else {
+          this.resizeEdge = zone;
+          this.activeManager.selectCurrentActive("resize");
+          return;
+        }
+      }
+
       this.activeManager.selectCurrentActive("move");
       return;
     }
@@ -262,8 +278,18 @@ export class ComponentInteractionManager {
     // Handle individual component hover
     for (const component of this.components) {
       if (component.isHover(e)) {
-        this.activeManager.selectCurrentActive("pointer");
+        const zone = component.getMultiSelectHoverZone(mouse);
+        if (zone === "outside") return;
+
         component.hoverComponent(e, mouse);
+
+        if (zone === "inside") {
+          this.activeManager.selectCurrentActive("pointer");
+        } else {
+          const cursorStyle = this.selectionManager.getCursorStyleForZone(zone);
+          this.activeManager.selectCurrentActive(cursorStyle);
+        }
+
         return;
       } else {
         this.activeManager.selectCurrentActive("default");
