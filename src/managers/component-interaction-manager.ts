@@ -201,63 +201,28 @@ export class ComponentInteractionManager {
       y: mousePos.y - this.tempPosition.y,
     };
 
-    // Handle resize logic for each edge/corner
-    this.handleResizeLogic(mouseDistance, currentMultiSelectRange, currentOriginMultiSelectRange);
-
-    // Apply changes back to SelectionManager
-    this.selectionManager.setMultiSelectRange(currentMultiSelectRange);
-
     // Update components only if resize edge didn't change
     const selectedComponents = this.selectionManager.getSelectedComponents();
     for (const component of selectedComponents) {
       component.resizeComponent(mouseDistance, currentOriginMultiSelectRange, this.resizeEdge);
     }
-  }
 
-  private handleResizeLogic(
-    mouseDistance: { x: number; y: number },
-    multiSelectRange: DragRange,
-    originMultiSelectRange: DragRange
-  ) {
-    if (this.resizeEdge === "left") {
-      const newX1 = originMultiSelectRange.x1 + mouseDistance.x;
-      multiSelectRange.x1 = newX1;
+    let nextRange = {
+      x1: Infinity,
+      y1: Infinity,
+      x2: -Infinity,
+      y2: -Infinity,
+    };
+
+    for (const component of selectedComponents) {
+      const { x1, y1, x2, y2 } = component.getPosition();
+      nextRange.x1 = Math.min(nextRange.x1, x1);
+      nextRange.y1 = Math.min(nextRange.y1, y1);
+      nextRange.x2 = Math.max(nextRange.x2, x2);
+      nextRange.y2 = Math.max(nextRange.y2, y2);
     }
 
-    if (this.resizeEdge === "right") {
-      const newX2 = originMultiSelectRange.x2 + mouseDistance.x;
-      multiSelectRange.x2 = newX2;
-    }
-
-    if (this.resizeEdge === "top") {
-      const newY1 = originMultiSelectRange.y1 + mouseDistance.y;
-      multiSelectRange.y1 = newY1;
-    }
-
-    if (this.resizeEdge === "bottom") {
-      const newY2 = originMultiSelectRange.y2 + mouseDistance.y;
-      multiSelectRange.y2 = newY2;
-    }
-
-    if (this.resizeEdge === "top-left") {
-      multiSelectRange.x1 = originMultiSelectRange.x1 + mouseDistance.x;
-      multiSelectRange.y1 = originMultiSelectRange.y1 + mouseDistance.y;
-    }
-
-    if (this.resizeEdge === "top-right") {
-      multiSelectRange.x2 = originMultiSelectRange.x2 + mouseDistance.x;
-      multiSelectRange.y1 = originMultiSelectRange.y1 + mouseDistance.y;
-    }
-
-    if (this.resizeEdge === "bottom-left") {
-      multiSelectRange.x1 = originMultiSelectRange.x1 + mouseDistance.x;
-      multiSelectRange.y2 = originMultiSelectRange.y2 + mouseDistance.y;
-    }
-
-    if (this.resizeEdge === "bottom-right") {
-      multiSelectRange.x2 = originMultiSelectRange.x2 + mouseDistance.x;
-      multiSelectRange.y2 = originMultiSelectRange.y2 + mouseDistance.y;
-    }
+    this.selectionManager.setMultiSelectRange(nextRange);
   }
 
   private handleHoverEffects(e: MouseEvent, mouse: MousePoint): void {
