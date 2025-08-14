@@ -96,10 +96,10 @@ export class RectTool extends BaseTool {
     const { x: startX, y: startY } = start;
     const { x: endX, y: endY } = end;
     const position = {
-      x1: startX,
-      y1: startY,
-      x2: endX,
-      y2: endY,
+      x1: Math.min(startX, endX),
+      y1: Math.min(startY, endY),
+      x2: Math.max(startX, endX),
+      y2: Math.max(startY, endY),
     };
 
     const rect = new Rect({ canvas: this.canvas, ctx: this.ctx, position, getZoomTransform: this.getZoomTransform });

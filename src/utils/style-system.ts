@@ -1,6 +1,6 @@
 export const STYLE_SYSTEM = {
-  PRIMARY: "rgba(38, 125, 255, 0.5)",
-  SECONDARY: "rgba(100, 162, 255, 0.5)",
+  PRIMARY: "rgba(38, 125, 255, 1)",
+  SECONDARY: "rgba(100, 162, 255, 1)",
 
   RED: "rgb(255, 48, 48)",
   GREEN: "rgb(26, 159, 44)",
