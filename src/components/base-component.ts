@@ -1,5 +1,5 @@
 import { v4 } from "uuid";
-import { DragRange, EdgeDirection, MousePoint } from "../types";
+import { CursorStyle, DragRange, EdgeDirection, MousePoint } from "../types";
 import { STYLE_SYSTEM } from "../utils";
 
 export interface BasePosition {
@@ -47,6 +47,7 @@ export abstract class BaseComponent<T extends BasePosition = BasePosition> {
     this.isActive = false;
   };
 
+  abstract getMultiSelectHoverZone(mouse: MousePoint): EdgeDirection | "inside" | "outside";
   abstract multiDragEffect(): void;
   abstract multiDragMode(mode: boolean): void;
   abstract isHover(e: MouseEvent): boolean;
