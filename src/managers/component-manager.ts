@@ -1,11 +1,11 @@
 import { ComponentInteractionManager, LeftMenuManager, SelectedComponentManager } from ".";
-import { BaseComponent } from "../components";
+import { BaseComponent, BasePosition } from "../components";
 import { Active, DragRange } from "../types";
 import { STYLE_SYSTEM } from "../utils";
 import { ActiveManager } from "./active-manager";
 
 export class ComponentManager {
-  public components: Set<BaseComponent>;
+  public components: BaseComponent<BasePosition>[];
 
   protected canvas: HTMLCanvasElement;
   protected ctx: CanvasRenderingContext2D;
@@ -23,7 +23,7 @@ export class ComponentManager {
   ) {
     this.canvas = canvas;
     this.ctx = ctx;
-    this.components = new Set();
+    this.components = [];
     this.leftMenuManager = leftMenuManager;
     this.activeManager = activeManager;
 
@@ -60,18 +60,23 @@ export class ComponentManager {
   };
 
   public add = (component: BaseComponent) => {
-    this.components.add(component);
+    this.components.push(component);
   };
 
   public remove = (component: BaseComponent) => {
-    this.components.delete(component);
+    this.components = this.components.filter((exist) => exist.id !== component.id);
   };
 
   public removeSelected = () => {
     const selectedComponents = this.selectedComponentManager.getSelectedComponents();
-    for (const component of selectedComponents) {
-      this.components.delete(component);
-    }
+    this.components = this.components.filter((exist) => {
+      for (const component of selectedComponents) {
+        if (exist.id === component.id) return false;
+      }
+
+      return true;
+    });
+
     this.selectedComponentManager.clearSelection();
   };
 

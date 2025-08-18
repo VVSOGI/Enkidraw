@@ -1,9 +1,9 @@
-import { BaseComponent } from "../components";
+import { BaseComponent, BasePosition } from "../components";
 import { DragRange, EdgeDirection, MousePoint, CursorStyle } from "../types";
 import { EventEmitter } from "../utils";
 
 export class SelectedComponentManager extends EventEmitter {
-  public selectedComponents: Set<BaseComponent>;
+  public selectedComponents: BaseComponent<BasePosition>[];
 
   private multiResizeRange = 5;
   private multiSelectRange: DragRange | null = null;
@@ -11,10 +11,10 @@ export class SelectedComponentManager extends EventEmitter {
 
   constructor() {
     super();
-    this.selectedComponents = new Set();
+    this.selectedComponents = [];
   }
 
-  public getSelectedComponents(): Set<BaseComponent> {
+  public getSelectedComponents(): BaseComponent<BasePosition>[] {
     return this.selectedComponents;
   }
 
@@ -43,19 +43,19 @@ export class SelectedComponentManager extends EventEmitter {
 
   public selectComponent(component: BaseComponent): void {
     this.clearSelection();
-    this.selectedComponents.add(component);
+    this.selectedComponents.push(component);
     this.emit("menuActivate");
     component.activate();
   }
 
-  public dragComponents(components: Set<BaseComponent>, dragRange: DragRange): void {
+  public dragComponents(components: BaseComponent<BasePosition>[], dragRange: DragRange): void {
     const { x1: dragX1, y1: dragY1, x2: dragX2, y2: dragY2 } = dragRange;
 
     for (const component of components) {
       const { x1: componentX1, y1: componentY1, x2: componentX2, y2: componentY2 } = component.getPosition();
       if (componentX1 >= dragX1 && componentX2 <= dragX2 && componentY1 >= dragY1 && componentY2 <= dragY2) {
         component.activate();
-        this.selectedComponents.add(component);
+        this.selectedComponents.push(component);
         if (component.name === "line") {
           this.emit("menuActivate");
         } else {
@@ -63,18 +63,18 @@ export class SelectedComponentManager extends EventEmitter {
         }
       } else {
         component.deactivate();
-        this.selectedComponents.delete(component);
+        this.selectedComponents = this.selectedComponents.filter((selected) => selected.id !== component.id);
         component.multiDragMode(false);
       }
     }
 
     // All Selected Components deactivated When selected component more than 1
-    if (this.selectedComponents.size > 1) {
+    if (this.selectedComponents.length > 1) {
       for (const component of this.selectedComponents) {
         component.deactivate();
         component.multiDragMode(true);
       }
-    } else if (this.selectedComponents.size === 1) {
+    } else if (this.selectedComponents.length === 1) {
       for (const component of this.selectedComponents) {
         component.activate();
         component.multiDragMode(false);
@@ -86,7 +86,7 @@ export class SelectedComponentManager extends EventEmitter {
   }
 
   public updateMultiSelectMode(): boolean {
-    if (this.selectedComponents.size >= 1) {
+    if (this.selectedComponents.length >= 1) {
       const multiRange = this.calculateMultiSelectBounds();
       this.multiSelectRange = Object.assign({}, multiRange);
       this.originMultiSelectRange = Object.assign({}, multiRange);
@@ -226,7 +226,7 @@ export class SelectedComponentManager extends EventEmitter {
     }
     this.multiSelectRange = null;
     this.originMultiSelectRange = null;
-    this.selectedComponents.clear();
+    this.selectedComponents = [];
   }
 
   public resetOriginMultiSelectRange(): void {

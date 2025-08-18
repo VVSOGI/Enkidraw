@@ -4,7 +4,7 @@ import { STYLE_SYSTEM } from "../utils";
 export class LeftMenuManager {
   public styleMenu: HTMLDivElement;
 
-  private components: Set<BaseComponent<BasePosition>> = new Set();
+  private components: BaseComponent<BasePosition>[] = [];
   private strokeButtons: HTMLButtonElement[];
   private currentStrokeColor: string;
   private currentStrokeColorButton!: HTMLButtonElement;
@@ -32,7 +32,7 @@ export class LeftMenuManager {
     this.appendStrokeColorTab();
   }
 
-  public setComponents(components: Set<BaseComponent<BasePosition>>): void {
+  public setComponents(components: BaseComponent<BasePosition>[]): void {
     this.components = components;
   }
 

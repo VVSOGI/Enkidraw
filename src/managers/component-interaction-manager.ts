@@ -1,5 +1,5 @@
-import { BaseComponent } from "../components";
-import { DragRange, EdgeDirection, MousePoint } from "../types";
+import { BaseComponent, BasePosition } from "../components";
+import { EdgeDirection, MousePoint } from "../types";
 import { SelectedComponentManager } from ".";
 import { ActiveManager } from "./active-manager";
 
@@ -7,7 +7,7 @@ export class ComponentInteractionManager {
   private canvas: HTMLCanvasElement;
   private activeManager: ActiveManager;
   private selectionManager: SelectedComponentManager;
-  private components: Set<BaseComponent>;
+  private components: BaseComponent<BasePosition>[];
   private removeSelectedComponents: () => void;
   private getZoomTransform?: () => { zoom: number; translateX: number; translateY: number };
 
@@ -19,7 +19,7 @@ export class ComponentInteractionManager {
     canvas: HTMLCanvasElement,
     activeManager: ActiveManager,
     selectionManager: SelectedComponentManager,
-    components: Set<BaseComponent>,
+    components: BaseComponent<BasePosition>[],
     removeSelectedComponents: () => void,
     getZoomTransform?: () => { zoom: number; translateX: number; translateY: number }
   ) {
@@ -107,7 +107,7 @@ export class ComponentInteractionManager {
     const component = this.findComponentWithPosition(e);
     const selectedComponents = this.selectionManager.getSelectedComponents();
 
-    if (component && selectedComponents.has(component)) {
+    if (component && selectedComponents.find((selected) => selected.id === component.id)) {
       this.tempPosition = mousePos;
 
       if (component.isTransformSelect) {
@@ -161,7 +161,7 @@ export class ComponentInteractionManager {
 
   private handleMultiDragMode(): boolean {
     const selectedComponents = this.selectionManager.getSelectedComponents();
-    if (selectedComponents.size > 1) {
+    if (selectedComponents.length > 1) {
       return this.selectionManager.updateMultiSelectMode();
     }
     return false;
@@ -266,7 +266,7 @@ export class ComponentInteractionManager {
   }
 
   private findComponentWithPosition(e: MouseEvent): BaseComponent | null {
-    for (const component of this.components) {
+    for (const component of this.components.reverse()) {
       if (component.isClicked(e)) {
         return component;
       }
@@ -279,7 +279,7 @@ export class ComponentInteractionManager {
       e.preventDefault();
       const selectedComponents = this.selectionManager.getSelectedComponents();
 
-      if (selectedComponents.size > 0) {
+      if (selectedComponents.length > 0) {
         this.removeSelectedComponents();
       }
 
