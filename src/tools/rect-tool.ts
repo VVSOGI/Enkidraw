@@ -61,7 +61,6 @@ export class RectTool extends BaseTool {
 
     const { x: startX, y: startY } = this.initPoint;
     const { x: endX, y: endY } = this.movePoint;
-    this.isDrawing = false;
 
     if (startX === endX && startY === endY) {
       return;
