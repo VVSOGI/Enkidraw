@@ -13,7 +13,7 @@ export class ComponentInteractionManager {
 
   private tempPosition: MousePoint | null = null;
   private resizeEdge: EdgeDirection | null = null;
-  private nonDefaultStates: Set<string> = new Set<string>(["grab", "grabbing"]);
+  private nonDefaultStates: Set<string> = new Set<string>(["grab", "grabbing", "line"]);
 
   constructor(
     canvas: HTMLCanvasElement,

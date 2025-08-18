@@ -19,9 +19,8 @@ export class CircleTool extends BaseTool {
   }
 
   onMouseDown = (e: MouseEvent) => {
-    this.activeManager.selectCurrentActive("circle");
-    this.isDrawing = true;
     const position = this.getLogicalMousePos(e);
+    this.isDrawing = true;
     this.initPoint = position;
     this.movePoint = position;
   };

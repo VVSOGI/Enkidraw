@@ -112,16 +112,19 @@ export class CanvasManager {
       if (e.code === "Escape") return;
       this.currentTool?.deactivate();
 
-      if (e.code === "Digit1" && !this.lineTool.isActive) {
+      if (e.code === "Digit1") {
         this.lineTool.activate();
+        this.activeManager.selectCurrentActive("line");
       }
 
       if (e.code === "Digit2") {
         this.rectTool.activate();
+        this.activeManager.selectCurrentActive("line");
       }
 
       if (e.code === "Digit3") {
         this.circleTool.activate();
+        this.activeManager.selectCurrentActive("line");
       }
 
       if (e.code === "KeyH") {

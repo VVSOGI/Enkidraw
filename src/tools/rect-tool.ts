@@ -42,9 +42,8 @@ export class RectTool extends BaseTool {
   };
 
   onMouseDown = (e: MouseEvent) => {
-    this.isDrawing = true;
-    this.activeManager.selectCurrentActive("line");
     const position = this.getLogicalMousePos(e);
+    this.isDrawing = true;
     this.initPoint = position;
     this.movePoint = position;
   };

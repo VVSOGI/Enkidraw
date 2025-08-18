@@ -40,7 +40,6 @@ export class LineTool extends BaseTool {
   };
 
   onMouseDown = (e: MouseEvent) => {
-    this.activeManager.selectCurrentActive("line");
     const position = this.getLogicalMousePos(e);
 
     if (!this.isDrawing) {

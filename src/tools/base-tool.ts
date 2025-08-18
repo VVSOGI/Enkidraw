@@ -74,6 +74,7 @@ export abstract class BaseTool {
     this.removeEventListeners();
     this.deleteCurrentTool();
     this.reset();
+    this.activeManager.selectCurrentActive("default");
   };
 
   resize = (stageWidth: number, stageHeight: number) => {
