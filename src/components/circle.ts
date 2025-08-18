@@ -19,7 +19,13 @@ export class Circle extends BaseComponent<CirclePosition> {
   }
 
   initialPosition = () => {
-    return this.position;
+    this.originPosition = {
+      ...this.position,
+      x1: this.position.x1,
+      y1: this.position.y1,
+      x2: this.position.x2,
+      y2: this.position.y2,
+    };
   };
 
   getPosition = () => {
@@ -68,7 +74,18 @@ export class Circle extends BaseComponent<CirclePosition> {
 
   hoverComponent = (e: MouseEvent, move: MousePoint) => {};
 
-  moveComponent = (e: MouseEvent, move: MousePoint) => {};
+  moveComponent = (e: MouseEvent, move: MousePoint) => {
+    const { x: moveX, y: moveY } = move;
+    const nextPosition = Object.assign({}, this.position);
+    nextPosition.x1 = this.originPosition.x1 + moveX;
+    nextPosition.y1 = this.originPosition.y1 + moveY;
+    nextPosition.x2 = this.originPosition.x2 + moveX;
+    nextPosition.y2 = this.originPosition.y2 + moveY;
+    nextPosition.centerX = this.originPosition.centerX + moveX;
+    nextPosition.centerY = this.originPosition.centerY + moveY;
+
+    this.position = nextPosition;
+  };
 
   resizeComponent = (mouseDistance: MousePoint, multiSelectRange: DragRange, edgeDirection: EdgeDirection) => {};
 
