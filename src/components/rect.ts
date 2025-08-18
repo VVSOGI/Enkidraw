@@ -9,10 +9,6 @@ export class Rect extends BaseComponent {
   private borderRadius = 10;
   private totalPadding = 10;
   private dragCornorRectSize = 10;
-  private hoverCornor = {
-    point: -1,
-    coordinates: { x: 0, y: 0 },
-  };
 
   constructor({ canvas, ctx, position, getZoomTransform }: BaseComponentProps<BasePosition>) {
     super({ canvas, ctx, position, getZoomTransform });
@@ -62,20 +58,7 @@ export class Rect extends BaseComponent {
     return false;
   };
 
-  hoverComponent = (e: MouseEvent, move: MousePoint) => {
-    if (!this.isActive) return;
-
-    const hoverCornor = this.getMouseHitControlPoint(move);
-
-    if (hoverCornor.point !== -1) {
-      this.hoverCornor = hoverCornor;
-    } else {
-      this.hoverCornor = {
-        point: -1,
-        coordinates: { x: 0, y: 0 },
-      };
-    }
-  };
+  hoverComponent = (e: MouseEvent, move: MousePoint) => {};
 
   moveComponent = (e: MouseEvent, move: MousePoint) => {
     const { x: moveX, y: moveY } = move;
