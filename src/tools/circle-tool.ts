@@ -1,4 +1,5 @@
 import { MousePoint, STYLE_SYSTEM } from "..";
+import { Circle } from "../components";
 import { BaseTool, BaseToolProps } from "./base-tool";
 
 export class CircleTool extends BaseTool {
@@ -42,6 +43,7 @@ export class CircleTool extends BaseTool {
       return;
     }
 
+    this.appendComponent(this.initPoint, this.movePoint);
     this.deactivate();
   };
 
@@ -72,17 +74,37 @@ export class CircleTool extends BaseTool {
     this.movePoint = null;
   };
 
-  protected addEventListeners = () => {
+  addEventListeners = () => {
     this.canvas.addEventListener("mousedown", this.onMouseDown);
     this.canvas.addEventListener("mousemove", this.onMouseMove);
     this.canvas.addEventListener("mouseup", this.onMouseUp);
     document.addEventListener("keydown", this.onKeyDown);
   };
 
-  protected removeEventListeners = () => {
+  removeEventListeners = () => {
     this.canvas.removeEventListener("mousedown", this.onMouseDown);
     this.canvas.removeEventListener("mousemove", this.onMouseMove);
     this.canvas.removeEventListener("mouseup", this.onMouseUp);
     document.removeEventListener("keydown", this.onKeyDown);
+  };
+
+  private appendComponent = (start: MousePoint, end: MousePoint) => {
+    const { x: startX, y: startY } = start;
+    const { x: endX, y: endY } = end;
+    const position = {
+      x1: Math.min(startX, endX),
+      y1: Math.min(startY, endY),
+      x2: Math.max(startX, endX),
+      y2: Math.max(startY, endY),
+    };
+
+    const circle = new Circle({
+      canvas: this.canvas,
+      ctx: this.ctx,
+      position,
+      getZoomTransform: this.getZoomTransform,
+    });
+
+    this.componentManager.add(circle);
   };
 }

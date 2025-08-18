@@ -1,6 +1,6 @@
 import { v4 } from "uuid";
 import { BaseComponent, BaseComponentProps, BasePosition } from ".";
-import { DragRange, EdgeDirection, MousePoint } from "..";
+import { DragRange, EdgeDirection, MousePoint, STYLE_SYSTEM } from "..";
 
 export class Circle extends BaseComponent {
   public id: string = v4();
@@ -38,5 +38,21 @@ export class Circle extends BaseComponent {
 
   multiDragEffect = () => {};
 
-  draw = () => {};
+  draw = () => {
+    const { x1: startX, y1: startY, x2: endX, y2: endY } = this.position;
+
+    const centerX = (startX + endX) / 2;
+    const centerY = (startY + endY) / 2;
+    const radiusX = Math.abs((endX - startX) / 2);
+    const radiusY = Math.abs((endY - startY) / 2);
+
+    this.ctx.save();
+    this.ctx.beginPath();
+    this.ctx.lineWidth = STYLE_SYSTEM.STROKE_WIDTH;
+    this.ctx.strokeStyle = "black";
+    this.ctx.ellipse(centerX, centerY, radiusX, radiusY, 0, 0, Math.PI * 2);
+    this.ctx.stroke();
+    this.ctx.closePath();
+    this.ctx.restore();
+  };
 }
