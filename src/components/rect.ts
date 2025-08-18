@@ -16,10 +16,10 @@ export class Rect extends BaseComponent {
   }
 
   getPosition = () => {
-    const x1 = Math.min(this.position.x1 - STYLE_SYSTEM.STROKE_WIDTH, this.position.x2 + STYLE_SYSTEM.STROKE_WIDTH);
-    const x2 = Math.max(this.position.x1 - STYLE_SYSTEM.STROKE_WIDTH, this.position.x2 + STYLE_SYSTEM.STROKE_WIDTH);
-    const y1 = Math.min(this.position.y1 - STYLE_SYSTEM.STROKE_WIDTH, this.position.y2 + STYLE_SYSTEM.STROKE_WIDTH);
-    const y2 = Math.max(this.position.y1 - STYLE_SYSTEM.STROKE_WIDTH, this.position.y2 + STYLE_SYSTEM.STROKE_WIDTH);
+    const x1 = Math.min(this.position.x1 - this.totalPadding, this.position.x2 + this.totalPadding);
+    const x2 = Math.max(this.position.x1 - this.totalPadding, this.position.x2 + this.totalPadding);
+    const y1 = Math.min(this.position.y1 - this.totalPadding, this.position.y2 + this.totalPadding);
+    const y2 = Math.max(this.position.y1 - this.totalPadding, this.position.y2 + this.totalPadding);
 
     return { x1, y1, x2, y2 };
   };
