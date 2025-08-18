@@ -10,19 +10,26 @@ export class Circle extends BaseComponent {
     super({ canvas, ctx, position, getZoomTransform });
   }
 
-  initialPosition = () => {};
+  initialPosition = () => {
+    return this.position;
+  };
+
   getPosition = () => {
     return this.position;
   };
+
   isHover = (e: MouseEvent) => {
     return false;
   };
+
   isClicked = (e: MouseEvent) => {
     return false;
   };
 
   hoverComponent = (e: MouseEvent, move: MousePoint) => {};
+
   moveComponent = (e: MouseEvent, move: MousePoint) => {};
+
   resizeComponent = (mouseDistance: MousePoint, multiSelectRange: DragRange, edgeDirection: EdgeDirection) => {};
 
   getMultiSelectHoverZone = (mouse: MousePoint): EdgeDirection | "inside" | "outside" => {
@@ -30,5 +37,6 @@ export class Circle extends BaseComponent {
   };
 
   multiDragEffect = () => {};
+
   draw = () => {};
 }
