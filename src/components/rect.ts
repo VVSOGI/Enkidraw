@@ -420,44 +420,4 @@ export class Rect extends BaseComponent {
 
     return "outside";
   }
-
-  private getMouseHitControlPoint = (mouse: MousePoint) => {
-    const { x: mouseX, y: mouseY } = mouse;
-
-    const currentPosition = this.position;
-
-    const leftTop = {
-      x: currentPosition.x1 - this.dragCornorRectSize,
-      y: currentPosition.y1 - this.dragCornorRectSize,
-    };
-
-    const rightTop = {
-      x: currentPosition.x2 + this.dragCornorRectSize,
-      y: currentPosition.y1 - this.dragCornorRectSize,
-    };
-
-    const leftBottom = {
-      x: currentPosition.x1 - this.dragCornorRectSize,
-      y: currentPosition.y2 + this.dragCornorRectSize,
-    };
-
-    const rightBottom = {
-      x: currentPosition.x2 + this.dragCornorRectSize,
-      y: currentPosition.y2 + this.dragCornorRectSize,
-    };
-
-    const cornors = [leftTop, rightTop, leftBottom, rightBottom];
-    const cornor = cornors.findIndex(
-      ({ x, y }) =>
-        mouseX >= x - this.totalPadding / 2 &&
-        mouseX <= x + this.totalPadding / 2 &&
-        mouseY >= y - this.totalPadding / 2 &&
-        mouseY <= y + this.totalPadding / 2
-    );
-
-    return {
-      point: cornor,
-      coordinates: cornor >= 0 ? cornors[cornor] : { x: 0, y: 0 },
-    };
-  };
 }
