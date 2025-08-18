@@ -1,5 +1,5 @@
 import { v4 } from "uuid";
-import { CursorStyle, DragRange, EdgeDirection, MousePoint } from "../types";
+import { DragRange, EdgeDirection, MousePoint } from "../types";
 import { STYLE_SYSTEM } from "../utils";
 
 export interface BasePosition {
@@ -52,14 +52,14 @@ export abstract class BaseComponent<T extends BasePosition = BasePosition> {
     this.isMultiDrag = mode;
   };
 
-  abstract getMultiSelectHoverZone(mouse: MousePoint): EdgeDirection | "inside" | "outside";
-  abstract multiDragEffect(): void;
+  abstract initialPosition(): void;
+  abstract getPosition(): BasePosition;
   abstract isHover(e: MouseEvent): boolean;
   abstract isClicked(e: MouseEvent): boolean;
   abstract hoverComponent(e: MouseEvent, move: MousePoint): void;
   abstract moveComponent(e: MouseEvent, move: MousePoint): void;
   abstract resizeComponent(mouseDistance: MousePoint, multiSelectRange: DragRange, edgeDirection: EdgeDirection): void;
-  abstract initialPosition(): void;
-  abstract getPosition(): BasePosition;
+  abstract getMultiSelectHoverZone(mouse: MousePoint): EdgeDirection | "inside" | "outside";
+  abstract multiDragEffect(): void;
   abstract draw(): void;
 }
