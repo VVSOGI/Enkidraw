@@ -97,4 +97,28 @@ export class MathUtils {
       cp2y: endPoint.y - (nextPoint.y - startPoint.y) * tension,
     };
   };
+
+  static isPointBoundByEllipse({
+    mouseX,
+    mouseY,
+    centerX,
+    centerY,
+    radiusX,
+    radiusY,
+    threshold = 1,
+  }: {
+    mouseX: number;
+    mouseY: number;
+    centerX: number;
+    centerY: number;
+    radiusX: number;
+    radiusY: number;
+    threshold: number;
+  }) {
+    return (
+      Math.pow(mouseX - centerX, 2) / Math.pow(radiusX + threshold / 2, 2) +
+        Math.pow(mouseY - centerY, 2) / Math.pow(radiusY + threshold / 2, 2) <=
+      1
+    );
+  }
 }
