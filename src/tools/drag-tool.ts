@@ -9,8 +9,16 @@ export class DragTool extends BaseTool {
   private movePoint: MousePoint | null = null;
   private isDrag: boolean = false;
 
-  constructor({ canvas, ctx, selectTool, deleteCurrentTool, getZoomTransform, activeManager }: DragToolProps) {
-    super({ canvas, ctx, activeManager, selectTool, deleteCurrentTool, getZoomTransform });
+  constructor({
+    canvas,
+    ctx,
+    activeManager,
+    componentManager,
+    selectTool,
+    deleteCurrentTool,
+    getZoomTransform,
+  }: DragToolProps) {
+    super({ canvas, ctx, activeManager, componentManager, selectTool, deleteCurrentTool, getZoomTransform });
     this.activate();
   }
 
