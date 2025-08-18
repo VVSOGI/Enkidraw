@@ -13,6 +13,9 @@ export class Circle extends BaseComponent<CirclePosition> {
   public id: string = v4();
   public name: string = "circle";
 
+  private totalPadding = 10;
+  private dragCornorRectSize = 10;
+
   constructor({ canvas, ctx, position, getZoomTransform }: BaseComponentProps<CirclePosition>) {
     super({ canvas, ctx, position, getZoomTransform });
     this.isTransformSelect = true;
@@ -29,44 +32,85 @@ export class Circle extends BaseComponent<CirclePosition> {
   };
 
   getPosition = () => {
-    return this.position;
+    const x1 = Math.min(this.position.x1 - this.totalPadding, this.position.x2 + this.totalPadding);
+    const x2 = Math.max(this.position.x1 - this.totalPadding, this.position.x2 + this.totalPadding);
+    const y1 = Math.min(this.position.y1 - this.totalPadding, this.position.y2 + this.totalPadding);
+    const y2 = Math.max(this.position.y1 - this.totalPadding, this.position.y2 + this.totalPadding);
+
+    return { x1, y1, x2, y2 };
   };
 
   isHover = (e: MouseEvent) => {
+    const { x1, y1, x2, y2 } = this.position;
     const transform = this.getZoomTransform();
-    const { x: mouseX, y: mouseY } = MouseUtils.getLogicalMousePos(e, this.canvas, transform);
-    const isInBound = MathUtils.isPointBoundByEllipse({
-      mouseX,
-      mouseY,
-      centerX: this.position.centerX,
-      centerY: this.position.centerY,
-      radiusX: this.position.radiusX,
-      radiusY: this.position.radiusY,
-      threshold: STYLE_SYSTEM.STROKE_WIDTH,
-    });
 
-    if (isInBound) {
-      return true;
+    if (this.isActive) {
+      const { x: mouseX, y: mouseY } = MouseUtils.getLogicalMousePos(e, this.canvas, transform);
+
+      if (
+        mouseX >= x1 - this.totalPadding - this.dragCornorRectSize / 2 &&
+        mouseX <= x2 + this.totalPadding + this.dragCornorRectSize / 2 &&
+        mouseY >= y1 - this.totalPadding - this.dragCornorRectSize / 2 &&
+        mouseY <= y2 + this.totalPadding + this.dragCornorRectSize / 2
+      ) {
+        return true;
+      }
+    }
+
+    if (!this.isActive) {
+      const { x: mouseX, y: mouseY } = MouseUtils.getLogicalMousePos(e, this.canvas, transform);
+
+      const isInBound = MathUtils.isPointBoundByEllipse({
+        mouseX,
+        mouseY,
+        centerX: this.position.centerX,
+        centerY: this.position.centerY,
+        radiusX: this.position.radiusX,
+        radiusY: this.position.radiusY,
+        threshold: STYLE_SYSTEM.STROKE_WIDTH,
+      });
+
+      if (isInBound) {
+        return true;
+      }
     }
 
     return false;
   };
 
   isClicked = (e: MouseEvent) => {
+    const { x1, y1, x2, y2 } = this.position;
     const transform = this.getZoomTransform();
-    const { x: mouseX, y: mouseY } = MouseUtils.getLogicalMousePos(e, this.canvas, transform);
-    const isInBound = MathUtils.isPointBoundByEllipse({
-      mouseX,
-      mouseY,
-      centerX: this.position.centerX,
-      centerY: this.position.centerY,
-      radiusX: this.position.radiusX,
-      radiusY: this.position.radiusY,
-      threshold: STYLE_SYSTEM.STROKE_WIDTH,
-    });
 
-    if (isInBound) {
-      return true;
+    if (this.isActive) {
+      const { x: mouseX, y: mouseY } = MouseUtils.getLogicalMousePos(e, this.canvas, transform);
+
+      if (
+        mouseX >= x1 - this.totalPadding - this.dragCornorRectSize / 2 &&
+        mouseX <= x2 + this.totalPadding + this.dragCornorRectSize / 2 &&
+        mouseY >= y1 - this.totalPadding - this.dragCornorRectSize / 2 &&
+        mouseY <= y2 + this.totalPadding + this.dragCornorRectSize / 2
+      ) {
+        return true;
+      }
+    }
+
+    if (!this.isActive) {
+      const { x: mouseX, y: mouseY } = MouseUtils.getLogicalMousePos(e, this.canvas, transform);
+
+      const isInBound = MathUtils.isPointBoundByEllipse({
+        mouseX,
+        mouseY,
+        centerX: this.position.centerX,
+        centerY: this.position.centerY,
+        radiusX: this.position.radiusX,
+        radiusY: this.position.radiusY,
+        threshold: STYLE_SYSTEM.STROKE_WIDTH,
+      });
+
+      if (isInBound) {
+        return true;
+      }
     }
 
     return false;
@@ -90,25 +134,196 @@ export class Circle extends BaseComponent<CirclePosition> {
   resizeComponent = (mouseDistance: MousePoint, multiSelectRange: DragRange, edgeDirection: EdgeDirection) => {};
 
   getMultiSelectHoverZone = (mouse: MousePoint): EdgeDirection | "inside" | "outside" => {
-    const { x: mouseX, y: mouseY } = mouse;
-    const isInBound = MathUtils.isPointBoundByEllipse({
-      mouseX,
-      mouseY,
-      centerX: this.position.centerX,
-      centerY: this.position.centerY,
-      radiusX: this.position.radiusX,
-      radiusY: this.position.radiusY,
-      threshold: STYLE_SYSTEM.STROKE_WIDTH,
-    });
+    const { x1: left, x2: right, y1: top, y2: bottom } = this.position;
 
-    if (isInBound) {
+    // Top-left corner
+    if (
+      mouse.x >= left - (this.multiDragPadding + this.dragCornorRectSize) &&
+      mouse.x <= left - this.multiDragPadding &&
+      mouse.y >= top - (this.multiDragPadding + this.dragCornorRectSize) &&
+      mouse.y <= top - this.multiDragPadding
+    ) {
+      return "top-left";
+    }
+
+    // Top-right corner
+    if (
+      mouse.x >= right + this.multiDragPadding &&
+      mouse.x <= right + this.multiDragPadding + this.dragCornorRectSize &&
+      mouse.y >= top - (this.multiDragPadding + this.dragCornorRectSize) &&
+      mouse.y <= top - this.multiDragPadding
+    ) {
+      return "top-right";
+    }
+
+    // Bottom-left corner
+    if (
+      mouse.x >= left - (this.multiDragPadding + this.dragCornorRectSize) &&
+      mouse.x <= left - this.multiDragPadding &&
+      mouse.y >= bottom + this.multiDragPadding &&
+      mouse.y <= bottom + this.multiDragPadding + this.dragCornorRectSize
+    ) {
+      return "bottom-left";
+    }
+
+    // Bottom-right corner
+    if (
+      mouse.x >= right + this.multiDragPadding &&
+      mouse.x <= right + this.multiDragPadding + this.dragCornorRectSize &&
+      mouse.y >= bottom + this.multiDragPadding &&
+      mouse.y <= bottom + this.multiDragPadding + this.dragCornorRectSize
+    ) {
+      return "bottom-right";
+    }
+
+    // Left edge
+    if (
+      mouse.x >= left - (this.multiDragPadding + this.dragCornorRectSize) &&
+      mouse.x <= left - this.multiDragPadding &&
+      mouse.y > top - this.multiDragPadding &&
+      mouse.y < bottom + this.multiDragPadding
+    ) {
+      return "left";
+    }
+
+    // Right edge
+    if (
+      mouse.x >= right + this.multiDragPadding &&
+      mouse.x <= right + this.multiDragPadding + this.dragCornorRectSize &&
+      mouse.y > top - this.multiDragPadding &&
+      mouse.y < bottom + this.multiDragPadding
+    ) {
+      return "right";
+    }
+
+    // Top edge
+    if (
+      mouse.x > left - this.multiDragPadding &&
+      mouse.x < right + this.multiDragPadding &&
+      mouse.y >= top - (this.multiDragPadding + this.dragCornorRectSize) &&
+      mouse.y <= top - this.multiDragPadding
+    ) {
+      return "top";
+    }
+
+    // Bottom edge
+    if (
+      mouse.x > left - this.multiDragPadding &&
+      mouse.x < right + this.multiDragPadding &&
+      mouse.y >= bottom + this.multiDragPadding &&
+      mouse.y <= bottom + this.multiDragPadding + this.dragCornorRectSize
+    ) {
+      return "bottom";
+    }
+
+    // Inside
+    if (
+      mouse.x >= left - this.multiDragPadding &&
+      mouse.x <= right + this.multiDragPadding &&
+      mouse.y >= top - this.multiDragPadding &&
+      mouse.y <= bottom + this.multiDragPadding
+    ) {
       return "inside";
+    }
+
+    if (this.isActive) {
+      const { x: mouseX, y: mouseY } = mouse;
+
+      if (
+        mouseX >= left - this.totalPadding - this.dragCornorRectSize / 2 &&
+        mouseX <= right + this.totalPadding + this.dragCornorRectSize / 2 &&
+        mouseY >= top - this.totalPadding - this.dragCornorRectSize / 2 &&
+        mouseY <= bottom + this.totalPadding + this.dragCornorRectSize / 2
+      ) {
+        return "inside";
+      }
+    }
+
+    if (!this.isActive) {
+      const { x: mouseX, y: mouseY } = mouse;
+
+      const isInBound = MathUtils.isPointBoundByEllipse({
+        mouseX,
+        mouseY,
+        centerX: this.position.centerX,
+        centerY: this.position.centerY,
+        radiusX: this.position.radiusX,
+        radiusY: this.position.radiusY,
+        threshold: STYLE_SYSTEM.STROKE_WIDTH,
+      });
+
+      if (isInBound) {
+        return "inside";
+      }
     }
 
     return "outside";
   };
 
-  multiDragEffect = () => {};
+  multiDragEffect = () => {
+    this.ctx.save();
+    this.ctx.beginPath();
+
+    const width = this.position.x2 - this.position.x1 + this.totalPadding * 2;
+    const height = this.position.y2 - this.position.y1 + this.totalPadding * 2;
+
+    this.ctx.strokeStyle = STYLE_SYSTEM.PRIMARY;
+    this.ctx.rect(this.position.x1 - this.totalPadding, this.position.y1 - this.totalPadding, width, height);
+    this.ctx.stroke();
+    this.ctx.closePath();
+    this.ctx.restore();
+  };
+
+  dragEffect = () => {
+    this.ctx.save();
+    this.ctx.beginPath();
+
+    const width = this.position.x2 - this.position.x1 + this.totalPadding * 2;
+    const height = this.position.y2 - this.position.y1 + this.totalPadding * 2;
+
+    this.ctx.strokeStyle = STYLE_SYSTEM.PRIMARY;
+    this.ctx.rect(this.position.x1 - this.totalPadding, this.position.y1 - this.totalPadding, width, height);
+    this.ctx.stroke();
+    this.ctx.closePath();
+    this.ctx.restore();
+
+    this.ctx.save();
+    this.ctx.beginPath();
+    this.ctx.roundRect(
+      this.position.x1 + this.dragCornorRectSize / 2 - this.totalPadding,
+      this.position.y1 + this.dragCornorRectSize / 2 - this.totalPadding,
+      -this.dragCornorRectSize,
+      -this.dragCornorRectSize,
+      4
+    );
+    this.ctx.roundRect(
+      this.position.x2 + this.dragCornorRectSize / 2 + this.totalPadding,
+      this.position.y1 + this.dragCornorRectSize / 2 - this.totalPadding,
+      -this.dragCornorRectSize,
+      -this.dragCornorRectSize,
+      4
+    );
+    this.ctx.roundRect(
+      this.position.x1 + this.dragCornorRectSize / 2 - this.totalPadding,
+      this.position.y2 + this.dragCornorRectSize / 2 + this.totalPadding,
+      -this.dragCornorRectSize,
+      -this.dragCornorRectSize,
+      4
+    );
+    this.ctx.roundRect(
+      this.position.x2 + this.dragCornorRectSize / 2 + this.totalPadding,
+      this.position.y2 + this.dragCornorRectSize / 2 + this.totalPadding,
+      -this.dragCornorRectSize,
+      -this.dragCornorRectSize,
+      4
+    );
+    this.ctx.fillStyle = STYLE_SYSTEM.WHITE;
+    this.ctx.fill();
+    this.ctx.strokeStyle = STYLE_SYSTEM.PRIMARY;
+    this.ctx.stroke();
+    this.ctx.closePath();
+    this.ctx.restore();
+  };
 
   draw = () => {
     this.ctx.save();
@@ -127,5 +342,9 @@ export class Circle extends BaseComponent<CirclePosition> {
     this.ctx.stroke();
     this.ctx.closePath();
     this.ctx.restore();
+
+    if (this.isActive) {
+      this.dragEffect();
+    }
   };
 }
