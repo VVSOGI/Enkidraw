@@ -23,6 +23,7 @@ export type EdgeDirection =
 export type Active =
   | "default"
   | "line"
+  | "circle"
   | "move"
   | "resize"
   | "pointer"

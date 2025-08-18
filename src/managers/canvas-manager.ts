@@ -1,5 +1,6 @@
 import { ComponentManager, LeftMenuManager } from ".";
 import { BaseTool, DragTool, ZoomTool, HandTool, LineTool, RectTool } from "../tools";
+import { CircleTool } from "../tools/circle-tool";
 import { ActiveManager } from "./active-manager";
 
 export class CanvasManager {
@@ -15,6 +16,7 @@ export class CanvasManager {
   private handTool: HandTool;
   private lineTool: LineTool;
   private rectTool: RectTool;
+  private circleTool: CircleTool;
 
   private activeManager: ActiveManager;
   private componentManager: ComponentManager;
@@ -92,6 +94,16 @@ export class CanvasManager {
       getZoomTransform: this.getZoomTransform,
     });
 
+    this.circleTool = new CircleTool({
+      canvas: this.canvas,
+      ctx: this.ctx,
+      activeManager: this.activeManager,
+      componentManager: this.componentManager,
+      selectTool: this.selectTool,
+      deleteCurrentTool: this.deleteCurrentTool,
+      getZoomTransform: this.getZoomTransform,
+    });
+
     this.animationId = requestAnimationFrame(this.draw);
 
     this.zoomTool.activate();
@@ -106,6 +118,10 @@ export class CanvasManager {
 
       if (e.code === "Digit2") {
         this.rectTool.activate();
+      }
+
+      if (e.code === "Digit3") {
+        this.circleTool.activate();
       }
 
       if (e.code === "KeyH") {
