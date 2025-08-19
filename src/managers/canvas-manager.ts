@@ -1,6 +1,7 @@
 import { ComponentManager, LeftMenuManager } from ".";
 import { BaseTool, DragTool, ZoomTool, HandTool, LineTool, RectTool } from "../tools";
 import { CircleTool } from "../tools/circle-tool";
+import { TextTool } from "../tools/text-tool";
 import { ActiveManager } from "./active-manager";
 
 export class CanvasManager {
@@ -17,6 +18,7 @@ export class CanvasManager {
   private lineTool: LineTool;
   private rectTool: RectTool;
   private circleTool: CircleTool;
+  private textTool: TextTool;
 
   private activeManager: ActiveManager;
   private componentManager: ComponentManager;
@@ -104,6 +106,16 @@ export class CanvasManager {
       getZoomTransform: this.getZoomTransform,
     });
 
+    this.textTool = new TextTool({
+      canvas: this.canvas,
+      ctx: this.ctx,
+      activeManager: this.activeManager,
+      componentManager: this.componentManager,
+      selectTool: this.selectTool,
+      deleteCurrentTool: this.deleteCurrentTool,
+      getZoomTransform: this.getZoomTransform,
+    });
+
     this.animationId = requestAnimationFrame(this.draw);
 
     this.zoomTool.activate();
@@ -129,6 +141,10 @@ export class CanvasManager {
 
       if (e.code === "KeyH") {
         this.handTool.activate();
+      }
+
+      if (e.code === "KeyT") {
+        this.textTool.activate();
       }
     });
   }
