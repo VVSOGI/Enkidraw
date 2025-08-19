@@ -55,7 +55,11 @@ export class SelectedComponentManager extends EventEmitter {
       const { x1: componentX1, y1: componentY1, x2: componentX2, y2: componentY2 } = component.getPosition();
       if (componentX1 >= dragX1 && componentX2 <= dragX2 && componentY1 >= dragY1 && componentY2 <= dragY2) {
         component.activate();
-        this.selectedComponents.push(component);
+
+        if (!this.selectedComponents.includes(component)) {
+          this.selectedComponents.push(component);
+        }
+
         if (component.name === "line") {
           this.emit("menuActivate");
         } else {

@@ -1,7 +1,6 @@
 import { BaseComponent, BasePosition } from "../components";
 import { EdgeDirection, MousePoint } from "../types";
-import { SelectedComponentManager } from ".";
-import { ActiveManager } from "./active-manager";
+import { ActiveManager, SelectedComponentManager } from ".";
 
 interface Props {
   canvas: HTMLCanvasElement;
