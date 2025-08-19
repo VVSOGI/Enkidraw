@@ -3,30 +3,39 @@ import { EdgeDirection, MousePoint } from "../types";
 import { SelectedComponentManager } from ".";
 import { ActiveManager } from "./active-manager";
 
+interface Props {
+  canvas: HTMLCanvasElement;
+  activeManager: ActiveManager;
+  selectionManager: SelectedComponentManager;
+  getComponents: () => BaseComponent<BasePosition>[];
+  removeSelectedComponents: (selectedComponents: BaseComponent[]) => void;
+  getZoomTransform?: () => { zoom: number; translateX: number; translateY: number };
+}
+
 export class ComponentInteractionManager {
   private canvas: HTMLCanvasElement;
   private activeManager: ActiveManager;
   private selectionManager: SelectedComponentManager;
-  private components: BaseComponent<BasePosition>[];
-  private removeSelectedComponents: () => void;
+  private getComponents: () => BaseComponent<BasePosition>[];
+  private removeSelectedComponents: (selectedComponents: BaseComponent[]) => void;
   private getZoomTransform?: () => { zoom: number; translateX: number; translateY: number };
 
   private tempPosition: MousePoint | null = null;
   private resizeEdge: EdgeDirection | null = null;
   private nonDefaultStates: Set<string> = new Set<string>(["grab", "grabbing", "line"]);
 
-  constructor(
-    canvas: HTMLCanvasElement,
-    activeManager: ActiveManager,
-    selectionManager: SelectedComponentManager,
-    components: BaseComponent<BasePosition>[],
-    removeSelectedComponents: () => void,
-    getZoomTransform?: () => { zoom: number; translateX: number; translateY: number }
-  ) {
+  constructor({
+    canvas,
+    activeManager,
+    selectionManager,
+    getComponents,
+    removeSelectedComponents,
+    getZoomTransform,
+  }: Props) {
     this.canvas = canvas;
     this.activeManager = activeManager;
     this.selectionManager = selectionManager;
-    this.components = components;
+    this.getComponents = getComponents;
     this.removeSelectedComponents = removeSelectedComponents;
     this.getZoomTransform = getZoomTransform;
     this.addEventListeners();
@@ -50,6 +59,8 @@ export class ComponentInteractionManager {
   };
 
   public onMouseMove = (e: MouseEvent) => {
+    // console.log(this.getComponents());
+
     if (this.nonDefaultStates.has(this.activeManager.currentActive)) {
       return;
     }
@@ -152,7 +163,7 @@ export class ComponentInteractionManager {
       this.selectionManager.updateMultiSelectMode();
     }
 
-    for (const component of this.components) {
+    for (const component of this.getComponents()) {
       component.initialPosition();
     }
 
@@ -244,7 +255,7 @@ export class ComponentInteractionManager {
     if (this.activeManager.currentActive === "move") return;
 
     // Handle individual component hover
-    for (const component of this.components) {
+    for (const component of this.getComponents()) {
       if (component.isHover(e)) {
         const zone = component.getMultiSelectHoverZone(mouse);
         if (zone === "outside") return;
@@ -266,7 +277,7 @@ export class ComponentInteractionManager {
   }
 
   private findComponentWithPosition(e: MouseEvent): BaseComponent | null {
-    for (const component of this.components.reverse()) {
+    for (const component of [...this.getComponents()].reverse()) {
       if (component.isClicked(e)) {
         return component;
       }
@@ -280,7 +291,7 @@ export class ComponentInteractionManager {
       const selectedComponents = this.selectionManager.getSelectedComponents();
 
       if (selectedComponents.length > 0) {
-        this.removeSelectedComponents();
+        this.removeSelectedComponents(selectedComponents);
       }
 
       this.activeManager.selectCurrentActive("default");

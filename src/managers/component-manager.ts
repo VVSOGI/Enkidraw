@@ -37,14 +37,14 @@ export class ComponentManager {
       this.leftMenuManager.deactivate();
     });
 
-    this.componentInteractionManager = new ComponentInteractionManager(
-      this.canvas,
-      this.activeManager,
-      this.selectedComponentManager,
-      this.components,
-      this.removeSelected,
-      getZoomTransform
-    );
+    this.componentInteractionManager = new ComponentInteractionManager({
+      canvas: this.canvas,
+      activeManager: this.activeManager,
+      selectionManager: this.selectedComponentManager,
+      getComponents: () => this.components,
+      removeSelectedComponents: this.removeSelected,
+      getZoomTransform: getZoomTransform,
+    });
   }
 
   public draw = () => {
@@ -67,8 +67,7 @@ export class ComponentManager {
     this.components = this.components.filter((exist) => exist.id !== component.id);
   };
 
-  public removeSelected = () => {
-    const selectedComponents = this.selectedComponentManager.getSelectedComponents();
+  public removeSelected = (selectedComponents: BaseComponent[]) => {
     this.components = this.components.filter((exist) => {
       for (const component of selectedComponents) {
         if (exist.id === component.id) return false;
