@@ -204,7 +204,6 @@ export class ComponentInteractionManager {
     if (!originMultiSelectRange || !multiSelectRange) return;
 
     // Make local copies to prevent race conditions
-    const currentMultiSelectRange = { ...multiSelectRange };
     const currentOriginMultiSelectRange = { ...originMultiSelectRange };
 
     const mouseDistance = {
