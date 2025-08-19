@@ -2,21 +2,14 @@ import { v4 } from "uuid";
 import { BaseComponent, BaseComponentProps, BasePosition } from ".";
 import { DragRange, EdgeDirection, MathUtils, MousePoint, MouseUtils, STYLE_SYSTEM } from "..";
 
-export interface CirclePosition extends BasePosition {
-  centerX: number;
-  centerY: number;
-  radiusX: number;
-  radiusY: number;
-}
-
-export class Circle extends BaseComponent<CirclePosition> {
+export class Circle extends BaseComponent<BasePosition> {
   public id: string = v4();
   public name: string = "circle";
 
   private totalPadding = 10;
   private dragCornorRectSize = 10;
 
-  constructor({ canvas, ctx, position, getZoomTransform }: BaseComponentProps<CirclePosition>) {
+  constructor({ canvas, ctx, position, getZoomTransform }: BaseComponentProps<BasePosition>) {
     super({ canvas, ctx, position, getZoomTransform });
     this.isTransformSelect = true;
   }
@@ -59,14 +52,18 @@ export class Circle extends BaseComponent<CirclePosition> {
 
     if (!this.isActive) {
       const { x: mouseX, y: mouseY } = MouseUtils.getLogicalMousePos(e, this.canvas, transform);
+      const centerX = (this.position.x1 + this.position.x2) / 2;
+      const centerY = (this.position.y1 + this.position.y2) / 2;
+      const radiusX = Math.abs((this.position.x2 - this.position.x1) / 2);
+      const radiusY = Math.abs((this.position.y2 - this.position.y1) / 2);
 
       const isInBound = MathUtils.isPointBoundByEllipse({
         mouseX,
         mouseY,
-        centerX: this.position.centerX,
-        centerY: this.position.centerY,
-        radiusX: this.position.radiusX,
-        radiusY: this.position.radiusY,
+        centerX,
+        centerY,
+        radiusX,
+        radiusY,
         threshold: STYLE_SYSTEM.STROKE_WIDTH,
       });
 
@@ -97,14 +94,18 @@ export class Circle extends BaseComponent<CirclePosition> {
 
     if (!this.isActive) {
       const { x: mouseX, y: mouseY } = MouseUtils.getLogicalMousePos(e, this.canvas, transform);
+      const centerX = (this.position.x1 + this.position.x2) / 2;
+      const centerY = (this.position.y1 + this.position.y2) / 2;
+      const radiusX = Math.abs((this.position.x2 - this.position.x1) / 2);
+      const radiusY = Math.abs((this.position.y2 - this.position.y1) / 2);
 
       const isInBound = MathUtils.isPointBoundByEllipse({
         mouseX,
         mouseY,
-        centerX: this.position.centerX,
-        centerY: this.position.centerY,
-        radiusX: this.position.radiusX,
-        radiusY: this.position.radiusY,
+        centerX,
+        centerY,
+        radiusX,
+        radiusY,
         threshold: STYLE_SYSTEM.STROKE_WIDTH,
       });
 
@@ -120,18 +121,170 @@ export class Circle extends BaseComponent<CirclePosition> {
 
   moveComponent = (e: MouseEvent, move: MousePoint) => {
     const { x: moveX, y: moveY } = move;
+
     const nextPosition = Object.assign({}, this.position);
     nextPosition.x1 = this.originPosition.x1 + moveX;
     nextPosition.y1 = this.originPosition.y1 + moveY;
     nextPosition.x2 = this.originPosition.x2 + moveX;
     nextPosition.y2 = this.originPosition.y2 + moveY;
-    nextPosition.centerX = this.originPosition.centerX + moveX;
-    nextPosition.centerY = this.originPosition.centerY + moveY;
 
     this.position = nextPosition;
   };
 
-  resizeComponent = (mouseDistance: MousePoint, multiSelectRange: DragRange, edgeDirection: EdgeDirection) => {};
+  resizeComponent = (mouseDistance: MousePoint, multiSelectRange: DragRange, edgeDirection: EdgeDirection) => {
+    if (edgeDirection === "right") {
+      const totalRangeX = Math.abs(multiSelectRange.x2 - multiSelectRange.x1);
+      const newTotalRangeX = totalRangeX + mouseDistance.x;
+      const scale = newTotalRangeX / totalRangeX;
+
+      const relativeX1 = this.originPosition.x1 - multiSelectRange.x1;
+      const relativeX2 = this.originPosition.x2 - multiSelectRange.x1;
+
+      this.position = {
+        ...this.position,
+        x1: Math.min(multiSelectRange.x1 + relativeX1 * scale, multiSelectRange.x1 + relativeX2 * scale),
+        x2: Math.max(multiSelectRange.x1 + relativeX1 * scale, multiSelectRange.x1 + relativeX2 * scale),
+      };
+    }
+
+    if (edgeDirection === "left") {
+      const totalRangeX = Math.abs(multiSelectRange.x2 - multiSelectRange.x1);
+      const newTotalRangeX = totalRangeX - mouseDistance.x;
+      const scale = newTotalRangeX / totalRangeX;
+
+      const relativeX1 = this.originPosition.x1 - multiSelectRange.x2;
+      const relativeX2 = this.originPosition.x2 - multiSelectRange.x2;
+
+      this.position = {
+        ...this.position,
+        x1: Math.min(multiSelectRange.x2 + relativeX1 * scale, multiSelectRange.x2 + relativeX2 * scale),
+        x2: Math.max(multiSelectRange.x2 + relativeX1 * scale, multiSelectRange.x2 + relativeX2 * scale),
+      };
+    }
+
+    if (edgeDirection === "top") {
+      const totalRangeY = Math.abs(multiSelectRange.y2 - multiSelectRange.y1);
+      const newTotalRangeY = totalRangeY - mouseDistance.y;
+      const scale = newTotalRangeY / totalRangeY;
+
+      const relativeY1 = this.originPosition.y1 - multiSelectRange.y2;
+      const relativeY2 = this.originPosition.y2 - multiSelectRange.y2;
+
+      // Adjust all points with the same scale
+      this.position = {
+        ...this.position,
+        y1: Math.min(multiSelectRange.y2 + relativeY1 * scale, multiSelectRange.y2 + relativeY2 * scale),
+        y2: Math.max(multiSelectRange.y2 + relativeY1 * scale, multiSelectRange.y2 + relativeY2 * scale),
+      };
+    }
+
+    if (edgeDirection === "bottom") {
+      const totalRangeY = Math.abs(multiSelectRange.y2 - multiSelectRange.y1);
+      const newTotalRangeY = totalRangeY + mouseDistance.y;
+      const scale = newTotalRangeY / totalRangeY;
+
+      const relativeY1 = this.originPosition.y1 - multiSelectRange.y1;
+      const relativeY2 = this.originPosition.y2 - multiSelectRange.y1;
+
+      this.position = {
+        ...this.position,
+        y1: Math.min(multiSelectRange.y1 + relativeY1 * scale, multiSelectRange.y1 + relativeY2 * scale),
+        y2: Math.max(multiSelectRange.y1 + relativeY1 * scale, multiSelectRange.y1 + relativeY2 * scale),
+      };
+    }
+
+    if (edgeDirection === "top-left") {
+      const totalRangeX = Math.abs(multiSelectRange.x2 - multiSelectRange.x1);
+      const newTotalRangeX = totalRangeX - mouseDistance.x;
+      const scaleX = newTotalRangeX / totalRangeX;
+
+      const totalRangeY = Math.abs(multiSelectRange.y2 - multiSelectRange.y1);
+      const newTotalRangeY = totalRangeY - mouseDistance.y;
+      const scaleY = newTotalRangeY / totalRangeY;
+
+      const relativeX1 = this.originPosition.x1 - multiSelectRange.x2;
+      const relativeX2 = this.originPosition.x2 - multiSelectRange.x2;
+      const relativeY1 = this.originPosition.y1 - multiSelectRange.y2;
+      const relativeY2 = this.originPosition.y2 - multiSelectRange.y2;
+
+      this.position = {
+        ...this.position,
+        x1: Math.min(multiSelectRange.x2 + relativeX1 * scaleX, multiSelectRange.x2 + relativeX2 * scaleX),
+        y1: Math.min(multiSelectRange.y2 + relativeY1 * scaleY, multiSelectRange.y2 + relativeY2 * scaleY),
+        x2: Math.max(multiSelectRange.x2 + relativeX1 * scaleX, multiSelectRange.x2 + relativeX2 * scaleX),
+        y2: Math.max(multiSelectRange.y2 + relativeY1 * scaleY, multiSelectRange.y2 + relativeY2 * scaleY),
+      };
+    }
+
+    if (edgeDirection === "top-right") {
+      const totalRangeX = Math.abs(multiSelectRange.x2 - multiSelectRange.x1);
+      const newTotalRangeX = totalRangeX + mouseDistance.x;
+      const scaleX = newTotalRangeX / totalRangeX;
+
+      const totalRangeY = Math.abs(multiSelectRange.y2 - multiSelectRange.y1);
+      const newTotalRangeY = totalRangeY - mouseDistance.y;
+      const scaleY = newTotalRangeY / totalRangeY;
+
+      const relativeX1 = this.originPosition.x1 - multiSelectRange.x1;
+      const relativeX2 = this.originPosition.x2 - multiSelectRange.x1;
+      const relativeY1 = this.originPosition.y1 - multiSelectRange.y2;
+      const relativeY2 = this.originPosition.y2 - multiSelectRange.y2;
+
+      this.position = {
+        ...this.position,
+        x1: Math.min(multiSelectRange.x1 + relativeX1 * scaleX, multiSelectRange.x1 + relativeX2 * scaleX),
+        y1: Math.min(multiSelectRange.y2 + relativeY1 * scaleY, multiSelectRange.y2 + relativeY2 * scaleY),
+        x2: Math.max(multiSelectRange.x1 + relativeX1 * scaleX, multiSelectRange.x1 + relativeX2 * scaleX),
+        y2: Math.max(multiSelectRange.y2 + relativeY1 * scaleY, multiSelectRange.y2 + relativeY2 * scaleY),
+      };
+    }
+
+    if (edgeDirection === "bottom-left") {
+      const totalRangeX = Math.abs(multiSelectRange.x2 - multiSelectRange.x1);
+      const newTotalRangeX = totalRangeX - mouseDistance.x;
+      const scaleX = newTotalRangeX / totalRangeX;
+
+      const totalRangeY = Math.abs(multiSelectRange.y2 - multiSelectRange.y1);
+      const newTotalRangeY = totalRangeY + mouseDistance.y;
+      const scaleY = newTotalRangeY / totalRangeY;
+
+      const relativeX1 = this.originPosition.x1 - multiSelectRange.x2;
+      const relativeX2 = this.originPosition.x2 - multiSelectRange.x2;
+      const relativeY1 = this.originPosition.y1 - multiSelectRange.y1;
+      const relativeY2 = this.originPosition.y2 - multiSelectRange.y1;
+
+      this.position = {
+        ...this.position,
+        x1: Math.min(multiSelectRange.x2 + relativeX1 * scaleX, multiSelectRange.x2 + relativeX2 * scaleX),
+        y1: Math.min(multiSelectRange.y1 + relativeY1 * scaleY, multiSelectRange.y1 + relativeY2 * scaleY),
+        x2: Math.max(multiSelectRange.x2 + relativeX1 * scaleX, multiSelectRange.x2 + relativeX2 * scaleX),
+        y2: Math.max(multiSelectRange.y1 + relativeY1 * scaleY, multiSelectRange.y1 + relativeY2 * scaleY),
+      };
+    }
+
+    if (edgeDirection === "bottom-right") {
+      const totalRangeX = Math.abs(multiSelectRange.x2 - multiSelectRange.x1);
+      const newTotalRangeX = totalRangeX + mouseDistance.x;
+      const scaleX = newTotalRangeX / totalRangeX;
+
+      const totalRangeY = Math.abs(multiSelectRange.y2 - multiSelectRange.y1);
+      const newTotalRangeY = totalRangeY + mouseDistance.y;
+      const scaleY = newTotalRangeY / totalRangeY;
+
+      const relativeX1 = this.originPosition.x1 - multiSelectRange.x1;
+      const relativeX2 = this.originPosition.x2 - multiSelectRange.x1;
+      const relativeY1 = this.originPosition.y1 - multiSelectRange.y1;
+      const relativeY2 = this.originPosition.y2 - multiSelectRange.y1;
+
+      this.position = {
+        ...this.position,
+        x1: Math.min(multiSelectRange.x1 + relativeX1 * scaleX, multiSelectRange.x1 + relativeX2 * scaleX),
+        y1: Math.min(multiSelectRange.y1 + relativeY1 * scaleY, multiSelectRange.y1 + relativeY2 * scaleY),
+        x2: Math.max(multiSelectRange.x1 + relativeX1 * scaleX, multiSelectRange.x1 + relativeX2 * scaleX),
+        y2: Math.max(multiSelectRange.y1 + relativeY1 * scaleY, multiSelectRange.y1 + relativeY2 * scaleY),
+      };
+    }
+  };
 
   getMultiSelectHoverZone = (mouse: MousePoint): EdgeDirection | "inside" | "outside" => {
     const { x1: left, x2: right, y1: top, y2: bottom } = this.position;
@@ -241,14 +394,18 @@ export class Circle extends BaseComponent<CirclePosition> {
 
     if (!this.isActive) {
       const { x: mouseX, y: mouseY } = mouse;
+      const centerX = (this.position.x1 + this.position.x2) / 2;
+      const centerY = (this.position.y1 + this.position.y2) / 2;
+      const radiusX = Math.abs((this.position.x2 - this.position.x1) / 2);
+      const radiusY = Math.abs((this.position.y2 - this.position.y1) / 2);
 
       const isInBound = MathUtils.isPointBoundByEllipse({
         mouseX,
         mouseY,
-        centerX: this.position.centerX,
-        centerY: this.position.centerY,
-        radiusX: this.position.radiusX,
-        radiusY: this.position.radiusY,
+        centerX,
+        centerY,
+        radiusX,
+        radiusY,
         threshold: STYLE_SYSTEM.STROKE_WIDTH,
       });
 
@@ -326,19 +483,16 @@ export class Circle extends BaseComponent<CirclePosition> {
   };
 
   draw = () => {
+    const centerX = (this.position.x1 + this.position.x2) / 2;
+    const centerY = (this.position.y1 + this.position.y2) / 2;
+    const radiusX = Math.abs((this.position.x2 - this.position.x1) / 2);
+    const radiusY = Math.abs((this.position.y2 - this.position.y1) / 2);
+
     this.ctx.save();
     this.ctx.beginPath();
     this.ctx.lineWidth = STYLE_SYSTEM.STROKE_WIDTH;
     this.ctx.strokeStyle = "black";
-    this.ctx.ellipse(
-      this.position.centerX,
-      this.position.centerY,
-      this.position.radiusX,
-      this.position.radiusY,
-      0,
-      0,
-      Math.PI * 2
-    );
+    this.ctx.ellipse(centerX, centerY, radiusX, radiusY, 0, 0, Math.PI * 2);
     this.ctx.stroke();
     this.ctx.closePath();
     this.ctx.restore();

@@ -91,8 +91,6 @@ export class CircleTool extends BaseTool {
   private appendComponent = (start: MousePoint, end: MousePoint) => {
     const { x: startX, y: startY } = start;
     const { x: endX, y: endY } = end;
-    const centerX = (startX + endX) / 2;
-    const centerY = (startY + endY) / 2;
     const radiusX = Math.abs((endX - startX) / 2);
     const radiusY = Math.abs((endY - startY) / 2);
 
@@ -101,10 +99,6 @@ export class CircleTool extends BaseTool {
       y1: Math.min(startY, endY),
       x2: Math.max(startX, endX),
       y2: Math.max(startY, endY),
-      centerX,
-      centerY,
-      radiusX,
-      radiusY,
     };
 
     const circle = new Circle({
