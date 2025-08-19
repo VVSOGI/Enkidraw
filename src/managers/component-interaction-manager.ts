@@ -1,6 +1,7 @@
 import { BaseComponent, BasePosition } from "../components";
 import { EdgeDirection, MousePoint } from "../types";
 import { ActiveManager, SelectedComponentManager } from ".";
+import { KeyUtils } from "../utils";
 
 interface Props {
   canvas: HTMLCanvasElement;
@@ -286,7 +287,6 @@ export class ComponentInteractionManager {
 
   private onKeyDown = (e: KeyboardEvent) => {
     if (e.code === "Backspace" || e.code === "Delete") {
-      e.preventDefault();
       const selectedComponents = this.selectionManager.getSelectedComponents();
 
       if (selectedComponents.length > 0) {
@@ -294,6 +294,14 @@ export class ComponentInteractionManager {
       }
 
       this.activeManager.selectCurrentActive("default");
+      return;
+    }
+
+    if (KeyUtils.isExistKeyCode(e.code)) {
+      this.selectionManager.clearSelection();
+      this.activeManager.selectCurrentActive("default");
+
+      return;
     }
   };
 
