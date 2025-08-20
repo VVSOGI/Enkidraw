@@ -80,6 +80,8 @@ export class TextTool extends BaseTool {
 
     if (this.createdTextarea) {
       this.removeTextarea(this.createdTextarea);
+      this.deactivate();
+      return;
     }
 
     this.createTextarea(position);
