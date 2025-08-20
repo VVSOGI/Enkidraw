@@ -30,7 +30,6 @@ export class DragTool extends BaseTool {
   };
 
   onMouseDown = (e: MouseEvent) => {
-    console.log(this.activeManager.currentActive);
     if (this.activeManager.currentActive === "default") {
       const position = this.getLogicalMousePos(e);
 
