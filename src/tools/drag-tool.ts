@@ -41,7 +41,6 @@ export class DragTool extends BaseTool {
   };
 
   onMouseMove = (e: MouseEvent) => {
-    console.log(this.activeManager.currentActive);
     if (!this.initPoint || !this.movePoint || this.activeManager.currentActive !== "drag") return null;
 
     this.movePoint = this.getLogicalMousePos(e);

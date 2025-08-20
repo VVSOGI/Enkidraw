@@ -1,11 +1,14 @@
+import { v4 } from "uuid";
 import { MousePoint } from "../types";
 import { MouseUtils, TimeUtils } from "../utils";
 import { BaseTool, BaseToolProps } from "./base-tool";
 
 export class TextTool extends BaseTool {
   name: string = "text-tool";
-  currentText: string = "";
-  firstDown: { position: MousePoint; time: Date } | null = null;
+
+  private currentText: string = "";
+  private createdTextarea: HTMLTextAreaElement | null = null;
+  private firstDown: { position: MousePoint; time: Date } | null = null;
 
   constructor({
     canvas,
@@ -19,12 +22,16 @@ export class TextTool extends BaseTool {
     super({ canvas, ctx, activeManager, componentManager, selectTool, deleteCurrentTool, getZoomTransform });
   }
 
-  onMouseDown = (e: MouseEvent) => {
+  createWithDoubleClick = (e: MouseEvent) => {
     const position = MouseUtils.getMousePos(e, this.canvas);
     const down = {
       position,
       time: new Date(),
     };
+
+    if (this.createdTextarea) {
+      this.removeTextarea(this.createdTextarea);
+    }
 
     if (!this.firstDown) {
       this.firstDown = down;
@@ -47,19 +54,35 @@ export class TextTool extends BaseTool {
   };
 
   createTextarea = (position: MousePoint) => {
-    // const textarea = document.createElement("textarea");
-    // textarea.name = "textarea";
-    // textarea.style.position = "absolute";
-    // textarea.style.top = `${position.y}px`;
-    // textarea.style.left = `${position.x}px`;
-    // textarea.style.padding = "4px 8px";
-    // textarea.style.resize = "none";
-    // textarea.style.outline = "none";
-    // textarea.style.border = "none";
-    // textarea.style.backgroundColor = "transparent";
-    // textarea.style.fontSize = "18px";
-    // textarea.focus();
-    // document.body.appendChild(textarea);
+    const textarea = document.createElement("textarea");
+    textarea.name = v4();
+    textarea.style.position = "absolute";
+    textarea.style.top = `${position.y}px`;
+    textarea.style.left = `${position.x}px`;
+    textarea.style.resize = "none";
+    textarea.style.outline = "none";
+    textarea.style.border = "none";
+    textarea.style.backgroundColor = "transparent";
+    textarea.style.fontSize = "18px";
+    document.body.appendChild(textarea);
+    this.createdTextarea = textarea;
+    this.createdTextarea.focus();
+  };
+
+  removeTextarea = (created: HTMLTextAreaElement) => {
+    document.body.removeChild(created);
+    this.createdTextarea = null;
+  };
+
+  onMouseDown = (e: MouseEvent) => {
+    e.preventDefault();
+    const position = MouseUtils.getMousePos(e, this.canvas);
+
+    if (this.createdTextarea) {
+      this.removeTextarea(this.createdTextarea);
+    }
+
+    this.createTextarea(position);
   };
 
   onMouseMove = (e: MouseEvent) => {};
