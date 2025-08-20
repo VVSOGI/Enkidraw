@@ -26,6 +26,7 @@ export type Active =
   | "move"
   | "resize"
   | "pointer"
+  | "text"
   | "drag"
   | "grab"
   | "grabbing"

@@ -121,6 +121,8 @@ export class CanvasManager {
     this.zoomTool.activate();
 
     document.addEventListener("keydown", (e) => {
+      if (this.currentTool?.name === "text-tool") return;
+
       if (e.code === "Escape") return;
       this.currentTool?.deactivate();
 
@@ -141,10 +143,12 @@ export class CanvasManager {
 
       if (e.code === "KeyH") {
         this.handTool.activate();
+        this.activeManager.selectCurrentActive("grab");
       }
 
       if (e.code === "KeyT") {
         this.textTool.activate();
+        this.activeManager.selectCurrentActive("text");
       }
     });
   }

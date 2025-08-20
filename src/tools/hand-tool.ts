@@ -30,19 +30,6 @@ export class HandTool extends BaseTool {
 
   reset = () => {};
 
-  activate = () => {
-    this.isActive = true;
-    this.addHandEventListeners();
-    this.selectTool(this);
-    this.activeManager.selectCurrentActive("grab");
-  };
-
-  deactivate = () => {
-    this.isActive = false;
-    this.removeHandEventListeners();
-    this.deleteCurrentTool();
-  };
-
   onMouseDown = (e: MouseEvent) => {
     if (!this.isActive) return;
 

@@ -41,8 +41,25 @@ export class TextTool extends BaseTool {
       this.firstDown.position.y === down.position.y &&
       TimeUtils.isWithingTimeLimit(this.firstDown.time, down.time, 1)
     ) {
+      this.createTextarea(down.position);
       this.firstDown = null;
     }
+  };
+
+  createTextarea = (position: MousePoint) => {
+    // const textarea = document.createElement("textarea");
+    // textarea.name = "textarea";
+    // textarea.style.position = "absolute";
+    // textarea.style.top = `${position.y}px`;
+    // textarea.style.left = `${position.x}px`;
+    // textarea.style.padding = "4px 8px";
+    // textarea.style.resize = "none";
+    // textarea.style.outline = "none";
+    // textarea.style.border = "none";
+    // textarea.style.backgroundColor = "transparent";
+    // textarea.style.fontSize = "18px";
+    // textarea.focus();
+    // document.body.appendChild(textarea);
   };
 
   onMouseMove = (e: MouseEvent) => {};
