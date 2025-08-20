@@ -2,6 +2,7 @@ import { BaseComponent, BasePosition } from "../components";
 import { EdgeDirection, MousePoint } from "../types";
 import { ActiveManager, SelectedComponentManager } from ".";
 import { KeyUtils } from "../utils";
+import { checkSkipStatus } from "../config";
 
 interface Props {
   canvas: HTMLCanvasElement;
@@ -22,7 +23,6 @@ export class ComponentInteractionManager {
 
   private tempPosition: MousePoint | null = null;
   private resizeEdge: EdgeDirection | null = null;
-  private nonDefaultStates: Set<string> = new Set<string>(["grab", "grabbing", "line"]);
 
   constructor({
     canvas,
@@ -61,7 +61,7 @@ export class ComponentInteractionManager {
   public onMouseMove = (e: MouseEvent) => {
     // console.log(this.getComponents());
 
-    if (this.nonDefaultStates.has(this.activeManager.currentActive)) {
+    if (checkSkipStatus("component-interaction-manager", this.activeManager.currentActive)) {
       return;
     }
 
@@ -87,7 +87,7 @@ export class ComponentInteractionManager {
   };
 
   public onMouseDown = (e: MouseEvent) => {
-    if (this.nonDefaultStates.has(this.activeManager.currentActive)) {
+    if (checkSkipStatus("component-interaction-manager", this.activeManager.currentActive)) {
       return;
     }
 
@@ -152,7 +152,7 @@ export class ComponentInteractionManager {
   };
 
   public onMouseUp = (e: MouseEvent) => {
-    if (this.nonDefaultStates.has(this.activeManager.currentActive)) {
+    if (checkSkipStatus("component-interaction-manager", this.activeManager.currentActive)) {
       return;
     }
 
