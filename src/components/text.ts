@@ -387,6 +387,9 @@ export class Text extends BaseComponent {
         drawLine(currentLine);
       }
     });
+
+    this.position.x2 = Math.min(this.position.x1 + maxWidth, this.position.x2);
+    this.position.y2 = y;
   }
 
   multiDragEffect = () => {
