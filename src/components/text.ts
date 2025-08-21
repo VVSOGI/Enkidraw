@@ -83,7 +83,160 @@ export class Text extends BaseComponent {
     this.position = nextPosition;
   };
 
-  resizeComponent = (mouseDistance: MousePoint, multiSelectRange: DragRange, edgeDirection: EdgeDirection) => {};
+  resizeComponent = (mouseDistance: MousePoint, multiSelectRange: DragRange, edgeDirection: EdgeDirection) => {
+    if (edgeDirection === "right") {
+      const totalRangeX = Math.abs(multiSelectRange.x2 - multiSelectRange.x1);
+      const newTotalRangeX = totalRangeX + mouseDistance.x;
+      const scale = newTotalRangeX / totalRangeX;
+
+      const relativeX1 = this.originPosition.x1 - multiSelectRange.x1;
+      const relativeX2 = this.originPosition.x2 - multiSelectRange.x1;
+
+      this.position = {
+        ...this.position,
+        x1: Math.min(multiSelectRange.x1 + relativeX1 * scale, multiSelectRange.x1 + relativeX2 * scale),
+        x2: Math.max(multiSelectRange.x1 + relativeX1 * scale, multiSelectRange.x1 + relativeX2 * scale),
+      };
+    }
+
+    if (edgeDirection === "left") {
+      const totalRangeX = Math.abs(multiSelectRange.x2 - multiSelectRange.x1);
+      const newTotalRangeX = totalRangeX - mouseDistance.x;
+      const scale = newTotalRangeX / totalRangeX;
+
+      const relativeX1 = this.originPosition.x1 - multiSelectRange.x2;
+      const relativeX2 = this.originPosition.x2 - multiSelectRange.x2;
+
+      this.position = {
+        ...this.position,
+        x1: Math.min(multiSelectRange.x2 + relativeX1 * scale, multiSelectRange.x2 + relativeX2 * scale),
+        x2: Math.max(multiSelectRange.x2 + relativeX1 * scale, multiSelectRange.x2 + relativeX2 * scale),
+      };
+    }
+
+    if (edgeDirection === "top") {
+      const totalRangeY = Math.abs(multiSelectRange.y2 - multiSelectRange.y1);
+      const newTotalRangeY = totalRangeY - mouseDistance.y;
+      const scale = newTotalRangeY / totalRangeY;
+
+      const relativeY1 = this.originPosition.y1 - multiSelectRange.y2;
+      const relativeY2 = this.originPosition.y2 - multiSelectRange.y2;
+
+      // Adjust all points with the same scale
+      this.position = {
+        ...this.position,
+        y1: Math.min(multiSelectRange.y2 + relativeY1 * scale, multiSelectRange.y2 + relativeY2 * scale),
+        y2: Math.max(multiSelectRange.y2 + relativeY1 * scale, multiSelectRange.y2 + relativeY2 * scale),
+      };
+    }
+
+    if (edgeDirection === "bottom") {
+      const totalRangeY = Math.abs(multiSelectRange.y2 - multiSelectRange.y1);
+      const newTotalRangeY = totalRangeY + mouseDistance.y;
+      const scale = newTotalRangeY / totalRangeY;
+
+      const relativeY1 = this.originPosition.y1 - multiSelectRange.y1;
+      const relativeY2 = this.originPosition.y2 - multiSelectRange.y1;
+
+      this.position = {
+        ...this.position,
+        y1: Math.min(multiSelectRange.y1 + relativeY1 * scale, multiSelectRange.y1 + relativeY2 * scale),
+        y2: Math.max(multiSelectRange.y1 + relativeY1 * scale, multiSelectRange.y1 + relativeY2 * scale),
+      };
+    }
+
+    if (edgeDirection === "top-left") {
+      const totalRangeX = Math.abs(multiSelectRange.x2 - multiSelectRange.x1);
+      const newTotalRangeX = totalRangeX - mouseDistance.x;
+      const scaleX = newTotalRangeX / totalRangeX;
+
+      const totalRangeY = Math.abs(multiSelectRange.y2 - multiSelectRange.y1);
+      const newTotalRangeY = totalRangeY - mouseDistance.y;
+      const scaleY = newTotalRangeY / totalRangeY;
+
+      const relativeX1 = this.originPosition.x1 - multiSelectRange.x2;
+      const relativeX2 = this.originPosition.x2 - multiSelectRange.x2;
+      const relativeY1 = this.originPosition.y1 - multiSelectRange.y2;
+      const relativeY2 = this.originPosition.y2 - multiSelectRange.y2;
+
+      this.position = {
+        ...this.position,
+        x1: Math.min(multiSelectRange.x2 + relativeX1 * scaleX, multiSelectRange.x2 + relativeX2 * scaleX),
+        y1: Math.min(multiSelectRange.y2 + relativeY1 * scaleY, multiSelectRange.y2 + relativeY2 * scaleY),
+        x2: Math.max(multiSelectRange.x2 + relativeX1 * scaleX, multiSelectRange.x2 + relativeX2 * scaleX),
+        y2: Math.max(multiSelectRange.y2 + relativeY1 * scaleY, multiSelectRange.y2 + relativeY2 * scaleY),
+      };
+    }
+
+    if (edgeDirection === "top-right") {
+      const totalRangeX = Math.abs(multiSelectRange.x2 - multiSelectRange.x1);
+      const newTotalRangeX = totalRangeX + mouseDistance.x;
+      const scaleX = newTotalRangeX / totalRangeX;
+
+      const totalRangeY = Math.abs(multiSelectRange.y2 - multiSelectRange.y1);
+      const newTotalRangeY = totalRangeY - mouseDistance.y;
+      const scaleY = newTotalRangeY / totalRangeY;
+
+      const relativeX1 = this.originPosition.x1 - multiSelectRange.x1;
+      const relativeX2 = this.originPosition.x2 - multiSelectRange.x1;
+      const relativeY1 = this.originPosition.y1 - multiSelectRange.y2;
+      const relativeY2 = this.originPosition.y2 - multiSelectRange.y2;
+
+      this.position = {
+        ...this.position,
+        x1: Math.min(multiSelectRange.x1 + relativeX1 * scaleX, multiSelectRange.x1 + relativeX2 * scaleX),
+        y1: Math.min(multiSelectRange.y2 + relativeY1 * scaleY, multiSelectRange.y2 + relativeY2 * scaleY),
+        x2: Math.max(multiSelectRange.x1 + relativeX1 * scaleX, multiSelectRange.x1 + relativeX2 * scaleX),
+        y2: Math.max(multiSelectRange.y2 + relativeY1 * scaleY, multiSelectRange.y2 + relativeY2 * scaleY),
+      };
+    }
+
+    if (edgeDirection === "bottom-left") {
+      const totalRangeX = Math.abs(multiSelectRange.x2 - multiSelectRange.x1);
+      const newTotalRangeX = totalRangeX - mouseDistance.x;
+      const scaleX = newTotalRangeX / totalRangeX;
+
+      const totalRangeY = Math.abs(multiSelectRange.y2 - multiSelectRange.y1);
+      const newTotalRangeY = totalRangeY + mouseDistance.y;
+      const scaleY = newTotalRangeY / totalRangeY;
+
+      const relativeX1 = this.originPosition.x1 - multiSelectRange.x2;
+      const relativeX2 = this.originPosition.x2 - multiSelectRange.x2;
+      const relativeY1 = this.originPosition.y1 - multiSelectRange.y1;
+      const relativeY2 = this.originPosition.y2 - multiSelectRange.y1;
+
+      this.position = {
+        ...this.position,
+        x1: Math.min(multiSelectRange.x2 + relativeX1 * scaleX, multiSelectRange.x2 + relativeX2 * scaleX),
+        y1: Math.min(multiSelectRange.y1 + relativeY1 * scaleY, multiSelectRange.y1 + relativeY2 * scaleY),
+        x2: Math.max(multiSelectRange.x2 + relativeX1 * scaleX, multiSelectRange.x2 + relativeX2 * scaleX),
+        y2: Math.max(multiSelectRange.y1 + relativeY1 * scaleY, multiSelectRange.y1 + relativeY2 * scaleY),
+      };
+    }
+
+    if (edgeDirection === "bottom-right") {
+      const totalRangeX = Math.abs(multiSelectRange.x2 - multiSelectRange.x1);
+      const newTotalRangeX = totalRangeX + mouseDistance.x;
+      const scaleX = newTotalRangeX / totalRangeX;
+
+      const totalRangeY = Math.abs(multiSelectRange.y2 - multiSelectRange.y1);
+      const newTotalRangeY = totalRangeY + mouseDistance.y;
+      const scaleY = newTotalRangeY / totalRangeY;
+
+      const relativeX1 = this.originPosition.x1 - multiSelectRange.x1;
+      const relativeX2 = this.originPosition.x2 - multiSelectRange.x1;
+      const relativeY1 = this.originPosition.y1 - multiSelectRange.y1;
+      const relativeY2 = this.originPosition.y2 - multiSelectRange.y1;
+
+      this.position = {
+        ...this.position,
+        x1: Math.min(multiSelectRange.x1 + relativeX1 * scaleX, multiSelectRange.x1 + relativeX2 * scaleX),
+        y1: Math.min(multiSelectRange.y1 + relativeY1 * scaleY, multiSelectRange.y1 + relativeY2 * scaleY),
+        x2: Math.max(multiSelectRange.x1 + relativeX1 * scaleX, multiSelectRange.x1 + relativeX2 * scaleX),
+        y2: Math.max(multiSelectRange.y1 + relativeY1 * scaleY, multiSelectRange.y1 + relativeY2 * scaleY),
+      };
+    }
+  };
 
   getMultiSelectHoverZone = (mouse: MousePoint): EdgeDirection | "inside" | "outside" => {
     const { x1: left, x2: right, y1: top, y2: bottom } = this.position;
@@ -182,14 +335,57 @@ export class Text extends BaseComponent {
   };
 
   drawMultilineText() {
+    const maxWidth = this.position.x2 - this.position.x1 + 10;
     const lines = this.currentText.split("\n");
-    lines.forEach((line, index) => {
-      this.ctx.fillText(
-        line,
-        this.position.x1,
-        this.position.y1 + index * 21 + 16.5,
-        this.position.x2 - this.position.x1
-      );
+    const lineHeight = 21.5;
+    let y = this.position.y1;
+
+    const drawLine = (text: string) => {
+      this.ctx.fillText(text, this.position.x1, y + 17, maxWidth);
+      y += lineHeight;
+    };
+
+    lines.forEach((line) => {
+      if (line.trim() === "") {
+        y += lineHeight;
+        return;
+      }
+
+      let currentLine = "";
+      const words = line.split(" ");
+
+      for (const word of words) {
+        if (this.ctx.measureText(word).width > maxWidth) {
+          if (currentLine !== "") {
+            drawLine(currentLine);
+            currentLine = "";
+          }
+
+          let tempWord = "";
+          for (const char of word) {
+            if (this.ctx.measureText(tempWord + char).width > maxWidth) {
+              drawLine(tempWord);
+              tempWord = char;
+            } else {
+              tempWord += char;
+            }
+          }
+          currentLine = tempWord;
+          continue;
+        }
+
+        const testLine = currentLine === "" ? word : currentLine + " " + word;
+        if (this.ctx.measureText(testLine).width > maxWidth) {
+          drawLine(currentLine);
+          currentLine = word;
+        } else {
+          currentLine = testLine;
+        }
+      }
+
+      if (currentLine !== "") {
+        drawLine(currentLine);
+      }
     });
   }
 
