@@ -335,7 +335,7 @@ export class Text extends BaseComponent {
   };
 
   drawMultilineText() {
-    const maxWidth = this.position.x2 - this.position.x1 + 10;
+    const maxWidth = this.position.x2 - this.position.x1 + 1;
     const lines = this.currentText.split("\n");
     const lineHeight = 21.5;
     let y = this.position.y1;
