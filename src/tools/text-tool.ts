@@ -6,7 +6,6 @@ import { BaseTool, BaseToolProps } from "./base-tool";
 export class TextTool extends BaseTool {
   name: string = "text-tool";
 
-  private currentText: string = "";
   private createdTextarea: HTMLTextAreaElement | null = null;
   private firstDown: { position: MousePoint; time: Date } | null = null;
 
@@ -64,6 +63,7 @@ export class TextTool extends BaseTool {
     textarea.style.border = "none";
     textarea.style.backgroundColor = "transparent";
     textarea.style.fontSize = "18px";
+    textarea.style.setProperty("field-sizing", "content");
     document.body.appendChild(textarea);
     this.createdTextarea = textarea;
     this.createdTextarea.focus();
@@ -79,6 +79,7 @@ export class TextTool extends BaseTool {
     const position = MouseUtils.getMousePos(e, this.canvas);
 
     if (this.createdTextarea) {
+      console.log(this.createdTextarea.value);
       this.removeTextarea(this.createdTextarea);
       this.deactivate();
       return;

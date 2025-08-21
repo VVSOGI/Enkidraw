@@ -31,3 +31,14 @@ canvas {
     padding: 10px 30px;
   }
 }
+
+#text {
+  position: absolute;
+  top: 300px;
+  left: 300px;
+  background-color: transparent;
+  resize: none;
+  outline: none;
+  padding: 4px 8px;
+  border: none;
+}
