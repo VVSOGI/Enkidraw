@@ -2,11 +2,13 @@ import { v4 } from "uuid";
 import { MousePoint } from "../types";
 import { MouseUtils, TimeUtils } from "../utils";
 import { BaseTool, BaseToolProps } from "./base-tool";
+import { Text } from "../components/text";
 
 export class TextTool extends BaseTool {
   name: string = "text-tool";
 
   private createdTextarea: HTMLTextAreaElement | null = null;
+  private createPoint: MousePoint | null = null;
   private firstDown: { position: MousePoint; time: Date } | null = null;
 
   constructor({
@@ -74,16 +76,41 @@ export class TextTool extends BaseTool {
     this.createdTextarea = null;
   };
 
+  appendComponent = (mousePoint: MousePoint) => {
+    if (!this.createdTextarea?.clientWidth || !this.createdTextarea?.clientHeight) return;
+
+    const { x, y } = mousePoint;
+    const position = {
+      x1: x,
+      y1: y,
+      x2: x + this.createdTextarea.clientWidth,
+      y2: y + this.createdTextarea.clientHeight,
+    };
+
+    const textComponent = new Text({
+      canvas: this.canvas,
+      ctx: this.ctx,
+      position,
+      currentText: this.createdTextarea.value,
+      getZoomTransform: this.getZoomTransform,
+    });
+
+    this.componentManager.add(textComponent);
+  };
+
   onMouseDown = (e: MouseEvent) => {
     e.preventDefault();
     const position = MouseUtils.getMousePos(e, this.canvas);
 
-    if (this.createdTextarea) {
-      console.log(this.createdTextarea.value);
+    if (this.createdTextarea && this.createPoint) {
+      this.appendComponent(this.createPoint);
       this.removeTextarea(this.createdTextarea);
       this.deactivate();
+      this.createPoint = null;
       return;
     }
+
+    this.createPoint = position;
 
     this.createTextarea(position);
   };
