@@ -1,4 +1,4 @@
-import { BaseComponent, BasePosition } from "../components";
+import { BaseComponent, BasePosition, Text } from "../components";
 import { EdgeDirection, MousePoint } from "../types";
 import { ActiveManager, SelectedComponentManager } from ".";
 import { KeyUtils } from "../utils";
@@ -125,6 +125,11 @@ export class ComponentInteractionManager {
         const zone = component.getMultiSelectHoverZone(mousePos);
 
         if (zone === "outside") return;
+
+        if (component.name === "text-component" && (component as Text).isUpdate) {
+          this.activeManager.selectCurrentActive("text");
+          return;
+        }
 
         if (zone === "inside") {
           this.activeManager.selectCurrentActive("move");

@@ -2,7 +2,7 @@ import { v4 } from "uuid";
 import { MousePoint } from "../types";
 import { MouseUtils, TimeUtils } from "../utils";
 import { BaseTool, BaseToolProps } from "./base-tool";
-import { Text } from "../components/text";
+import { Text } from "../components";
 
 export class TextTool extends BaseTool {
   name: string = "text-tool";
@@ -10,6 +10,7 @@ export class TextTool extends BaseTool {
   private createdTextarea: HTMLTextAreaElement | null = null;
   private createPoint: MousePoint | null = null;
   private firstDown: { position: MousePoint; time: Date } | null = null;
+  private updateTargetComponent: Text | null = null;
 
   constructor({
     canvas,
@@ -54,7 +55,7 @@ export class TextTool extends BaseTool {
     }
   };
 
-  createTextarea = (position: MousePoint) => {
+  createTextarea = (position: MousePoint, text: string = "") => {
     const textarea = document.createElement("textarea");
     textarea.name = v4();
     textarea.style.position = "absolute";
@@ -66,6 +67,7 @@ export class TextTool extends BaseTool {
     textarea.style.backgroundColor = "transparent";
     textarea.style.fontSize = "18px";
     textarea.style.setProperty("field-sizing", "content");
+    textarea.textContent = text;
     document.body.appendChild(textarea);
     this.createdTextarea = textarea;
     this.createdTextarea.focus();
@@ -74,6 +76,13 @@ export class TextTool extends BaseTool {
   removeTextarea = (created: HTMLTextAreaElement) => {
     document.body.removeChild(created);
     this.createdTextarea = null;
+  };
+
+  activateTextTool = (position: MousePoint, text: string, component: Text) => {
+    this.activate();
+    this.createTextarea(position, text);
+    this.createPoint = position;
+    this.updateTargetComponent = component;
   };
 
   appendComponent = (mousePoint: MousePoint) => {
@@ -93,6 +102,7 @@ export class TextTool extends BaseTool {
       position,
       currentText: this.createdTextarea.value,
       getZoomTransform: this.getZoomTransform,
+      activateTextTool: this.activateTextTool,
     });
 
     this.componentManager.add(textComponent);
@@ -107,6 +117,11 @@ export class TextTool extends BaseTool {
       this.removeTextarea(this.createdTextarea);
       this.deactivate();
       this.createPoint = null;
+
+      if (this.updateTargetComponent) {
+        this.componentManager.remove(this.updateTargetComponent);
+      }
+
       return;
     }
 

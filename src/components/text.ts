@@ -1,21 +1,33 @@
 import { BaseComponent, BaseComponentProps, BasePosition } from ".";
-import { DragRange, EdgeDirection, MousePoint, MouseUtils, STYLE_SYSTEM } from "..";
+import { DragRange, EdgeDirection, MousePoint, MouseUtils, STYLE_SYSTEM, TimeUtils } from "..";
 
 interface TextComponentProps<T> extends BaseComponentProps<T> {
   currentText: string;
+  activateTextTool: (position: MousePoint, text: string, component: Text) => void;
 }
 
 export class Text extends BaseComponent {
   name: string = "text-component";
   currentText: string = "";
+  isUpdate: boolean = false;
 
   private totalPadding = 10;
   private dragCornorRectSize = 10;
+  private firstClickTiming: Date | null = null;
+  private activateTextTool: (position: MousePoint, text: string, component: Text) => void;
 
-  constructor({ canvas, ctx, position, currentText, getZoomTransform }: TextComponentProps<BasePosition>) {
+  constructor({
+    canvas,
+    ctx,
+    position,
+    currentText,
+    getZoomTransform,
+    activateTextTool,
+  }: TextComponentProps<BasePosition>) {
     super({ canvas, ctx, position, getZoomTransform });
     this.currentText = currentText;
     this.isTransformSelect = true;
+    this.activateTextTool = activateTextTool;
   }
 
   initialPosition = () => {
@@ -64,6 +76,18 @@ export class Text extends BaseComponent {
       mouseY >= y1 - this.totalPadding - this.dragCornorRectSize / 2 &&
       mouseY <= y2 + this.totalPadding + this.dragCornorRectSize / 2
     ) {
+      if (this.firstClickTiming) {
+        const timing = new Date();
+        if (TimeUtils.isWithingTimeLimit(this.firstClickTiming, timing, 1)) {
+          this.activateTextTool({ x: this.position.x1, y: this.position.y1 }, this.currentText, this);
+          this.isUpdate = true;
+          this.deactivate();
+        }
+        this.firstClickTiming = null;
+      } else {
+        this.firstClickTiming = new Date();
+      }
+
       return true;
     }
 
@@ -458,13 +482,15 @@ export class Text extends BaseComponent {
   };
 
   draw = () => {
-    this.ctx.save();
-    this.ctx.beginPath();
-    this.ctx.font = "18px monospace";
-    this.ctx.fillStyle = "black";
-    this.drawMultilineText();
-    this.ctx.closePath();
-    this.ctx.restore();
+    if (!this.isUpdate) {
+      this.ctx.save();
+      this.ctx.beginPath();
+      this.ctx.font = "18px monospace";
+      this.ctx.fillStyle = "black";
+      this.drawMultilineText();
+      this.ctx.closePath();
+      this.ctx.restore();
+    }
 
     if (this.isMultiDrag) {
       this.multiDragEffect();
