@@ -92,9 +92,9 @@ export class ComponentInteractionManager {
     }
 
     const mousePos = this.getLogicalMousePos(e);
-
-    // Handle multi-select range interactions
     const multiSelectRange = this.selectionManager.getMultiSelectRange();
+    const component = this.findComponentWithPosition(e);
+    const selectedComponents = this.selectionManager.getSelectedComponents();
 
     if (multiSelectRange) {
       const zone = this.selectionManager.getMultiSelectHoverZone(mousePos);
@@ -105,6 +105,12 @@ export class ComponentInteractionManager {
         // Set appropriate mode based on zone
         if (zone === "inside") {
           this.activeManager.selectCurrentActive("move");
+
+          if (component && component.name === "text-component" && (component as Text).isUpdate) {
+            this.activeManager.selectCurrentActive("text");
+            this.selectionManager.clearSelection();
+            return;
+          }
         } else {
           // Handle resize modes for edges
           this.resizeEdge = zone;
@@ -114,9 +120,6 @@ export class ComponentInteractionManager {
         return;
       }
     }
-
-    const component = this.findComponentWithPosition(e);
-    const selectedComponents = this.selectionManager.getSelectedComponents();
 
     if (component && selectedComponents.find((selected) => selected.id === component.id)) {
       this.tempPosition = mousePos;
@@ -243,6 +246,7 @@ export class ComponentInteractionManager {
   private handleHoverEffects(e: MouseEvent, mouse: MousePoint): void {
     // Handle multi-select range hover
     const multiSelectRange = this.selectionManager.getMultiSelectRange();
+
     if (multiSelectRange) {
       const zone = this.selectionManager.getMultiSelectHoverZone(mouse);
       if (zone !== "outside") {

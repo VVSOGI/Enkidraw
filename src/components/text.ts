@@ -69,7 +69,6 @@ export class Text extends BaseComponent {
     const { x1, y1, x2, y2 } = this.position;
     const transform = this.getZoomTransform();
     const { x: mouseX, y: mouseY } = MouseUtils.getLogicalMousePos(e, this.canvas, transform);
-
     if (
       mouseX >= x1 - this.totalPadding - this.dragCornorRectSize / 2 &&
       mouseX <= x2 + this.totalPadding + this.dragCornorRectSize / 2 &&
@@ -78,11 +77,19 @@ export class Text extends BaseComponent {
     ) {
       if (this.firstClickTiming) {
         const timing = new Date();
-        if (TimeUtils.isWithingTimeLimit(this.firstClickTiming, timing, 1)) {
+
+        if (
+          TimeUtils.isWithingTimeLimit(this.firstClickTiming, timing, 1) &&
+          mouseX >= x1 &&
+          mouseX <= x2 &&
+          mouseY >= y1 &&
+          mouseY <= y2
+        ) {
           this.activateTextTool({ x: this.position.x1, y: this.position.y1 }, this.currentText, this);
           this.isUpdate = true;
           this.deactivate();
         }
+
         this.firstClickTiming = null;
       } else {
         this.firstClickTiming = new Date();
