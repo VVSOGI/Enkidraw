@@ -42,9 +42,12 @@ export class SelectedComponentManager extends EventEmitter {
   }
 
   public selectComponent(component: BaseComponent): void {
+    if (component.name === "line") {
+      this.emit("lineMenuActivate");
+    }
+
     this.clearSelection();
     this.selectedComponents.push(component);
-    this.emit("menuActivate");
     component.activate();
   }
 
@@ -61,9 +64,9 @@ export class SelectedComponentManager extends EventEmitter {
         }
 
         if (component.name === "line") {
-          this.emit("menuActivate");
+          this.emit("lineMenuActivate");
         } else {
-          this.emit("menuDeactivate");
+          this.emit("lineMenuDeactivate");
         }
       } else {
         component.deactivate();
@@ -85,7 +88,7 @@ export class SelectedComponentManager extends EventEmitter {
         this.multiSelectRange = null;
       }
     } else {
-      this.emit("menuDeactivate");
+      this.emit("lineMenuDeactivate");
     }
   }
 
@@ -226,7 +229,7 @@ export class SelectedComponentManager extends EventEmitter {
     for (const component of this.selectedComponents) {
       component.deactivate();
       component.multiDragMode(false);
-      this.emit("menuDeactivate");
+      this.emit("lineMenuDeactivate");
     }
     this.multiSelectRange = null;
     this.originMultiSelectRange = null;

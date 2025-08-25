@@ -28,12 +28,12 @@ export class ComponentManager {
     this.activeManager = activeManager;
 
     this.selectedComponentManager = new SelectedComponentManager();
-    this.selectedComponentManager.on("menuActivate", () => {
+    this.selectedComponentManager.on("lineMenuActivate", () => {
       this.leftMenuManager.setComponents(this.selectedComponentManager.selectedComponents);
       this.leftMenuManager.activate();
     });
 
-    this.selectedComponentManager.on("menuDeactivate", () => {
+    this.selectedComponentManager.on("lineMenuDeactivate", () => {
       this.leftMenuManager.deactivate();
     });
 
