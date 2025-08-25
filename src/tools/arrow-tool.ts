@@ -74,10 +74,22 @@ export class ArrowTool extends BaseTool {
     this.ctx.stroke();
     this.ctx.closePath();
 
+    const angle = Math.atan2(this.movePoint.y - this.initPoint.y, this.movePoint.x - this.initPoint.x);
+    const headLength = 20;
+    const headAngle = Math.PI / 6;
+
     this.ctx.beginPath();
-    this.ctx.arc(this.movePoint.x, this.movePoint.y, 2, 0, Math.PI * 2);
-    this.ctx.fillStyle = this.leftMenuManager.strokeColor;
-    this.ctx.fill();
+    this.ctx.moveTo(this.movePoint.x, this.movePoint.y);
+    this.ctx.lineTo(
+      this.movePoint.x - headLength * Math.cos(angle - headAngle),
+      this.movePoint.y - headLength * Math.sin(angle - headAngle)
+    );
+    this.ctx.moveTo(this.movePoint.x, this.movePoint.y);
+    this.ctx.lineTo(
+      this.movePoint.x - headLength * Math.cos(angle + headAngle),
+      this.movePoint.y - headLength * Math.sin(angle + headAngle)
+    );
+    this.ctx.stroke();
     this.ctx.closePath();
     this.ctx.restore();
   };
