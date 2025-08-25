@@ -68,6 +68,7 @@ export class TextTool extends BaseTool {
     textarea.style.fontSize = "18px";
     textarea.style.setProperty("field-sizing", "content");
     textarea.textContent = text;
+    textarea.focus();
     document.body.appendChild(textarea);
     this.createdTextarea = textarea;
     this.createdTextarea.focus();
@@ -126,7 +127,6 @@ export class TextTool extends BaseTool {
     }
 
     this.createPoint = position;
-
     this.createTextarea(position);
   };
 
