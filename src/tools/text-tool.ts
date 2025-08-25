@@ -85,7 +85,15 @@ export class TextTool extends BaseTool {
     this.createPoint = position;
     this.updateTargetComponent = component;
 
-    (window as Window).getSelection()?.selectAllChildren(this.createdTextarea as Node);
+    setTimeout(() => {
+      if (this.createdTextarea) {
+        this.createdTextarea.focus();
+        const valueLength = this.createdTextarea.value.length;
+        this.createdTextarea.selectionStart = valueLength;
+        this.createdTextarea.selectionEnd = valueLength;
+        this.createdTextarea.setSelectionRange(0, valueLength);
+      }
+    }, 0);
   };
 
   appendComponent = (mousePoint: MousePoint) => {
