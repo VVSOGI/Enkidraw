@@ -13,6 +13,7 @@ export class Text extends BaseComponent {
 
   private totalPadding = 10;
   private dragCornorRectSize = 10;
+  private updateDuration = 0.5;
   private firstClickTiming: Date | null = null;
   private activateTextTool: (position: MousePoint, text: string, component: Text) => void;
 
@@ -79,7 +80,7 @@ export class Text extends BaseComponent {
         const timing = new Date();
 
         if (
-          TimeUtils.isWithingTimeLimit(this.firstClickTiming, timing, 1) &&
+          TimeUtils.isWithingTimeLimit(this.firstClickTiming, timing, this.updateDuration) &&
           mouseX >= x1 &&
           mouseX <= x2 &&
           mouseY >= y1 &&
