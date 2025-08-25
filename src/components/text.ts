@@ -499,20 +499,20 @@ export class Text extends BaseComponent {
       this.ctx.restore();
     }
 
-    if (this.isUpdate) {
-      this.ctx.save();
-      this.ctx.beginPath();
-      this.ctx.rect(
-        this.position.x1,
-        this.position.y1,
-        this.position.x2 - this.position.x1,
-        this.position.y2 - this.position.y1
-      );
-      this.ctx.fillStyle = "rgba(62, 126, 222, 0.46)";
-      this.ctx.fill();
-      this.ctx.closePath();
-      this.ctx.restore();
-    }
+    // if (this.isUpdate) {
+    //   this.ctx.save();
+    //   this.ctx.beginPath();
+    //   this.ctx.rect(
+    //     this.position.x1,
+    //     this.position.y1,
+    //     this.position.x2 - this.position.x1,
+    //     this.position.y2 - this.position.y1
+    //   );
+    //   this.ctx.fillStyle = "rgba(62, 126, 222, 0.46)";
+    //   this.ctx.fill();
+    //   this.ctx.closePath();
+    //   this.ctx.restore();
+    // }
 
     if (this.isMultiDrag) {
       this.multiDragEffect();
