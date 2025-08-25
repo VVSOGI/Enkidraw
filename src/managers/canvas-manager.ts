@@ -1,5 +1,6 @@
 import { ComponentManager, LeftMenuManager } from ".";
 import { BaseTool, DragTool, ZoomTool, HandTool, LineTool, RectTool } from "../tools";
+import { ArrowTool } from "../tools/arrow-tool";
 import { CircleTool } from "../tools/circle-tool";
 import { TextTool } from "../tools/text-tool";
 import { ActiveManager } from "./active-manager";
@@ -19,6 +20,7 @@ export class CanvasManager {
   private rectTool: RectTool;
   private circleTool: CircleTool;
   private textTool: TextTool;
+  private arrowTool: ArrowTool;
 
   private activeManager: ActiveManager;
   private componentManager: ComponentManager;
@@ -116,6 +118,17 @@ export class CanvasManager {
       getZoomTransform: this.getZoomTransform,
     });
 
+    this.arrowTool = new ArrowTool({
+      canvas: this.canvas,
+      ctx: this.ctx,
+      activeManager: this.activeManager,
+      leftMenuManager: this.leftMenuManager,
+      componentManager: this.componentManager,
+      selectTool: this.selectTool,
+      deleteCurrentTool: this.deleteCurrentTool,
+      getZoomTransform: this.getZoomTransform,
+    });
+
     this.animationId = requestAnimationFrame(this.draw);
 
     this.zoomTool.activate();
@@ -138,6 +151,11 @@ export class CanvasManager {
 
       if (e.code === "Digit3") {
         this.circleTool.activate();
+        this.activeManager.selectCurrentActive("line");
+      }
+
+      if (e.code === "Digit4") {
+        this.arrowTool.activate();
         this.activeManager.selectCurrentActive("line");
       }
 
