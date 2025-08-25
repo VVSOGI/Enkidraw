@@ -138,6 +138,7 @@ export class TextTool extends BaseTool {
 
     this.createPoint = position;
     this.createTextarea(position);
+    this.activeManager.selectCurrentActive("default");
   };
 
   onMouseMove = (e: MouseEvent) => {};
