@@ -75,7 +75,7 @@ export class ArrowTool extends BaseTool {
     const distanceX = endX - initX;
     const distanceY = endY - initY;
     const cx = initX + distanceX / 2;
-    const cy = endY + distanceY / 2;
+    const cy = initY + distanceY / 2;
 
     const arrow = new Arrow({
       canvas: this.canvas,
