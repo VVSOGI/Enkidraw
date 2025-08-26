@@ -1,4 +1,4 @@
-import { DragRange, EdgeDirection, MousePoint } from "..";
+import { DragRange, EdgeDirection, MathUtils, MousePoint, MouseUtils, STYLE_SYSTEM } from "..";
 import { BaseComponent, BaseComponentProps, BasePosition } from "./base-component";
 
 export interface ArrowPosition extends BasePosition {
@@ -16,13 +16,25 @@ export class Arrow extends BaseComponent<ArrowPosition> {
   name = "arrow-component";
   type: "line" | "curve" | "angle" = "line";
   lineWidth = 5;
+  private dragCornerRectSize = 7.5;
+  private totalPadding = 10;
+  private dragCornorRectSize = 10;
 
   constructor({ canvas, ctx, position, type, getZoomTransform }: Props<ArrowPosition>) {
     super({ canvas, ctx, position, getZoomTransform });
     this.type = type;
+    this.isTransformSelect = true;
   }
 
-  initialPosition = () => {};
+  initialPosition = () => {
+    this.originPosition = {
+      x1: this.position.x1,
+      y1: this.position.y1,
+      x2: this.position.x2,
+      y2: this.position.y2,
+      crossPoints: this.position.crossPoints.map((point) => ({ ...point })),
+    };
+  };
 
   getPosition = () => {
     if (this.type === "line") {
@@ -64,10 +76,86 @@ export class Arrow extends BaseComponent<ArrowPosition> {
   };
 
   isHover = (e: MouseEvent) => {
+    const { x1, y1, x2, y2 } = this.position;
+    const transform = this.getZoomTransform();
+
+    if (this.isActive) {
+      const { x: mouseX, y: mouseY } = MouseUtils.getLogicalMousePos(e, this.canvas, transform);
+
+      if (
+        mouseX >= x1 - this.totalPadding - this.dragCornorRectSize / 2 &&
+        mouseX <= x2 + this.totalPadding + this.dragCornorRectSize / 2 &&
+        mouseY >= y1 - this.totalPadding - this.dragCornorRectSize / 2 &&
+        mouseY <= y2 + this.totalPadding + this.dragCornorRectSize / 2
+      ) {
+        return true;
+      }
+    }
+
+    if (!this.isActive) {
+      const { x: mouseX, y: mouseY } = MouseUtils.getLogicalMousePos(e, this.canvas, transform);
+      const centerX = (this.position.x1 + this.position.x2) / 2;
+      const centerY = (this.position.y1 + this.position.y2) / 2;
+      const radiusX = Math.abs((this.position.x2 - this.position.x1) / 2);
+      const radiusY = Math.abs((this.position.y2 - this.position.y1) / 2);
+
+      const isInBound = MathUtils.isPointBoundByEllipse({
+        mouseX,
+        mouseY,
+        centerX,
+        centerY,
+        radiusX,
+        radiusY,
+        threshold: STYLE_SYSTEM.STROKE_WIDTH,
+      });
+
+      if (isInBound) {
+        return true;
+      }
+    }
+
     return false;
   };
 
   isClicked = (e: MouseEvent) => {
+    const { x1, y1, x2, y2 } = this.position;
+    const transform = this.getZoomTransform();
+
+    if (this.isActive) {
+      const { x: mouseX, y: mouseY } = MouseUtils.getLogicalMousePos(e, this.canvas, transform);
+
+      if (
+        mouseX >= x1 - this.totalPadding - this.dragCornorRectSize / 2 &&
+        mouseX <= x2 + this.totalPadding + this.dragCornorRectSize / 2 &&
+        mouseY >= y1 - this.totalPadding - this.dragCornorRectSize / 2 &&
+        mouseY <= y2 + this.totalPadding + this.dragCornorRectSize / 2
+      ) {
+        return true;
+      }
+    }
+
+    if (!this.isActive) {
+      const { x: mouseX, y: mouseY } = MouseUtils.getLogicalMousePos(e, this.canvas, transform);
+      const centerX = (this.position.x1 + this.position.x2) / 2;
+      const centerY = (this.position.y1 + this.position.y2) / 2;
+      const radiusX = Math.abs((this.position.x2 - this.position.x1) / 2);
+      const radiusY = Math.abs((this.position.y2 - this.position.y1) / 2);
+
+      const isInBound = MathUtils.isPointBoundByEllipse({
+        mouseX,
+        mouseY,
+        centerX,
+        centerY,
+        radiusX,
+        radiusY,
+        threshold: STYLE_SYSTEM.STROKE_WIDTH,
+      });
+
+      if (isInBound) {
+        return true;
+      }
+    }
+
     return false;
   };
 
@@ -189,6 +277,92 @@ export class Arrow extends BaseComponent<ArrowPosition> {
     }
   };
 
+  dragEffect = () => {
+    this.ctx.save();
+    this.ctx.beginPath();
+    this.ctx.roundRect(
+      this.position.x1 + this.dragCornerRectSize / 2,
+      this.position.y1 + this.dragCornerRectSize / 2,
+      -this.dragCornerRectSize,
+      -this.dragCornerRectSize,
+      4
+    );
+    for (const point of this.position.crossPoints) {
+      this.ctx.roundRect(
+        point.cx + this.dragCornerRectSize / 2,
+        point.cy + this.dragCornerRectSize / 2,
+        -this.dragCornerRectSize,
+        -this.dragCornerRectSize,
+        4
+      );
+    }
+
+    this.ctx.roundRect(
+      this.position.x2 + this.dragCornerRectSize / 2,
+      this.position.y2 + this.dragCornerRectSize / 2,
+      -this.dragCornerRectSize,
+      -this.dragCornerRectSize,
+      4
+    );
+    this.ctx.fillStyle = STYLE_SYSTEM.WHITE;
+    this.ctx.fill();
+    this.ctx.strokeStyle = STYLE_SYSTEM.PRIMARY;
+    this.ctx.stroke();
+    this.ctx.closePath();
+    this.ctx.restore();
+  };
+
+  dragCornorEffect = () => {
+    this.ctx.save();
+    this.ctx.beginPath();
+
+    const width = this.position.x2 - this.position.x1 + this.totalPadding * 2;
+    const height = this.position.y2 - this.position.y1 + this.totalPadding * 2;
+
+    this.ctx.strokeStyle = STYLE_SYSTEM.PRIMARY;
+    this.ctx.rect(this.position.x1 - this.totalPadding, this.position.y1 - this.totalPadding, width, height);
+    this.ctx.stroke();
+    this.ctx.closePath();
+    this.ctx.restore();
+
+    this.ctx.save();
+    this.ctx.beginPath();
+    this.ctx.roundRect(
+      this.position.x1 + this.dragCornorRectSize / 2 - this.totalPadding,
+      this.position.y1 + this.dragCornorRectSize / 2 - this.totalPadding,
+      -this.dragCornorRectSize,
+      -this.dragCornorRectSize,
+      4
+    );
+    this.ctx.roundRect(
+      this.position.x2 + this.dragCornorRectSize / 2 + this.totalPadding,
+      this.position.y1 + this.dragCornorRectSize / 2 - this.totalPadding,
+      -this.dragCornorRectSize,
+      -this.dragCornorRectSize,
+      4
+    );
+    this.ctx.roundRect(
+      this.position.x1 + this.dragCornorRectSize / 2 - this.totalPadding,
+      this.position.y2 + this.dragCornorRectSize / 2 + this.totalPadding,
+      -this.dragCornorRectSize,
+      -this.dragCornorRectSize,
+      4
+    );
+    this.ctx.roundRect(
+      this.position.x2 + this.dragCornorRectSize / 2 + this.totalPadding,
+      this.position.y2 + this.dragCornorRectSize / 2 + this.totalPadding,
+      -this.dragCornorRectSize,
+      -this.dragCornorRectSize,
+      4
+    );
+    this.ctx.fillStyle = STYLE_SYSTEM.WHITE;
+    this.ctx.fill();
+    this.ctx.strokeStyle = STYLE_SYSTEM.PRIMARY;
+    this.ctx.stroke();
+    this.ctx.closePath();
+    this.ctx.restore();
+  };
+
   draw = () => {
     if (this.type === "line") {
       this.drawDefaultLine();
@@ -196,6 +370,11 @@ export class Arrow extends BaseComponent<ArrowPosition> {
 
     if (this.type === "angle") {
       this.drawAngleLine();
+    }
+
+    if (this.isActive) {
+      this.dragEffect();
+      this.dragCornorEffect();
     }
   };
 }
