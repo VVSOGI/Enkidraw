@@ -1,4 +1,5 @@
 import { LeftMenuManager, MousePoint } from "..";
+import { Arrow } from "../components";
 import { BaseTool, BaseToolProps } from "./base-tool";
 
 interface ArrowToolProps extends BaseToolProps {
@@ -58,15 +59,46 @@ export class ArrowTool extends BaseTool {
   onMouseUp = (e: MouseEvent) => {
     if (!this.initPoint || !this.movePoint || this.isDrawing) return;
 
-    const { x: initX, y: initY } = this.initPoint;
-    const { x: endX, y: endY } = this.movePoint;
-
     this.activeManager.selectCurrentActive("default");
+    this.appendComponent(this.initPoint, this.movePoint);
     this.deactivate();
     this.reset();
   };
 
   onKeyDown = (e: KeyboardEvent) => {};
+
+  appendComponent = (init: MousePoint, end: MousePoint) => {
+    if (!this.getZoomTransform) return;
+
+    const { x: initX, y: initY } = init;
+    const { x: endX, y: endY } = end;
+    const distanceX = endX - initX;
+    const distanceY = endY - initY;
+    const cx = initX + distanceX / 2;
+    const cy = endY + distanceY / 2;
+
+    const arrow = new Arrow({
+      canvas: this.canvas,
+      ctx: this.ctx,
+      position: {
+        x1: initX,
+        y1: initY,
+        crossPoints: [
+          {
+            cx,
+            cy,
+          },
+        ],
+        x2: endX,
+        y2: endY,
+      },
+      type: this.type,
+      getZoomTransform: this.getZoomTransform,
+    });
+
+    arrow.color = this.leftMenuManager.strokeColor;
+    this.componentManager.add(arrow);
+  };
 
   drawDefaultLine = () => {
     if (!this.initPoint || !this.movePoint) return;
