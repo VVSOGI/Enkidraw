@@ -91,28 +91,78 @@ export class ArrowTool extends BaseTool {
 
   drawAngleLine = () => {
     if (!this.initPoint || !this.movePoint) return;
-    const centerX = this.initPoint.x + (this.movePoint.x - this.initPoint.x) / 2;
-
-    this.ctx.save();
-    this.ctx.beginPath();
-    this.ctx.strokeStyle = this.leftMenuManager.strokeColor;
-    this.ctx.lineWidth = this.lineWidth;
-    this.ctx.lineCap = "round";
-    this.ctx.moveTo(this.initPoint.x, this.initPoint.y);
-    this.ctx.lineTo(centerX, this.initPoint.y);
-    this.ctx.lineTo(centerX, this.movePoint.y);
-    this.ctx.lineTo(this.movePoint.x, this.movePoint.y);
-
+    const distanceX = this.movePoint.x - this.initPoint.x;
+    const distanceY = this.movePoint.y - this.initPoint.y;
+    const centerX = this.initPoint.x + distanceX / 2;
+    const centerY = this.initPoint.y + distanceY / 2;
     const headLength = 20;
     const headAngle = Math.PI / 6;
 
-    this.ctx.moveTo(this.movePoint.x, this.movePoint.y);
-    this.ctx.lineTo(this.movePoint.x - headLength, this.movePoint.y - headLength * headAngle);
-    this.ctx.moveTo(this.movePoint.x, this.movePoint.y);
-    this.ctx.lineTo(this.movePoint.x - headLength, this.movePoint.y + headLength * headAngle);
-    this.ctx.stroke();
-    this.ctx.closePath();
-    this.ctx.restore();
+    if (Math.abs(distanceX) >= Math.abs(distanceY)) {
+      const horizontalDirection = distanceX >= 0 ? "right" : "left";
+      this.ctx.save();
+      this.ctx.beginPath();
+      this.ctx.strokeStyle = this.leftMenuManager.strokeColor;
+      this.ctx.lineWidth = this.lineWidth;
+      this.ctx.lineCap = "round";
+      this.ctx.moveTo(this.initPoint.x, this.initPoint.y);
+      this.ctx.lineTo(centerX, this.initPoint.y);
+      this.ctx.lineTo(centerX, this.movePoint.y);
+      this.ctx.lineTo(this.movePoint.x, this.movePoint.y);
+
+      if (horizontalDirection === "right") {
+        this.ctx.moveTo(this.movePoint.x, this.movePoint.y);
+        this.ctx.lineTo(this.movePoint.x - headLength, this.movePoint.y - headLength * headAngle);
+        this.ctx.moveTo(this.movePoint.x, this.movePoint.y);
+        this.ctx.lineTo(this.movePoint.x - headLength, this.movePoint.y + headLength * headAngle);
+        this.ctx.stroke();
+        this.ctx.closePath();
+        this.ctx.restore();
+      }
+
+      if (horizontalDirection === "left") {
+        this.ctx.moveTo(this.movePoint.x, this.movePoint.y);
+        this.ctx.lineTo(this.movePoint.x + headLength, this.movePoint.y - headLength * headAngle);
+        this.ctx.moveTo(this.movePoint.x, this.movePoint.y);
+        this.ctx.lineTo(this.movePoint.x + headLength, this.movePoint.y + headLength * headAngle);
+        this.ctx.stroke();
+        this.ctx.closePath();
+        this.ctx.restore();
+      }
+
+      return;
+    } else {
+      const verticalDirection = distanceY >= 0 ? "down" : "up";
+      this.ctx.save();
+      this.ctx.beginPath();
+      this.ctx.strokeStyle = this.leftMenuManager.strokeColor;
+      this.ctx.lineWidth = this.lineWidth;
+      this.ctx.lineCap = "round";
+      this.ctx.moveTo(this.initPoint.x, this.initPoint.y);
+      this.ctx.lineTo(this.initPoint.x, centerY);
+      this.ctx.lineTo(this.movePoint.x, centerY);
+      this.ctx.lineTo(this.movePoint.x, this.movePoint.y);
+
+      if (verticalDirection === "down") {
+        this.ctx.moveTo(this.movePoint.x, this.movePoint.y);
+        this.ctx.lineTo(this.movePoint.x + headLength * headAngle, this.movePoint.y - headLength);
+        this.ctx.moveTo(this.movePoint.x, this.movePoint.y);
+        this.ctx.lineTo(this.movePoint.x - headLength * headAngle, this.movePoint.y - headLength);
+        this.ctx.stroke();
+        this.ctx.closePath();
+        this.ctx.restore();
+      }
+
+      if (verticalDirection === "up") {
+        this.ctx.moveTo(this.movePoint.x, this.movePoint.y);
+        this.ctx.lineTo(this.movePoint.x + headLength * headAngle, this.movePoint.y + headLength);
+        this.ctx.moveTo(this.movePoint.x, this.movePoint.y);
+        this.ctx.lineTo(this.movePoint.x - headLength * headAngle, this.movePoint.y + headLength);
+        this.ctx.stroke();
+        this.ctx.closePath();
+        this.ctx.restore();
+      }
+    }
   };
 
   draw = () => {
