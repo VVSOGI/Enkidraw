@@ -46,6 +46,8 @@ export class ArrowTool extends BaseTool {
       this.initPoint = position;
       this.movePoint = position;
       this.points.push(this.initPoint);
+    } else {
+      this.isDrawing = false;
     }
   };
 
@@ -53,7 +55,16 @@ export class ArrowTool extends BaseTool {
     this.movePoint = this.getLogicalMousePos(e);
   };
 
-  onMouseUp = (e: MouseEvent) => {};
+  onMouseUp = (e: MouseEvent) => {
+    if (!this.initPoint || !this.movePoint || this.isDrawing) return;
+
+    const { x: initX, y: initY } = this.initPoint;
+    const { x: endX, y: endY } = this.movePoint;
+
+    this.activeManager.selectCurrentActive("default");
+    this.deactivate();
+    this.reset();
+  };
 
   onKeyDown = (e: KeyboardEvent) => {};
 
