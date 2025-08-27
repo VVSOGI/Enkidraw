@@ -142,7 +142,25 @@ export class Arrow extends BaseComponent<ArrowPosition> {
 
   hoverComponent = (e: MouseEvent, move: MousePoint) => {};
 
-  moveComponent = (e: MouseEvent, move: MousePoint) => {};
+  moveComponent = (e: MouseEvent, move: MousePoint) => {
+    const { x: moveX, y: moveY } = move;
+    const nextPosition = Object.assign({}, this.position);
+    nextPosition.x1 = this.originPosition.x1 + moveX;
+    nextPosition.y1 = this.originPosition.y1 + moveY;
+    nextPosition.x2 = this.originPosition.x2 + moveX;
+    nextPosition.y2 = this.originPosition.y2 + moveY;
+
+    const crossPoints = this.originPosition.crossPoints.map(({ cx, cy }) => {
+      return {
+        cx: cx + move.x,
+        cy: cy + move.y,
+      };
+    });
+
+    nextPosition.crossPoints = crossPoints;
+
+    this.position = nextPosition;
+  };
 
   resizeComponent = (mouseDistance: MousePoint, multiSelectRange: DragRange, edgeDirection: EdgeDirection) => {};
 
