@@ -94,22 +94,12 @@ export class Arrow extends BaseComponent<ArrowPosition> {
 
     if (!this.isActive) {
       const { x: mouseX, y: mouseY } = MouseUtils.getLogicalMousePos(e, this.canvas, transform);
-      const centerX = (this.position.x1 + this.position.x2) / 2;
-      const centerY = (this.position.y1 + this.position.y2) / 2;
-      const radiusX = Math.abs((this.position.x2 - this.position.x1) / 2);
-      const radiusY = Math.abs((this.position.y2 - this.position.y1) / 2);
-
-      const isInBound = MathUtils.isPointBoundByEllipse({
-        mouseX,
-        mouseY,
-        centerX,
-        centerY,
-        radiusX,
-        radiusY,
-        threshold: STYLE_SYSTEM.STROKE_WIDTH,
-      });
-
-      if (isInBound) {
+      if (
+        mouseX >= x1 - this.totalPadding - this.dragCornorRectSize / 2 &&
+        mouseX <= x2 + this.totalPadding + this.dragCornorRectSize / 2 &&
+        mouseY >= y1 - this.totalPadding - this.dragCornorRectSize / 2 &&
+        mouseY <= y2 + this.totalPadding + this.dragCornorRectSize / 2
+      ) {
         return true;
       }
     }
@@ -136,22 +126,13 @@ export class Arrow extends BaseComponent<ArrowPosition> {
 
     if (!this.isActive) {
       const { x: mouseX, y: mouseY } = MouseUtils.getLogicalMousePos(e, this.canvas, transform);
-      const centerX = (this.position.x1 + this.position.x2) / 2;
-      const centerY = (this.position.y1 + this.position.y2) / 2;
-      const radiusX = Math.abs((this.position.x2 - this.position.x1) / 2);
-      const radiusY = Math.abs((this.position.y2 - this.position.y1) / 2);
 
-      const isInBound = MathUtils.isPointBoundByEllipse({
-        mouseX,
-        mouseY,
-        centerX,
-        centerY,
-        radiusX,
-        radiusY,
-        threshold: STYLE_SYSTEM.STROKE_WIDTH,
-      });
-
-      if (isInBound) {
+      if (
+        mouseX >= x1 - this.totalPadding - this.dragCornorRectSize / 2 &&
+        mouseX <= x2 + this.totalPadding + this.dragCornorRectSize / 2 &&
+        mouseY >= y1 - this.totalPadding - this.dragCornorRectSize / 2 &&
+        mouseY <= y2 + this.totalPadding + this.dragCornorRectSize / 2
+      ) {
         return true;
       }
     }
@@ -166,7 +147,7 @@ export class Arrow extends BaseComponent<ArrowPosition> {
   resizeComponent = (mouseDistance: MousePoint, multiSelectRange: DragRange, edgeDirection: EdgeDirection) => {};
 
   getMultiSelectHoverZone = (mouse: MousePoint): EdgeDirection | "inside" | "outside" => {
-    return "outside";
+    return "inside";
   };
 
   multiDragEffect = () => {};
