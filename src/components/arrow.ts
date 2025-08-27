@@ -20,6 +20,7 @@ export class Arrow extends BaseComponent<ArrowPosition> {
   name = "arrow-component";
   type: "line" | "curve" | "angle" = "line";
   lineWidth = 5;
+
   private dragCornerRectSize = 7.5;
   private totalPadding = 10;
   private dragCornorRectSize = 10;
@@ -572,6 +573,47 @@ export class Arrow extends BaseComponent<ArrowPosition> {
     return "outside";
   };
 
+  calculateSparePoints = (direction: "vertical" | "horizontal") => {
+    let nextSparePoints: {
+      cx: number;
+      cy: number;
+    }[] = [];
+
+    if (direction === "horizontal") {
+      const totalCx = this.position.x1 + (this.position.x2 - this.position.x1) / 2;
+      const spare1X = this.position.x1 + (totalCx - this.position.x1) / 2;
+      const spare2X = this.position.x2 - (totalCx - this.position.x1) / 2;
+      nextSparePoints = [
+        {
+          cx: spare1X,
+          cy: this.position.y1,
+        },
+        {
+          cx: spare2X,
+          cy: this.position.y2,
+        },
+      ];
+    }
+
+    if (direction === "vertical") {
+      const totalCy = this.position.y1 + (this.position.y2 - this.position.y1) / 2;
+      const spare1Y = this.position.y1 + (totalCy - this.position.y1) / 2;
+      const spare2Y = this.position.y2 - (totalCy - this.position.y1) / 2;
+      nextSparePoints = [
+        {
+          cx: this.position.x1,
+          cy: spare1Y,
+        },
+        {
+          cx: this.position.x2,
+          cy: spare2Y,
+        },
+      ];
+    }
+
+    this.position.sparePoints = [...nextSparePoints];
+  };
+
   multiDragEffect = () => {};
 
   drawDefaultLine = () => {
@@ -615,6 +657,8 @@ export class Arrow extends BaseComponent<ArrowPosition> {
 
     if (Math.abs(distanceX) >= Math.abs(distanceY)) {
       const horizontalDirection = distanceX >= 0 ? "right" : "left";
+      this.calculateSparePoints("horizontal");
+
       this.ctx.save();
       this.ctx.beginPath();
       this.ctx.strokeStyle = this.color;
@@ -648,6 +692,8 @@ export class Arrow extends BaseComponent<ArrowPosition> {
       return;
     } else {
       const verticalDirection = distanceY >= 0 ? "down" : "up";
+      this.calculateSparePoints("vertical");
+
       this.ctx.save();
       this.ctx.beginPath();
       this.ctx.strokeStyle = this.color;
@@ -716,6 +762,7 @@ export class Arrow extends BaseComponent<ArrowPosition> {
 
     this.ctx.save();
     this.ctx.beginPath();
+
     for (const point of this.position.sparePoints) {
       this.ctx.roundRect(
         point.cx + this.dragCornerRectSize / 2,
