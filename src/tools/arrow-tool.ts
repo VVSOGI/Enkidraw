@@ -76,6 +76,8 @@ export class ArrowTool extends BaseTool {
     const distanceY = endY - initY;
     const cx = initX + distanceX / 2;
     const cy = initY + distanceY / 2;
+    const spare1X = initX + (cx - initX) / 2;
+    const spare2X = cx + (endX - cx) / 2;
 
     const arrow = new Arrow({
       canvas: this.canvas,
@@ -83,6 +85,16 @@ export class ArrowTool extends BaseTool {
       position: {
         x1: initX,
         y1: initY,
+        sparePoints: [
+          {
+            cx: spare1X,
+            cy: initY,
+          },
+          {
+            cx: spare2X,
+            cy: endY,
+          },
+        ],
         crossPoints: [
           {
             cx,

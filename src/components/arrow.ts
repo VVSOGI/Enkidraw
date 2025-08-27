@@ -2,6 +2,10 @@ import { DragRange, EdgeDirection, MathUtils, MousePoint, MouseUtils, STYLE_SYST
 import { BaseComponent, BaseComponentProps, BasePosition } from "./base-component";
 
 export interface ArrowPosition extends BasePosition {
+  sparePoints: {
+    cx: number;
+    cy: number;
+  }[];
   crossPoints: {
     cx: number;
     cy: number;
@@ -33,6 +37,7 @@ export class Arrow extends BaseComponent<ArrowPosition> {
       x2: this.position.x2,
       y2: this.position.y2,
       crossPoints: this.position.crossPoints.map((point) => ({ ...point })),
+      sparePoints: this.position.sparePoints.map((point) => ({ ...point })),
     };
   };
 
@@ -617,6 +622,25 @@ export class Arrow extends BaseComponent<ArrowPosition> {
     this.ctx.fillStyle = STYLE_SYSTEM.WHITE;
     this.ctx.fill();
     this.ctx.strokeStyle = STYLE_SYSTEM.PRIMARY;
+    this.ctx.stroke();
+    this.ctx.closePath();
+    this.ctx.restore();
+
+    this.ctx.save();
+    this.ctx.beginPath();
+    for (const point of this.position.sparePoints) {
+      this.ctx.roundRect(
+        point.cx + this.dragCornerRectSize / 2,
+        point.cy + this.dragCornerRectSize / 2,
+        -this.dragCornerRectSize,
+        -this.dragCornerRectSize,
+        4
+      );
+    }
+
+    this.ctx.fillStyle = STYLE_SYSTEM.SECONDARY;
+    this.ctx.fill();
+    this.ctx.strokeStyle = STYLE_SYSTEM.SECONDARY;
     this.ctx.stroke();
     this.ctx.closePath();
     this.ctx.restore();
