@@ -65,10 +65,10 @@ export class Arrow extends BaseComponent<ArrowPosition> {
       }
 
       return {
-        x1: left,
-        y1: top,
-        x2: right,
-        y2: bottom,
+        x1: left - this.totalPadding,
+        y1: top - this.totalPadding,
+        x2: right + this.totalPadding,
+        y2: bottom + this.totalPadding,
       };
     }
 
@@ -162,7 +162,261 @@ export class Arrow extends BaseComponent<ArrowPosition> {
     this.position = nextPosition;
   };
 
-  resizeComponent = (mouseDistance: MousePoint, multiSelectRange: DragRange, edgeDirection: EdgeDirection) => {};
+  resizeComponent = (mouseDistance: MousePoint, multiSelectRange: DragRange, edgeDirection: EdgeDirection) => {
+    if (edgeDirection === "left") {
+      const totalRangeX = Math.abs(multiSelectRange.x2 - multiSelectRange.x1);
+      const newTotalRangeX = totalRangeX - mouseDistance.x;
+      const scale = newTotalRangeX / totalRangeX;
+
+      // Calculate relative positions based on end point of selection area
+      const relativeX1 = this.originPosition.x1 - multiSelectRange.x2;
+      const relativeX2 = this.originPosition.x2 - multiSelectRange.x2;
+
+      const crossPoints = this.originPosition.crossPoints.map((point) => {
+        const relativeCx = point.cx - multiSelectRange.x2;
+        return {
+          cx: multiSelectRange.x2 + relativeCx * scale,
+          cy: point.cy,
+        };
+      });
+
+      // Adjust all points with the same scale
+      this.position = {
+        ...this.position,
+        x1: multiSelectRange.x2 + relativeX1 * scale,
+        x2: multiSelectRange.x2 + relativeX2 * scale,
+        crossPoints,
+      };
+    }
+
+    if (edgeDirection === "right") {
+      const totalRangeX = Math.abs(multiSelectRange.x2 - multiSelectRange.x1);
+      const newTotalRangeX = totalRangeX + mouseDistance.x;
+      const scale = newTotalRangeX / totalRangeX;
+
+      // Calculate relative positions based on start point of selection area
+      const relativeX1 = this.originPosition.x1 - multiSelectRange.x1;
+      const relativeX2 = this.originPosition.x2 - multiSelectRange.x1;
+
+      const crossPoints = this.originPosition.crossPoints.map((point) => {
+        const relativeCx = point.cx - multiSelectRange.x1;
+        return {
+          cx: multiSelectRange.x1 + relativeCx * scale,
+          cy: point.cy,
+        };
+      });
+
+      // Adjust all points with the same scale
+      this.position = {
+        ...this.position,
+        x1: multiSelectRange.x1 + relativeX1 * scale,
+        x2: multiSelectRange.x1 + relativeX2 * scale,
+        crossPoints,
+      };
+    }
+
+    if (edgeDirection === "top") {
+      const totalRangeY = Math.abs(multiSelectRange.y2 - multiSelectRange.y1);
+      const newTotalRangeY = totalRangeY - mouseDistance.y;
+      const scale = newTotalRangeY / totalRangeY;
+
+      // Calculate relative positions based on end point of selection area
+      const relativeY1 = this.originPosition.y1 - multiSelectRange.y2;
+      const relativeY2 = this.originPosition.y2 - multiSelectRange.y2;
+
+      const crossPoints = this.originPosition.crossPoints.map((point) => {
+        const relativeCy = point.cy - multiSelectRange.y2;
+        return {
+          cx: point.cx,
+          cy: multiSelectRange.y2 + relativeCy * scale,
+        };
+      });
+
+      // Adjust all points with the same scale
+      this.position = {
+        ...this.position,
+        y1: multiSelectRange.y2 + relativeY1 * scale,
+        y2: multiSelectRange.y2 + relativeY2 * scale,
+        crossPoints,
+      };
+    }
+
+    if (edgeDirection === "bottom") {
+      const totalRangeY = Math.abs(multiSelectRange.y2 - multiSelectRange.y1);
+      const newTotalRangeY = totalRangeY + mouseDistance.y;
+      const scale = newTotalRangeY / totalRangeY;
+
+      // Calculate relative positions based on start point of selection area
+      const relativeY1 = this.originPosition.y1 - multiSelectRange.y1;
+      const relativeY2 = this.originPosition.y2 - multiSelectRange.y1;
+
+      const crossPoints = this.originPosition.crossPoints.map((point) => {
+        const relativeCy = point.cy - multiSelectRange.y1;
+        return {
+          cx: point.cx,
+          cy: multiSelectRange.y1 + relativeCy * scale,
+        };
+      });
+
+      // Adjust all points with the same scale
+      this.position = {
+        ...this.position,
+        y1: multiSelectRange.y1 + relativeY1 * scale,
+        y2: multiSelectRange.y1 + relativeY2 * scale,
+        crossPoints,
+      };
+    }
+
+    if (edgeDirection === "top-left") {
+      // Horizontal scale
+      const totalRangeX = Math.abs(multiSelectRange.x2 - multiSelectRange.x1);
+      const newTotalRangeX = totalRangeX - mouseDistance.x;
+      const scaleX = newTotalRangeX / totalRangeX;
+
+      // Vertical scale
+      const totalRangeY = Math.abs(multiSelectRange.y2 - multiSelectRange.y1);
+      const newTotalRangeY = totalRangeY - mouseDistance.y;
+      const scaleY = newTotalRangeY / totalRangeY;
+
+      // Calculate relative positions based on bottom-right corner
+      const relativeX1 = this.originPosition.x1 - multiSelectRange.x2;
+      const relativeY1 = this.originPosition.y1 - multiSelectRange.y2;
+      const relativeX2 = this.originPosition.x2 - multiSelectRange.x2;
+      const relativeY2 = this.originPosition.y2 - multiSelectRange.y2;
+
+      const crossPoints = this.originPosition.crossPoints.map((point) => {
+        const relativeCx = point.cx - multiSelectRange.x2;
+        const relativeCy = point.cy - multiSelectRange.y2;
+        return {
+          cx: multiSelectRange.x2 + relativeCx * scaleX,
+          cy: multiSelectRange.y2 + relativeCy * scaleY,
+        };
+      });
+
+      // Adjust all points with both scales
+      this.position = {
+        ...this.position,
+        x1: multiSelectRange.x2 + relativeX1 * scaleX,
+        y1: multiSelectRange.y2 + relativeY1 * scaleY,
+        x2: multiSelectRange.x2 + relativeX2 * scaleX,
+        y2: multiSelectRange.y2 + relativeY2 * scaleY,
+        crossPoints,
+      };
+    }
+
+    // Top-right corner resize
+    if (edgeDirection === "top-right") {
+      // Horizontal scale
+      const totalRangeX = Math.abs(multiSelectRange.x2 - multiSelectRange.x1);
+      const newTotalRangeX = totalRangeX + mouseDistance.x;
+      const scaleX = newTotalRangeX / totalRangeX;
+
+      // Vertical scale
+      const totalRangeY = Math.abs(multiSelectRange.y2 - multiSelectRange.y1);
+      const newTotalRangeY = totalRangeY - mouseDistance.y;
+      const scaleY = newTotalRangeY / totalRangeY;
+
+      // Calculate relative positions
+      const relativeX1 = this.originPosition.x1 - multiSelectRange.x1;
+      const relativeY1 = this.originPosition.y1 - multiSelectRange.y2;
+      const relativeX2 = this.originPosition.x2 - multiSelectRange.x1;
+      const relativeY2 = this.originPosition.y2 - multiSelectRange.y2;
+
+      const crossPoints = this.originPosition.crossPoints.map((point) => {
+        const relativeCx = point.cx - multiSelectRange.x1;
+        const relativeCy = point.cy - multiSelectRange.y2;
+        return {
+          cx: multiSelectRange.x1 + relativeCx * scaleX,
+          cy: multiSelectRange.y2 + relativeCy * scaleY,
+        };
+      });
+
+      // Adjust all points with both scales
+      this.position = {
+        ...this.position,
+        x1: multiSelectRange.x1 + relativeX1 * scaleX,
+        y1: multiSelectRange.y2 + relativeY1 * scaleY,
+        x2: multiSelectRange.x1 + relativeX2 * scaleX,
+        y2: multiSelectRange.y2 + relativeY2 * scaleY,
+        crossPoints,
+      };
+    }
+
+    if (edgeDirection === "bottom-left") {
+      // Horizontal scale
+      const totalRangeX = Math.abs(multiSelectRange.x2 - multiSelectRange.x1);
+      const newTotalRangeX = totalRangeX - mouseDistance.x;
+      const scaleX = newTotalRangeX / totalRangeX;
+
+      // Vertical scale
+      const totalRangeY = Math.abs(multiSelectRange.y2 - multiSelectRange.y1);
+      const newTotalRangeY = totalRangeY + mouseDistance.y;
+      const scaleY = newTotalRangeY / totalRangeY;
+
+      // Calculate relative positions
+      const relativeX1 = this.originPosition.x1 - multiSelectRange.x2;
+      const relativeY1 = this.originPosition.y1 - multiSelectRange.y1;
+      const relativeX2 = this.originPosition.x2 - multiSelectRange.x2;
+      const relativeY2 = this.originPosition.y2 - multiSelectRange.y1;
+
+      const crossPoints = this.originPosition.crossPoints.map((point) => {
+        const relativeCx = point.cx - multiSelectRange.x2;
+        const relativeCy = point.cy - multiSelectRange.y1;
+        return {
+          cx: multiSelectRange.x2 + relativeCx * scaleX,
+          cy: multiSelectRange.y1 + relativeCy * scaleY,
+        };
+      });
+
+      // Adjust all points with both scales
+      this.position = {
+        ...this.position,
+        x1: multiSelectRange.x2 + relativeX1 * scaleX,
+        y1: multiSelectRange.y1 + relativeY1 * scaleY,
+        x2: multiSelectRange.x2 + relativeX2 * scaleX,
+        y2: multiSelectRange.y1 + relativeY2 * scaleY,
+        crossPoints,
+      };
+    }
+
+    // Bottom-right corner resize
+    if (edgeDirection === "bottom-right") {
+      // Horizontal scale
+      const totalRangeX = Math.abs(multiSelectRange.x2 - multiSelectRange.x1);
+      const newTotalRangeX = totalRangeX + mouseDistance.x;
+      const scaleX = newTotalRangeX / totalRangeX;
+
+      // Vertical scale
+      const totalRangeY = Math.abs(multiSelectRange.y2 - multiSelectRange.y1);
+      const newTotalRangeY = totalRangeY + mouseDistance.y;
+      const scaleY = newTotalRangeY / totalRangeY;
+
+      // Calculate relative positions based on top-left corner
+      const relativeX1 = this.originPosition.x1 - multiSelectRange.x1;
+      const relativeY1 = this.originPosition.y1 - multiSelectRange.y1;
+      const relativeX2 = this.originPosition.x2 - multiSelectRange.x1;
+      const relativeY2 = this.originPosition.y2 - multiSelectRange.y1;
+
+      const crossPoints = this.originPosition.crossPoints.map((point) => {
+        const relativeCx = point.cx - multiSelectRange.x1;
+        const relativeCy = point.cy - multiSelectRange.y1;
+        return {
+          cx: multiSelectRange.x1 + relativeCx * scaleX,
+          cy: multiSelectRange.y1 + relativeCy * scaleY,
+        };
+      });
+
+      // Adjust all points with both scales
+      this.position = {
+        ...this.position,
+        x1: multiSelectRange.x1 + relativeX1 * scaleX,
+        y1: multiSelectRange.y1 + relativeY1 * scaleY,
+        x2: multiSelectRange.x1 + relativeX2 * scaleX,
+        y2: multiSelectRange.y1 + relativeY2 * scaleY,
+        crossPoints,
+      };
+    }
+  };
 
   getMultiSelectHoverZone = (mouse: MousePoint): EdgeDirection | "inside" | "outside" => {
     const { x1: left, x2: right, y1: top, y2: bottom } = this.position;
