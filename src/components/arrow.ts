@@ -174,7 +174,15 @@ export class Arrow extends BaseComponent<ArrowPosition> {
       };
     });
 
+    const sparePoints = this.originPosition.sparePoints.map(({ cx, cy }) => {
+      return {
+        cx: cx + move.x,
+        cy: cy + move.y,
+      };
+    });
+
     nextPosition.crossPoints = crossPoints;
+    nextPosition.sparePoints = sparePoints;
 
     this.position = nextPosition;
   };
@@ -195,12 +203,20 @@ export class Arrow extends BaseComponent<ArrowPosition> {
           cy: point.cy,
         };
       });
+      const sparePoints = this.originPosition.sparePoints.map((point) => {
+        const relativeCx = point.cx - multiSelectRange.x2;
+        return {
+          cx: multiSelectRange.x2 + relativeCx * scale,
+          cy: point.cy,
+        };
+      });
 
       this.position = {
         ...this.position,
         x1: multiSelectRange.x2 + relativeX1 * scale,
         x2: multiSelectRange.x2 + relativeX2 * scale,
         crossPoints,
+        sparePoints,
       };
     }
 
@@ -219,12 +235,20 @@ export class Arrow extends BaseComponent<ArrowPosition> {
           cy: point.cy,
         };
       });
+      const sparePoints = this.originPosition.sparePoints.map((point) => {
+        const relativeCx = point.cx - multiSelectRange.x1;
+        return {
+          cx: multiSelectRange.x1 + relativeCx * scale,
+          cy: point.cy,
+        };
+      });
 
       this.position = {
         ...this.position,
         x1: multiSelectRange.x1 + relativeX1 * scale,
         x2: multiSelectRange.x1 + relativeX2 * scale,
         crossPoints,
+        sparePoints,
       };
     }
 
@@ -243,12 +267,20 @@ export class Arrow extends BaseComponent<ArrowPosition> {
           cy: multiSelectRange.y2 + relativeCy * scale,
         };
       });
+      const sparePoints = this.originPosition.sparePoints.map((point) => {
+        const relativeCy = point.cy - multiSelectRange.y2;
+        return {
+          cx: point.cx,
+          cy: multiSelectRange.y2 + relativeCy * scale,
+        };
+      });
 
       this.position = {
         ...this.position,
         y1: multiSelectRange.y2 + relativeY1 * scale,
         y2: multiSelectRange.y2 + relativeY2 * scale,
         crossPoints,
+        sparePoints,
       };
     }
 
@@ -267,12 +299,20 @@ export class Arrow extends BaseComponent<ArrowPosition> {
           cy: multiSelectRange.y1 + relativeCy * scale,
         };
       });
+      const sparePoints = this.originPosition.sparePoints.map((point) => {
+        const relativeCy = point.cy - multiSelectRange.y1;
+        return {
+          cx: point.cx,
+          cy: multiSelectRange.y1 + relativeCy * scale,
+        };
+      });
 
       this.position = {
         ...this.position,
         y1: multiSelectRange.y1 + relativeY1 * scale,
         y2: multiSelectRange.y1 + relativeY2 * scale,
         crossPoints,
+        sparePoints,
       };
     }
 
@@ -298,6 +338,14 @@ export class Arrow extends BaseComponent<ArrowPosition> {
           cy: multiSelectRange.y2 + relativeCy * scaleY,
         };
       });
+      const sparePoints = this.originPosition.sparePoints.map((point) => {
+        const relativeCx = point.cx - multiSelectRange.x2;
+        const relativeCy = point.cy - multiSelectRange.y2;
+        return {
+          cx: multiSelectRange.x2 + relativeCx * scaleX,
+          cy: multiSelectRange.y2 + relativeCy * scaleY,
+        };
+      });
 
       this.position = {
         ...this.position,
@@ -306,6 +354,7 @@ export class Arrow extends BaseComponent<ArrowPosition> {
         x2: multiSelectRange.x2 + relativeX2 * scaleX,
         y2: multiSelectRange.y2 + relativeY2 * scaleY,
         crossPoints,
+        sparePoints,
       };
     }
 
@@ -331,6 +380,14 @@ export class Arrow extends BaseComponent<ArrowPosition> {
           cy: multiSelectRange.y2 + relativeCy * scaleY,
         };
       });
+      const sparePoints = this.originPosition.sparePoints.map((point) => {
+        const relativeCx = point.cx - multiSelectRange.x1;
+        const relativeCy = point.cy - multiSelectRange.y2;
+        return {
+          cx: multiSelectRange.x1 + relativeCx * scaleX,
+          cy: multiSelectRange.y2 + relativeCy * scaleY,
+        };
+      });
 
       this.position = {
         ...this.position,
@@ -339,6 +396,7 @@ export class Arrow extends BaseComponent<ArrowPosition> {
         x2: multiSelectRange.x1 + relativeX2 * scaleX,
         y2: multiSelectRange.y2 + relativeY2 * scaleY,
         crossPoints,
+        sparePoints,
       };
     }
 
@@ -364,6 +422,14 @@ export class Arrow extends BaseComponent<ArrowPosition> {
           cy: multiSelectRange.y1 + relativeCy * scaleY,
         };
       });
+      const sparePoints = this.originPosition.sparePoints.map((point) => {
+        const relativeCx = point.cx - multiSelectRange.x2;
+        const relativeCy = point.cy - multiSelectRange.y1;
+        return {
+          cx: multiSelectRange.x2 + relativeCx * scaleX,
+          cy: multiSelectRange.y1 + relativeCy * scaleY,
+        };
+      });
 
       this.position = {
         ...this.position,
@@ -372,6 +438,7 @@ export class Arrow extends BaseComponent<ArrowPosition> {
         x2: multiSelectRange.x2 + relativeX2 * scaleX,
         y2: multiSelectRange.y1 + relativeY2 * scaleY,
         crossPoints,
+        sparePoints,
       };
     }
 
@@ -397,6 +464,14 @@ export class Arrow extends BaseComponent<ArrowPosition> {
           cy: multiSelectRange.y1 + relativeCy * scaleY,
         };
       });
+      const sparePoints = this.originPosition.sparePoints.map((point) => {
+        const relativeCx = point.cx - multiSelectRange.x1;
+        const relativeCy = point.cy - multiSelectRange.y1;
+        return {
+          cx: multiSelectRange.x1 + relativeCx * scaleX,
+          cy: multiSelectRange.y1 + relativeCy * scaleY,
+        };
+      });
 
       this.position = {
         ...this.position,
@@ -405,6 +480,7 @@ export class Arrow extends BaseComponent<ArrowPosition> {
         x2: multiSelectRange.x1 + relativeX2 * scaleX,
         y2: multiSelectRange.y1 + relativeY2 * scaleY,
         crossPoints,
+        sparePoints,
       };
     }
   };
