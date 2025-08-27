@@ -23,6 +23,8 @@ export class Arrow extends BaseComponent<ArrowPosition> {
   private dragCornerRectSize = 7.5;
   private totalPadding = 10;
   private dragCornorRectSize = 10;
+  private moveCornorPoint = -1;
+  private hoverPosition: { position: MousePoint } | null = null;
 
   constructor({ canvas, ctx, position, type, getZoomTransform }: Props<ArrowPosition>) {
     super({ canvas, ctx, position, getZoomTransform });
@@ -145,7 +147,17 @@ export class Arrow extends BaseComponent<ArrowPosition> {
     return false;
   };
 
-  hoverComponent = (e: MouseEvent, move: MousePoint) => {};
+  hoverComponent = (e: MouseEvent, move: MousePoint) => {
+    if (!this.isActive) return;
+
+    const { point, coordinates } = this.getMouseHitControlPoint(move);
+
+    if (point > -1) {
+      this.hoverPosition = { position: coordinates as MousePoint };
+    } else {
+      this.hoverPosition = null;
+    }
+  };
 
   moveComponent = (e: MouseEvent, move: MousePoint) => {
     const { x: moveX, y: moveY } = move;
@@ -697,7 +709,23 @@ export class Arrow extends BaseComponent<ArrowPosition> {
     this.ctx.restore();
   };
 
+  private hoverPointEffect = () => {
+    if (!this.hoverPosition) return;
+
+    this.ctx.save();
+    this.ctx.beginPath();
+    this.ctx.roundRect(this.hoverPosition.position.x - 7.5, this.hoverPosition.position.y - 7.5, 15, 15, 10);
+    this.ctx.fillStyle = STYLE_SYSTEM.PRIMARY;
+    this.ctx.fill();
+    this.ctx.closePath();
+    this.ctx.restore();
+  };
+
   draw = () => {
+    if (this.hoverPosition) {
+      this.hoverPointEffect();
+    }
+
     if (this.type === "line") {
       this.drawDefaultLine();
     }
@@ -710,5 +738,41 @@ export class Arrow extends BaseComponent<ArrowPosition> {
       this.dragEffect();
       this.dragCornorEffect();
     }
+  };
+
+  private getMouseHitControlPoint = (mousePosition: MousePoint) => {
+    const { x: mouseX, y: mouseY } = mousePosition;
+
+    const points = [
+      { x: this.position.x1, y: this.position.y1 },
+      ...this.position.crossPoints.map(({ cx, cy }) => ({ x: cx, y: cy })),
+      ...this.position.sparePoints.map(({ cx, cy }) => ({ x: cx, y: cy })),
+      { x: this.position.x2, y: this.position.y2 },
+    ];
+
+    const hoveredPointIndex = points.findIndex(({ x, y }) => {
+      return (
+        mouseX >= x - this.dragCornerRectSize / 2 &&
+        mouseX < x + this.dragCornerRectSize / 2 &&
+        mouseY >= y - this.dragCornerRectSize / 2 &&
+        mouseY < y + this.dragCornerRectSize / 2
+      );
+    });
+
+    if (hoveredPointIndex >= 0) {
+      const point = points[hoveredPointIndex];
+      return {
+        point: hoveredPointIndex,
+        coordinates: {
+          x: point.x,
+          y: point.y,
+        },
+      };
+    }
+
+    return {
+      point: -1,
+      coordinates: {},
+    };
   };
 }
