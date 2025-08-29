@@ -1,5 +1,5 @@
 import { LeftMenuManager, MousePoint } from "..";
-import { Arrow } from "../components";
+import { Arrow, ArrowPosition } from "../components";
 import { BaseTool, BaseToolProps } from "./base-tool";
 
 interface ArrowToolProps extends BaseToolProps {
@@ -82,17 +82,19 @@ export class ArrowTool extends BaseTool {
     const spare2Y = cy + (endY - cy) / 2;
 
     const direction = Math.abs(distanceX) >= Math.abs(distanceY) ? "horizontal" : "vertical";
-    let sparePoints: { cx: number; cy: number }[] = [];
+    let sparePoints: ArrowPosition["sparePoints"] = [];
 
     if (direction === "horizontal") {
       sparePoints = [
         {
           cx: spare1X,
           cy: initY,
+          direction,
         },
         {
           cx: spare2X,
           cy: endY,
+          direction,
         },
       ];
     }
@@ -102,10 +104,12 @@ export class ArrowTool extends BaseTool {
         {
           cx: initX,
           cy: spare1Y,
+          direction,
         },
         {
           cx: endX,
           cy: spare2Y,
+          direction,
         },
       ];
     }
@@ -113,6 +117,7 @@ export class ArrowTool extends BaseTool {
     const arrow = new Arrow({
       canvas: this.canvas,
       ctx: this.ctx,
+      direction,
       position: {
         x1: initX,
         y1: initY,

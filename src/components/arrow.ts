@@ -1,10 +1,13 @@
 import { DragRange, EdgeDirection, MousePoint, MouseUtils, STYLE_SYSTEM } from "..";
 import { BaseComponent, BaseComponentProps, BasePosition } from "./base-component";
 
+type Direction = "vertical" | "horizontal";
+
 export interface ArrowPosition extends BasePosition {
   sparePoints: {
     cx: number;
     cy: number;
+    direction: Direction;
   }[];
   crossPoints: {
     cx: number;
@@ -14,6 +17,7 @@ export interface ArrowPosition extends BasePosition {
 
 interface Props<T> extends BaseComponentProps<T> {
   type: "line" | "curve" | "angle";
+  direction: Direction;
 }
 
 export class Arrow extends BaseComponent<ArrowPosition> {
@@ -26,11 +30,13 @@ export class Arrow extends BaseComponent<ArrowPosition> {
   private dragCornorRectSize = 10;
   private moveCornorPoint = -1;
   private hoverPosition: { position: MousePoint } | null = null;
+  private direction: Direction;
 
-  constructor({ canvas, ctx, position, type, getZoomTransform }: Props<ArrowPosition>) {
+  constructor({ canvas, ctx, position, direction, type, getZoomTransform }: Props<ArrowPosition>) {
     super({ canvas, ctx, position, getZoomTransform });
     this.type = type;
     this.isTransformSelect = true;
+    this.direction = direction;
   }
 
   initialPosition = () => {
@@ -198,10 +204,11 @@ export class Arrow extends BaseComponent<ArrowPosition> {
       };
     });
 
-    const sparePoints = this.originPosition.sparePoints.map(({ cx, cy }) => {
+    const sparePoints = this.originPosition.sparePoints.map((point) => {
       return {
-        cx: cx + move.x,
-        cy: cy + move.y,
+        ...point,
+        cx: point.cx + move.x,
+        cy: point.cy + move.y,
       };
     });
 
@@ -230,6 +237,7 @@ export class Arrow extends BaseComponent<ArrowPosition> {
       const sparePoints = this.originPosition.sparePoints.map((point) => {
         const relativeCx = point.cx - multiSelectRange.x2;
         return {
+          ...point,
           cx: multiSelectRange.x2 + relativeCx * scale,
           cy: point.cy,
         };
@@ -262,6 +270,7 @@ export class Arrow extends BaseComponent<ArrowPosition> {
       const sparePoints = this.originPosition.sparePoints.map((point) => {
         const relativeCx = point.cx - multiSelectRange.x1;
         return {
+          ...point,
           cx: multiSelectRange.x1 + relativeCx * scale,
           cy: point.cy,
         };
@@ -294,6 +303,7 @@ export class Arrow extends BaseComponent<ArrowPosition> {
       const sparePoints = this.originPosition.sparePoints.map((point) => {
         const relativeCy = point.cy - multiSelectRange.y2;
         return {
+          ...point,
           cx: point.cx,
           cy: multiSelectRange.y2 + relativeCy * scale,
         };
@@ -326,6 +336,7 @@ export class Arrow extends BaseComponent<ArrowPosition> {
       const sparePoints = this.originPosition.sparePoints.map((point) => {
         const relativeCy = point.cy - multiSelectRange.y1;
         return {
+          ...point,
           cx: point.cx,
           cy: multiSelectRange.y1 + relativeCy * scale,
         };
@@ -366,6 +377,7 @@ export class Arrow extends BaseComponent<ArrowPosition> {
         const relativeCx = point.cx - multiSelectRange.x2;
         const relativeCy = point.cy - multiSelectRange.y2;
         return {
+          ...point,
           cx: multiSelectRange.x2 + relativeCx * scaleX,
           cy: multiSelectRange.y2 + relativeCy * scaleY,
         };
@@ -408,6 +420,7 @@ export class Arrow extends BaseComponent<ArrowPosition> {
         const relativeCx = point.cx - multiSelectRange.x1;
         const relativeCy = point.cy - multiSelectRange.y2;
         return {
+          ...point,
           cx: multiSelectRange.x1 + relativeCx * scaleX,
           cy: multiSelectRange.y2 + relativeCy * scaleY,
         };
@@ -450,6 +463,7 @@ export class Arrow extends BaseComponent<ArrowPosition> {
         const relativeCx = point.cx - multiSelectRange.x2;
         const relativeCy = point.cy - multiSelectRange.y1;
         return {
+          ...point,
           cx: multiSelectRange.x2 + relativeCx * scaleX,
           cy: multiSelectRange.y1 + relativeCy * scaleY,
         };
@@ -492,6 +506,7 @@ export class Arrow extends BaseComponent<ArrowPosition> {
         const relativeCx = point.cx - multiSelectRange.x1;
         const relativeCy = point.cy - multiSelectRange.y1;
         return {
+          ...point,
           cx: multiSelectRange.x1 + relativeCx * scaleX,
           cy: multiSelectRange.y1 + relativeCy * scaleY,
         };
@@ -596,47 +611,6 @@ export class Arrow extends BaseComponent<ArrowPosition> {
     return "outside";
   };
 
-  calculateSparePoints = (direction: "vertical" | "horizontal") => {
-    let nextSparePoints: {
-      cx: number;
-      cy: number;
-    }[] = [];
-
-    if (direction === "horizontal") {
-      const totalCx = this.position.x1 + (this.position.x2 - this.position.x1) / 2;
-      const spare1X = this.position.x1 + (totalCx - this.position.x1) / 2;
-      const spare2X = this.position.x2 - (totalCx - this.position.x1) / 2;
-      nextSparePoints = [
-        {
-          cx: spare1X,
-          cy: this.position.y1,
-        },
-        {
-          cx: spare2X,
-          cy: this.position.y2,
-        },
-      ];
-    }
-
-    if (direction === "vertical") {
-      const totalCy = this.position.y1 + (this.position.y2 - this.position.y1) / 2;
-      const spare1Y = this.position.y1 + (totalCy - this.position.y1) / 2;
-      const spare2Y = this.position.y2 - (totalCy - this.position.y1) / 2;
-      nextSparePoints = [
-        {
-          cx: this.position.x1,
-          cy: spare1Y,
-        },
-        {
-          cx: this.position.x2,
-          cy: spare2Y,
-        },
-      ];
-    }
-
-    this.position.sparePoints = [...nextSparePoints];
-  };
-
   multiDragEffect = () => {};
 
   drawDefaultLine = () => {
@@ -678,9 +652,8 @@ export class Arrow extends BaseComponent<ArrowPosition> {
     const headLength = 20;
     const headAngle = Math.PI / 6;
 
-    if (Math.abs(distanceX) >= Math.abs(distanceY)) {
+    if (this.direction === "horizontal") {
       const horizontalDirection = distanceX >= 0 ? "right" : "left";
-      this.calculateSparePoints("horizontal");
 
       this.ctx.save();
       this.ctx.beginPath();
@@ -715,7 +688,6 @@ export class Arrow extends BaseComponent<ArrowPosition> {
       return;
     } else {
       const verticalDirection = distanceY >= 0 ? "down" : "up";
-      this.calculateSparePoints("vertical");
 
       this.ctx.save();
       this.ctx.beginPath();
