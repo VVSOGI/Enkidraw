@@ -126,6 +126,7 @@ export class ArrowTool extends BaseTool {
           {
             cx,
             cy,
+            direction: direction === "horizontal" ? "vertical" : "horizontal",
           },
         ],
         x2: endX,

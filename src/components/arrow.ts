@@ -12,6 +12,7 @@ export interface ArrowPosition extends BasePosition {
   crossPoints: {
     cx: number;
     cy: number;
+    direction: Direction;
   }[];
 }
 
@@ -197,10 +198,11 @@ export class Arrow extends BaseComponent<ArrowPosition> {
     nextPosition.x2 = this.originPosition.x2 + moveX;
     nextPosition.y2 = this.originPosition.y2 + moveY;
 
-    const crossPoints = this.originPosition.crossPoints.map(({ cx, cy }) => {
+    const crossPoints = this.originPosition.crossPoints.map((point) => {
       return {
-        cx: cx + move.x,
-        cy: cy + move.y,
+        ...point,
+        cx: point.cx + move.x,
+        cy: point.cy + move.y,
       };
     });
 
@@ -230,6 +232,7 @@ export class Arrow extends BaseComponent<ArrowPosition> {
       const crossPoints = this.originPosition.crossPoints.map((point) => {
         const relativeCx = point.cx - multiSelectRange.x2;
         return {
+          ...point,
           cx: multiSelectRange.x2 + relativeCx * scale,
           cy: point.cy,
         };
@@ -263,6 +266,7 @@ export class Arrow extends BaseComponent<ArrowPosition> {
       const crossPoints = this.originPosition.crossPoints.map((point) => {
         const relativeCx = point.cx - multiSelectRange.x1;
         return {
+          ...point,
           cx: multiSelectRange.x1 + relativeCx * scale,
           cy: point.cy,
         };
@@ -296,6 +300,7 @@ export class Arrow extends BaseComponent<ArrowPosition> {
       const crossPoints = this.originPosition.crossPoints.map((point) => {
         const relativeCy = point.cy - multiSelectRange.y2;
         return {
+          ...point,
           cx: point.cx,
           cy: multiSelectRange.y2 + relativeCy * scale,
         };
@@ -329,6 +334,7 @@ export class Arrow extends BaseComponent<ArrowPosition> {
       const crossPoints = this.originPosition.crossPoints.map((point) => {
         const relativeCy = point.cy - multiSelectRange.y1;
         return {
+          ...point,
           cx: point.cx,
           cy: multiSelectRange.y1 + relativeCy * scale,
         };
@@ -369,6 +375,7 @@ export class Arrow extends BaseComponent<ArrowPosition> {
         const relativeCx = point.cx - multiSelectRange.x2;
         const relativeCy = point.cy - multiSelectRange.y2;
         return {
+          ...point,
           cx: multiSelectRange.x2 + relativeCx * scaleX,
           cy: multiSelectRange.y2 + relativeCy * scaleY,
         };
@@ -412,6 +419,7 @@ export class Arrow extends BaseComponent<ArrowPosition> {
         const relativeCx = point.cx - multiSelectRange.x1;
         const relativeCy = point.cy - multiSelectRange.y2;
         return {
+          ...point,
           cx: multiSelectRange.x1 + relativeCx * scaleX,
           cy: multiSelectRange.y2 + relativeCy * scaleY,
         };
@@ -455,6 +463,7 @@ export class Arrow extends BaseComponent<ArrowPosition> {
         const relativeCx = point.cx - multiSelectRange.x2;
         const relativeCy = point.cy - multiSelectRange.y1;
         return {
+          ...point,
           cx: multiSelectRange.x2 + relativeCx * scaleX,
           cy: multiSelectRange.y1 + relativeCy * scaleY,
         };
@@ -498,6 +507,7 @@ export class Arrow extends BaseComponent<ArrowPosition> {
         const relativeCx = point.cx - multiSelectRange.x1;
         const relativeCy = point.cy - multiSelectRange.y1;
         return {
+          ...point,
           cx: multiSelectRange.x1 + relativeCx * scaleX,
           cy: multiSelectRange.y1 + relativeCy * scaleY,
         };
