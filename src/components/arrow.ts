@@ -534,27 +534,25 @@ export class Arrow extends BaseComponent<ArrowPosition> {
     const firstSpare = {
       x:
         this.direction === "horizontal"
-          ? this.position.x1 + (this.position.crossPoints[0].cx - this.position.x1) / 2 + this.dragCornerRectSize / 2
-          : this.position.x1 + this.dragCornerRectSize / 2,
+          ? this.position.x1 + (this.position.crossPoints[0].cx - this.position.x1) / 2
+          : this.position.x1,
       y:
         this.direction === "vertical"
-          ? this.position.y1 + (this.position.crossPoints[0].cy - this.position.y1) / 2 + this.dragCornerRectSize / 2
-          : this.position.y1 + this.dragCornerRectSize / 2,
+          ? this.position.y1 + (this.position.crossPoints[0].cy - this.position.y1) / 2
+          : this.position.y1,
     };
 
     const secondSpare = {
       x:
         this.direction === "horizontal"
           ? this.position.crossPoints[this.position.crossPoints.length - 1].cx +
-            (this.position.x2 - this.position.crossPoints[this.position.crossPoints.length - 1].cx) / 2 +
-            this.dragCornerRectSize / 2
-          : this.position.x2 + this.dragCornerRectSize / 2,
+            (this.position.x2 - this.position.crossPoints[this.position.crossPoints.length - 1].cx) / 2
+          : this.position.x2,
       y:
         this.direction === "vertical"
           ? this.position.crossPoints[this.position.crossPoints.length - 1].cy +
-            (this.position.y2 - this.position.crossPoints[this.position.crossPoints.length - 1].cy) / 2 +
-            this.dragCornerRectSize / 2
-          : this.position.y2 + this.dragCornerRectSize / 2,
+            (this.position.y2 - this.position.crossPoints[this.position.crossPoints.length - 1].cy) / 2
+          : this.position.y2,
     };
 
     return {
@@ -735,8 +733,20 @@ export class Arrow extends BaseComponent<ArrowPosition> {
     this.ctx.beginPath();
     const { firstSpare, secondSpare } = this.getCircleSpare();
 
-    this.ctx.roundRect(firstSpare.x, firstSpare.y, -this.dragCornerRectSize, -this.dragCornerRectSize, 4);
-    this.ctx.roundRect(secondSpare.x, secondSpare.y, -this.dragCornerRectSize, -this.dragCornerRectSize, 4);
+    this.ctx.roundRect(
+      firstSpare.x + this.dragCornerRectSize / 2,
+      firstSpare.y + this.dragCornerRectSize / 2,
+      -this.dragCornerRectSize,
+      -this.dragCornerRectSize,
+      4
+    );
+    this.ctx.roundRect(
+      secondSpare.x + this.dragCornerRectSize / 2,
+      secondSpare.y + this.dragCornerRectSize / 2,
+      -this.dragCornerRectSize,
+      -this.dragCornerRectSize,
+      4
+    );
 
     this.ctx.fillStyle = STYLE_SYSTEM.SECONDARY;
     this.ctx.fill();
@@ -802,7 +812,13 @@ export class Arrow extends BaseComponent<ArrowPosition> {
 
     this.ctx.save();
     this.ctx.beginPath();
-    this.ctx.roundRect(this.hoverPosition.position.x - 7.5, this.hoverPosition.position.y - 7.5, 15, 15, 10);
+    this.ctx.roundRect(
+      this.hoverPosition.position.x - this.dragCornerRectSize,
+      this.hoverPosition.position.y - this.dragCornerRectSize,
+      15,
+      15,
+      10
+    );
     this.ctx.fillStyle = STYLE_SYSTEM.PRIMARY;
     this.ctx.fill();
     this.ctx.closePath();
