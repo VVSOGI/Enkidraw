@@ -1,4 +1,4 @@
-import { DragRange, EdgeDirection, MathUtils, MousePoint, MouseUtils, STYLE_SYSTEM } from "..";
+import { DragRange, EdgeDirection, MousePoint, MouseUtils, STYLE_SYSTEM } from "..";
 import { BaseComponent, BaseComponentProps, BasePosition } from "./base-component";
 
 export interface ArrowPosition extends BasePosition {
@@ -42,6 +42,8 @@ export class Arrow extends BaseComponent<ArrowPosition> {
       crossPoints: this.position.crossPoints.map((point) => ({ ...point })),
       sparePoints: this.position.sparePoints.map((point) => ({ ...point })),
     };
+
+    this.moveCornorPoint = -1;
   };
 
   getPosition = () => {
@@ -121,6 +123,8 @@ export class Arrow extends BaseComponent<ArrowPosition> {
 
     if (this.isActive) {
       const { x: mouseX, y: mouseY } = MouseUtils.getLogicalMousePos(e, this.canvas, transform);
+      const { point, coordinates } = this.getMouseHitControlPoint({ x: mouseX, y: mouseY });
+      this.moveCornorPoint = point;
 
       if (
         mouseX >= x1 - this.totalPadding - this.dragCornorRectSize / 2 &&
@@ -163,6 +167,25 @@ export class Arrow extends BaseComponent<ArrowPosition> {
   moveComponent = (e: MouseEvent, move: MousePoint) => {
     const { x: moveX, y: moveY } = move;
     const nextPosition = Object.assign({}, this.position);
+
+    if (this.moveCornorPoint >= 0) {
+      const points = [
+        { x: this.position.x1, y: this.position.y1 },
+        { x: this.position.sparePoints[0].cx, y: this.position.sparePoints[0].cy },
+        ...this.position.crossPoints.map(({ cx, cy }) => ({ x: cx, y: cy })),
+        { x: this.position.sparePoints[1].cx, y: this.position.sparePoints[1].cy },
+        { x: this.position.x2, y: this.position.y2 },
+      ];
+
+      if (this.moveCornorPoint === 1) {
+        return;
+      }
+
+      if (this.moveCornorPoint === points.length - 2) {
+        return;
+      }
+    }
+
     nextPosition.x1 = this.originPosition.x1 + moveX;
     nextPosition.y1 = this.originPosition.y1 + moveY;
     nextPosition.x2 = this.originPosition.x2 + moveX;
@@ -868,8 +891,9 @@ export class Arrow extends BaseComponent<ArrowPosition> {
 
     const points = [
       { x: this.position.x1, y: this.position.y1 },
+      { x: this.position.sparePoints[0].cx, y: this.position.sparePoints[0].cy },
       ...this.position.crossPoints.map(({ cx, cy }) => ({ x: cx, y: cy })),
-      ...this.position.sparePoints.map(({ cx, cy }) => ({ x: cx, y: cy })),
+      { x: this.position.sparePoints[1].cx, y: this.position.sparePoints[1].cy },
       { x: this.position.x2, y: this.position.y2 },
     ];
 
