@@ -4,11 +4,6 @@ import { BaseComponent, BaseComponentProps, BasePosition } from "./base-componen
 type Direction = "vertical" | "horizontal";
 
 export interface ArrowPosition extends BasePosition {
-  sparePoints: {
-    cx: number;
-    cy: number;
-    direction: Direction;
-  }[];
   crossPoints: {
     cx: number;
     cy: number;
@@ -47,7 +42,6 @@ export class Arrow extends BaseComponent<ArrowPosition> {
       x2: this.position.x2,
       y2: this.position.y2,
       crossPoints: this.position.crossPoints.map((point) => ({ ...point })),
-      sparePoints: this.position.sparePoints.map((point) => ({ ...point })),
     };
 
     this.moveCornorPoint = -1;
@@ -178,9 +172,7 @@ export class Arrow extends BaseComponent<ArrowPosition> {
     if (this.moveCornorPoint >= 0) {
       const points = [
         { x: this.position.x1, y: this.position.y1 },
-        { x: this.position.sparePoints[0].cx, y: this.position.sparePoints[0].cy },
         ...this.position.crossPoints.map(({ cx, cy }) => ({ x: cx, y: cy })),
-        { x: this.position.sparePoints[1].cx, y: this.position.sparePoints[1].cy },
         { x: this.position.x2, y: this.position.y2 },
       ];
 
@@ -191,6 +183,8 @@ export class Arrow extends BaseComponent<ArrowPosition> {
       if (this.moveCornorPoint === points.length - 2) {
         return;
       }
+
+      return;
     }
 
     nextPosition.x1 = this.originPosition.x1 + moveX;
@@ -206,16 +200,7 @@ export class Arrow extends BaseComponent<ArrowPosition> {
       };
     });
 
-    const sparePoints = this.originPosition.sparePoints.map((point) => {
-      return {
-        ...point,
-        cx: point.cx + move.x,
-        cy: point.cy + move.y,
-      };
-    });
-
     nextPosition.crossPoints = crossPoints;
-    nextPosition.sparePoints = sparePoints;
 
     this.position = nextPosition;
   };
@@ -237,21 +222,12 @@ export class Arrow extends BaseComponent<ArrowPosition> {
           cy: point.cy,
         };
       });
-      const sparePoints = this.originPosition.sparePoints.map((point) => {
-        const relativeCx = point.cx - multiSelectRange.x2;
-        return {
-          ...point,
-          cx: multiSelectRange.x2 + relativeCx * scale,
-          cy: point.cy,
-        };
-      });
 
       this.position = {
         ...this.position,
         x1: multiSelectRange.x2 + relativeX1 * scale,
         x2: multiSelectRange.x2 + relativeX2 * scale,
         crossPoints,
-        sparePoints,
       };
     }
 
@@ -271,21 +247,12 @@ export class Arrow extends BaseComponent<ArrowPosition> {
           cy: point.cy,
         };
       });
-      const sparePoints = this.originPosition.sparePoints.map((point) => {
-        const relativeCx = point.cx - multiSelectRange.x1;
-        return {
-          ...point,
-          cx: multiSelectRange.x1 + relativeCx * scale,
-          cy: point.cy,
-        };
-      });
 
       this.position = {
         ...this.position,
         x1: multiSelectRange.x1 + relativeX1 * scale,
         x2: multiSelectRange.x1 + relativeX2 * scale,
         crossPoints,
-        sparePoints,
       };
     }
 
@@ -305,21 +272,12 @@ export class Arrow extends BaseComponent<ArrowPosition> {
           cy: multiSelectRange.y2 + relativeCy * scale,
         };
       });
-      const sparePoints = this.originPosition.sparePoints.map((point) => {
-        const relativeCy = point.cy - multiSelectRange.y2;
-        return {
-          ...point,
-          cx: point.cx,
-          cy: multiSelectRange.y2 + relativeCy * scale,
-        };
-      });
 
       this.position = {
         ...this.position,
         y1: multiSelectRange.y2 + relativeY1 * scale,
         y2: multiSelectRange.y2 + relativeY2 * scale,
         crossPoints,
-        sparePoints,
       };
     }
 
@@ -339,21 +297,12 @@ export class Arrow extends BaseComponent<ArrowPosition> {
           cy: multiSelectRange.y1 + relativeCy * scale,
         };
       });
-      const sparePoints = this.originPosition.sparePoints.map((point) => {
-        const relativeCy = point.cy - multiSelectRange.y1;
-        return {
-          ...point,
-          cx: point.cx,
-          cy: multiSelectRange.y1 + relativeCy * scale,
-        };
-      });
 
       this.position = {
         ...this.position,
         y1: multiSelectRange.y1 + relativeY1 * scale,
         y2: multiSelectRange.y1 + relativeY2 * scale,
         crossPoints,
-        sparePoints,
       };
     }
 
@@ -380,15 +329,6 @@ export class Arrow extends BaseComponent<ArrowPosition> {
           cy: multiSelectRange.y2 + relativeCy * scaleY,
         };
       });
-      const sparePoints = this.originPosition.sparePoints.map((point) => {
-        const relativeCx = point.cx - multiSelectRange.x2;
-        const relativeCy = point.cy - multiSelectRange.y2;
-        return {
-          ...point,
-          cx: multiSelectRange.x2 + relativeCx * scaleX,
-          cy: multiSelectRange.y2 + relativeCy * scaleY,
-        };
-      });
 
       this.position = {
         ...this.position,
@@ -397,7 +337,6 @@ export class Arrow extends BaseComponent<ArrowPosition> {
         x2: multiSelectRange.x2 + relativeX2 * scaleX,
         y2: multiSelectRange.y2 + relativeY2 * scaleY,
         crossPoints,
-        sparePoints,
       };
     }
 
@@ -424,15 +363,6 @@ export class Arrow extends BaseComponent<ArrowPosition> {
           cy: multiSelectRange.y2 + relativeCy * scaleY,
         };
       });
-      const sparePoints = this.originPosition.sparePoints.map((point) => {
-        const relativeCx = point.cx - multiSelectRange.x1;
-        const relativeCy = point.cy - multiSelectRange.y2;
-        return {
-          ...point,
-          cx: multiSelectRange.x1 + relativeCx * scaleX,
-          cy: multiSelectRange.y2 + relativeCy * scaleY,
-        };
-      });
 
       this.position = {
         ...this.position,
@@ -441,7 +371,6 @@ export class Arrow extends BaseComponent<ArrowPosition> {
         x2: multiSelectRange.x1 + relativeX2 * scaleX,
         y2: multiSelectRange.y2 + relativeY2 * scaleY,
         crossPoints,
-        sparePoints,
       };
     }
 
@@ -468,15 +397,6 @@ export class Arrow extends BaseComponent<ArrowPosition> {
           cy: multiSelectRange.y1 + relativeCy * scaleY,
         };
       });
-      const sparePoints = this.originPosition.sparePoints.map((point) => {
-        const relativeCx = point.cx - multiSelectRange.x2;
-        const relativeCy = point.cy - multiSelectRange.y1;
-        return {
-          ...point,
-          cx: multiSelectRange.x2 + relativeCx * scaleX,
-          cy: multiSelectRange.y1 + relativeCy * scaleY,
-        };
-      });
 
       this.position = {
         ...this.position,
@@ -485,7 +405,6 @@ export class Arrow extends BaseComponent<ArrowPosition> {
         x2: multiSelectRange.x2 + relativeX2 * scaleX,
         y2: multiSelectRange.y1 + relativeY2 * scaleY,
         crossPoints,
-        sparePoints,
       };
     }
 
@@ -512,15 +431,6 @@ export class Arrow extends BaseComponent<ArrowPosition> {
           cy: multiSelectRange.y1 + relativeCy * scaleY,
         };
       });
-      const sparePoints = this.originPosition.sparePoints.map((point) => {
-        const relativeCx = point.cx - multiSelectRange.x1;
-        const relativeCy = point.cy - multiSelectRange.y1;
-        return {
-          ...point,
-          cx: multiSelectRange.x1 + relativeCx * scaleX,
-          cy: multiSelectRange.y1 + relativeCy * scaleY,
-        };
-      });
 
       this.position = {
         ...this.position,
@@ -529,7 +439,6 @@ export class Arrow extends BaseComponent<ArrowPosition> {
         x2: multiSelectRange.x1 + relativeX2 * scaleX,
         y2: multiSelectRange.y1 + relativeY2 * scaleY,
         crossPoints,
-        sparePoints,
       };
     }
   };
@@ -621,6 +530,39 @@ export class Arrow extends BaseComponent<ArrowPosition> {
     return "outside";
   };
 
+  getCircleSpare = () => {
+    const firstSpare = {
+      x:
+        this.direction === "horizontal"
+          ? this.position.x1 + (this.position.crossPoints[0].cx - this.position.x1) / 2 + this.dragCornerRectSize / 2
+          : this.position.x1 + this.dragCornerRectSize / 2,
+      y:
+        this.direction === "vertical"
+          ? this.position.y1 + (this.position.crossPoints[0].cy - this.position.y1) / 2 + this.dragCornerRectSize / 2
+          : this.position.y1 + this.dragCornerRectSize / 2,
+    };
+
+    const secondSpare = {
+      x:
+        this.direction === "horizontal"
+          ? this.position.crossPoints[this.position.crossPoints.length - 1].cx +
+            (this.position.x2 - this.position.crossPoints[this.position.crossPoints.length - 1].cx) / 2 +
+            this.dragCornerRectSize / 2
+          : this.position.x2 + this.dragCornerRectSize / 2,
+      y:
+        this.direction === "vertical"
+          ? this.position.crossPoints[this.position.crossPoints.length - 1].cy +
+            (this.position.y2 - this.position.crossPoints[this.position.crossPoints.length - 1].cy) / 2 +
+            this.dragCornerRectSize / 2
+          : this.position.y2 + this.dragCornerRectSize / 2,
+    };
+
+    return {
+      firstSpare,
+      secondSpare,
+    };
+  };
+
   multiDragEffect = () => {};
 
   drawDefaultLine = () => {
@@ -661,6 +603,19 @@ export class Arrow extends BaseComponent<ArrowPosition> {
     const centerY = this.position.y1 + distanceY / 2;
     const headLength = 20;
     const headAngle = Math.PI / 6;
+    const points = [
+      {
+        x: this.position.x1,
+        y: this.position.y1,
+        direction: this.direction,
+      },
+      ...this.position.crossPoints.map((point) => ({ x: point.cx, y: point.cy, direction: point.direction })),
+      {
+        x: this.position.x2,
+        y: this.position.y2,
+        direction: this.direction,
+      },
+    ];
 
     if (this.direction === "horizontal") {
       const horizontalDirection = distanceX >= 0 ? "right" : "left";
@@ -670,10 +625,20 @@ export class Arrow extends BaseComponent<ArrowPosition> {
       this.ctx.strokeStyle = this.color;
       this.ctx.lineWidth = this.lineWidth;
       this.ctx.lineCap = "round";
-      this.ctx.moveTo(this.position.x1, this.position.y1);
-      this.ctx.lineTo(centerX, this.position.y1);
-      this.ctx.lineTo(centerX, this.position.y2);
-      this.ctx.lineTo(this.position.x2, this.position.y2);
+      this.ctx.moveTo(points[0].x, points[0].y);
+
+      for (let i = 0; i < points.length - 1; i++) {
+        const { x: currentX, y: currentY, direction } = points[i];
+        const { x: nextX, y: nextY } = points[i + 1];
+
+        if (direction === "horizontal") {
+          this.ctx.lineTo(nextX, currentY);
+        } else {
+          this.ctx.lineTo(currentX, nextY);
+        }
+      }
+
+      this.ctx.lineTo(points[points.length - 1].x, points[points.length - 1].y);
 
       if (horizontalDirection === "right") {
         this.ctx.moveTo(this.position.x2, this.position.y2);
@@ -741,6 +706,7 @@ export class Arrow extends BaseComponent<ArrowPosition> {
       -this.dragCornerRectSize,
       4
     );
+
     for (const point of this.position.crossPoints) {
       this.ctx.roundRect(
         point.cx + this.dragCornerRectSize / 2,
@@ -767,16 +733,10 @@ export class Arrow extends BaseComponent<ArrowPosition> {
 
     this.ctx.save();
     this.ctx.beginPath();
+    const { firstSpare, secondSpare } = this.getCircleSpare();
 
-    for (const point of this.position.sparePoints) {
-      this.ctx.roundRect(
-        point.cx + this.dragCornerRectSize / 2,
-        point.cy + this.dragCornerRectSize / 2,
-        -this.dragCornerRectSize,
-        -this.dragCornerRectSize,
-        4
-      );
-    }
+    this.ctx.roundRect(firstSpare.x, firstSpare.y, -this.dragCornerRectSize, -this.dragCornerRectSize, 4);
+    this.ctx.roundRect(secondSpare.x, secondSpare.y, -this.dragCornerRectSize, -this.dragCornerRectSize, 4);
 
     this.ctx.fillStyle = STYLE_SYSTEM.SECONDARY;
     this.ctx.fill();
@@ -871,11 +831,13 @@ export class Arrow extends BaseComponent<ArrowPosition> {
   private getMouseHitControlPoint = (mousePosition: MousePoint) => {
     const { x: mouseX, y: mouseY } = mousePosition;
 
+    const { firstSpare, secondSpare } = this.getCircleSpare();
+
     const points = [
       { x: this.position.x1, y: this.position.y1 },
-      { x: this.position.sparePoints[0].cx, y: this.position.sparePoints[0].cy },
+      firstSpare,
       ...this.position.crossPoints.map(({ cx, cy }) => ({ x: cx, y: cy })),
-      { x: this.position.sparePoints[1].cx, y: this.position.sparePoints[1].cy },
+      secondSpare,
       { x: this.position.x2, y: this.position.y2 },
     ];
 

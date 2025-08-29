@@ -82,37 +82,6 @@ export class ArrowTool extends BaseTool {
     const spare2Y = cy + (endY - cy) / 2;
 
     const direction = Math.abs(distanceX) >= Math.abs(distanceY) ? "horizontal" : "vertical";
-    let sparePoints: ArrowPosition["sparePoints"] = [];
-
-    if (direction === "horizontal") {
-      sparePoints = [
-        {
-          cx: spare1X,
-          cy: initY,
-          direction,
-        },
-        {
-          cx: spare2X,
-          cy: endY,
-          direction,
-        },
-      ];
-    }
-
-    if (direction === "vertical") {
-      sparePoints = [
-        {
-          cx: initX,
-          cy: spare1Y,
-          direction,
-        },
-        {
-          cx: endX,
-          cy: spare2Y,
-          direction,
-        },
-      ];
-    }
 
     const arrow = new Arrow({
       canvas: this.canvas,
@@ -121,7 +90,6 @@ export class ArrowTool extends BaseTool {
       position: {
         x1: initX,
         y1: initY,
-        sparePoints,
         crossPoints: [
           {
             cx,
