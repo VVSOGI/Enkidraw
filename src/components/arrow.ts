@@ -46,6 +46,7 @@ export class Arrow extends BaseComponent<ArrowPosition> {
     };
 
     this.moveCornorPoint = -1;
+    this.isMovePoint = false;
   };
 
   getPosition = () => {
@@ -171,35 +172,6 @@ export class Arrow extends BaseComponent<ArrowPosition> {
     const nextPosition = Object.assign({}, this.position);
 
     if (this.moveCornorPoint >= 0) {
-      const { firstSpare, secondSpare } = this.getCircleSpare();
-      const points = [
-        { x: this.position.x1, y: this.position.y1 },
-        firstSpare,
-        ...this.position.crossPoints.map(({ cx, cy, direction }) => ({ x: cx, y: cy, direction })),
-        secondSpare,
-        { x: this.position.x2, y: this.position.y2 },
-      ];
-
-      if (this.moveCornorPoint === 1) {
-        return;
-      }
-
-      if (this.moveCornorPoint === points.length - 2) {
-        if (!this.isMovePoint) {
-          const nextDirection = this.direction === "horizontal" ? "vertical" : "horizontal";
-          const nextPosition: ArrowPosition["crossPoints"][0] = {
-            cx: points[this.moveCornorPoint].x,
-            cy: points[this.moveCornorPoint].y,
-            direction: nextDirection,
-          };
-
-          this.isMovePoint = true;
-
-          this.position.crossPoints.push(nextPosition);
-        }
-        return;
-      }
-
       return;
     }
 
@@ -546,26 +518,26 @@ export class Arrow extends BaseComponent<ArrowPosition> {
     return "outside";
   };
 
-  getCircleSpare = () => {
+  getCircleSpare = (direction?: Direction) => {
     const firstSpare = {
       x:
-        this.direction === "horizontal"
+        direction || this.direction === "horizontal"
           ? this.position.x1 + (this.position.crossPoints[0].cx - this.position.x1) / 2
           : this.position.x1,
       y:
-        this.direction === "vertical"
+        direction || this.direction === "vertical"
           ? this.position.y1 + (this.position.crossPoints[0].cy - this.position.y1) / 2
           : this.position.y1,
     };
 
     const secondSpare = {
       x:
-        this.direction === "horizontal"
+        direction || this.direction === "horizontal"
           ? this.position.crossPoints[this.position.crossPoints.length - 1].cx +
             (this.position.x2 - this.position.crossPoints[this.position.crossPoints.length - 1].cx) / 2
           : this.position.x2,
       y:
-        this.direction === "vertical"
+        direction || this.direction === "vertical"
           ? this.position.crossPoints[this.position.crossPoints.length - 1].cy +
             (this.position.y2 - this.position.crossPoints[this.position.crossPoints.length - 1].cy) / 2
           : this.position.y2,
@@ -747,6 +719,7 @@ export class Arrow extends BaseComponent<ArrowPosition> {
 
     this.ctx.save();
     this.ctx.beginPath();
+
     const { firstSpare, secondSpare } = this.getCircleSpare();
 
     this.ctx.roundRect(
