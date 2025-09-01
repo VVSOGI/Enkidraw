@@ -27,6 +27,7 @@ export class Arrow extends BaseComponent<ArrowPosition> {
   private moveCornorPoint = -1;
   private hoverPosition: { position: MousePoint } | null = null;
   private direction: Direction;
+  private isMovePoint: boolean = false;
 
   constructor({ canvas, ctx, position, direction, type, getZoomTransform }: Props<ArrowPosition>) {
     super({ canvas, ctx, position, getZoomTransform });
@@ -170,9 +171,12 @@ export class Arrow extends BaseComponent<ArrowPosition> {
     const nextPosition = Object.assign({}, this.position);
 
     if (this.moveCornorPoint >= 0) {
+      const { firstSpare, secondSpare } = this.getCircleSpare();
       const points = [
         { x: this.position.x1, y: this.position.y1 },
-        ...this.position.crossPoints.map(({ cx, cy }) => ({ x: cx, y: cy })),
+        firstSpare,
+        ...this.position.crossPoints.map(({ cx, cy, direction }) => ({ x: cx, y: cy, direction })),
+        secondSpare,
         { x: this.position.x2, y: this.position.y2 },
       ];
 
@@ -181,6 +185,18 @@ export class Arrow extends BaseComponent<ArrowPosition> {
       }
 
       if (this.moveCornorPoint === points.length - 2) {
+        if (!this.isMovePoint) {
+          const nextDirection = this.direction === "horizontal" ? "vertical" : "horizontal";
+          const nextPosition: ArrowPosition["crossPoints"][0] = {
+            cx: points[this.moveCornorPoint].x,
+            cy: points[this.moveCornorPoint].y,
+            direction: nextDirection,
+          };
+
+          this.isMovePoint = true;
+
+          this.position.crossPoints.push(nextPosition);
+        }
         return;
       }
 
