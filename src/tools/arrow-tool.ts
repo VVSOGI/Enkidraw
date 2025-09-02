@@ -76,17 +76,15 @@ export class ArrowTool extends BaseTool {
     const distanceY = endY - initY;
     const cx = initX + distanceX / 2;
     const cy = initY + distanceY / 2;
-    const spare1X = initX + (cx - initX) / 2;
-    const spare2X = cx + (endX - cx) / 2;
-    const spare1Y = initY + (cy - initY) / 2;
-    const spare2Y = cy + (endY - cy) / 2;
 
     const direction = Math.abs(distanceX) >= Math.abs(distanceY) ? "horizontal" : "vertical";
 
     const arrow = new Arrow({
       canvas: this.canvas,
       ctx: this.ctx,
-      direction,
+      totalDirection: direction,
+      startDirection: direction,
+      endDirection: direction,
       position: {
         x1: initX,
         y1: initY,

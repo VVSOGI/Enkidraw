@@ -13,7 +13,9 @@ export interface ArrowPosition extends BasePosition {
 
 interface Props<T> extends BaseComponentProps<T> {
   type: "line" | "curve" | "angle";
-  direction: Direction;
+  totalDirection: Direction;
+  startDirection: Direction;
+  endDirection: Direction;
 }
 
 export class Arrow extends BaseComponent<ArrowPosition> {
@@ -26,14 +28,27 @@ export class Arrow extends BaseComponent<ArrowPosition> {
   private dragCornorRectSize = 10;
   private moveCornorPoint = -1;
   private hoverPosition: { position: MousePoint } | null = null;
-  private direction: Direction;
+  private totalDirection: Direction;
+  private startDirection: Direction;
+  private endDirection: Direction;
   private isMovePoint: boolean = false;
 
-  constructor({ canvas, ctx, position, direction, type, getZoomTransform }: Props<ArrowPosition>) {
+  constructor({
+    canvas,
+    ctx,
+    position,
+    totalDirection,
+    startDirection,
+    endDirection,
+    type,
+    getZoomTransform,
+  }: Props<ArrowPosition>) {
     super({ canvas, ctx, position, getZoomTransform });
     this.type = type;
     this.isTransformSelect = true;
-    this.direction = direction;
+    this.totalDirection = totalDirection;
+    this.startDirection = startDirection;
+    this.endDirection = endDirection;
   }
 
   initialPosition = () => {
@@ -176,11 +191,11 @@ export class Arrow extends BaseComponent<ArrowPosition> {
       const { firstSpare, secondSpare } = this.getCircleSpare();
 
       const points = [
-        { x: this.position.x1, y: this.position.y1, direction: this.direction },
+        { x: this.position.x1, y: this.position.y1, direction: this.totalDirection },
         { x: firstSpare.cx, y: firstSpare.cy, direction: firstSpare.direction },
         ...crossPoints.map(({ cx, cy, direction }) => ({ x: cx, y: cy, direction })),
         { x: secondSpare.cx, y: secondSpare.cy, direction: secondSpare.direction },
-        { x: this.position.x2, y: this.position.y2, direction: this.direction },
+        { x: this.position.x2, y: this.position.y2, direction: this.totalDirection },
       ];
 
       if (this.moveCornorPoint === 0) {
@@ -203,6 +218,7 @@ export class Arrow extends BaseComponent<ArrowPosition> {
           this.isMovePoint = true;
           this.position.crossPoints.unshift(Object.assign({}, nextPosition));
           this.originPosition.crossPoints.unshift(Object.assign({}, nextPosition));
+          this.startDirection = this.startDirection === "horizontal" ? "vertical" : "horizontal";
         }
 
         if (target) {
@@ -719,17 +735,17 @@ export class Arrow extends BaseComponent<ArrowPosition> {
       {
         x: this.position.x1,
         y: this.position.y1,
-        direction: this.direction,
+        direction: this.startDirection,
       },
       ...this.position.crossPoints.map((point) => ({ x: point.cx, y: point.cy, direction: point.direction })),
       {
         x: this.position.x2,
         y: this.position.y2,
-        direction: this.direction,
+        direction: this.endDirection,
       },
     ];
 
-    if (this.direction === "horizontal") {
+    if (this.totalDirection === "horizontal") {
       const horizontalDirection = distanceX >= 0 ? "right" : "left";
 
       this.ctx.save();
