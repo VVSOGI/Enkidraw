@@ -183,6 +183,10 @@ export class Arrow extends BaseComponent<ArrowPosition> {
         { x: this.position.x2, y: this.position.y2, direction: this.direction },
       ];
 
+      const positionTargetIndex = this.moveCornorPoint - 2;
+      const target = this.position.crossPoints[positionTargetIndex];
+      const originTarget = this.originPosition.crossPoints[positionTargetIndex];
+
       if (this.moveCornorPoint === 0) {
         return;
       }
@@ -210,36 +214,14 @@ export class Arrow extends BaseComponent<ArrowPosition> {
         }
       }
 
-      const positionTargetIndex = this.moveCornorPoint - 2;
-      const target = this.position.crossPoints[positionTargetIndex];
-      const originTarget = this.originPosition.crossPoints[positionTargetIndex];
+      if (target) {
+        this.updateNeighborPoints(crossPoints, points, positionTargetIndex, this.moveCornorPoint);
 
-      if (target.direction === "vertical") {
-        if (crossPoints.length > 1 && positionTargetIndex > 0) {
-          const targetBefore = this.position.crossPoints[positionTargetIndex - 1];
-          const targetAfter = this.position.crossPoints[positionTargetIndex + 1];
-          const beforeVertical = points[this.moveCornorPoint - 2];
-          const afterVertical = points[this.moveCornorPoint + 2];
-          targetBefore.cx = beforeVertical.x + (target.cx - beforeVertical.x) / 2;
-
-          if (targetAfter) {
-            targetAfter.cx = target.cx + (afterVertical.x - target.cx) / 2;
-          }
+        if (target.direction === "vertical") {
+          target.cx = originTarget.cx + moveX;
+        } else {
+          target.cy = originTarget.cy + moveY;
         }
-        target.cx = originTarget.cx + moveX;
-      } else {
-        if (crossPoints.length > 1 && positionTargetIndex > 0) {
-          const targetBefore = this.position.crossPoints[positionTargetIndex - 1];
-          const targetAfter = this.position.crossPoints[positionTargetIndex + 1];
-          const beforeHorizontal = points[this.moveCornorPoint - 2];
-          const afterHorizontal = points[this.moveCornorPoint + 2];
-          targetBefore.cy = beforeHorizontal.y + (target.cy - beforeHorizontal.y) / 2;
-
-          if (targetAfter) {
-            targetAfter.cy = target.cy + (afterHorizontal.y - target.cy) / 2;
-          }
-        }
-        target.cy = originTarget.cy + moveY;
       }
 
       return;
@@ -261,6 +243,44 @@ export class Arrow extends BaseComponent<ArrowPosition> {
     nextPosition.crossPoints = crossPoints;
 
     this.position = nextPosition;
+  };
+
+  private updateNeighborPoints = (
+    crossPoints: ArrowPosition["crossPoints"],
+    points: { x: number; y: number; direction: Direction }[],
+    positionTargetIndex: number,
+    moveCornorPoint: number
+  ) => {
+    console.log(crossPoints, positionTargetIndex);
+    if (crossPoints.length <= 1) {
+      return;
+    }
+
+    const target = crossPoints[positionTargetIndex];
+    const targetBefore = crossPoints[positionTargetIndex - 1];
+    const targetAfter = crossPoints[positionTargetIndex + 1];
+
+    if (target.direction === "vertical") {
+      if (targetBefore) {
+        const beforePoint = points[moveCornorPoint - 2];
+        targetBefore.cx = beforePoint.x + (target.cx - beforePoint.x) / 2;
+      }
+
+      if (targetAfter) {
+        const afterPoint = points[moveCornorPoint + 2];
+        targetAfter.cx = target.cx + (afterPoint.x - target.cx) / 2;
+      }
+    } else {
+      if (targetBefore) {
+        const beforePoint = points[moveCornorPoint - 2];
+        targetBefore.cy = beforePoint.y + (target.cy - beforePoint.y) / 2;
+      }
+
+      if (targetAfter) {
+        const afterPoint = points[moveCornorPoint + 2];
+        targetAfter.cy = target.cy + (afterPoint.y - target.cy) / 2;
+      }
+    }
   };
 
   resizeComponent = (mouseDistance: MousePoint, multiSelectRange: DragRange, edgeDirection: EdgeDirection) => {
