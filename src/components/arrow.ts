@@ -183,21 +183,48 @@ export class Arrow extends BaseComponent<ArrowPosition> {
         { x: this.position.x2, y: this.position.y2, direction: this.direction },
       ];
 
-      const positionTargetIndex = this.moveCornorPoint - 2;
-      const target = this.position.crossPoints[positionTargetIndex];
-      const originTarget = this.originPosition.crossPoints[positionTargetIndex];
-
       if (this.moveCornorPoint === 0) {
         return;
       }
 
       if (this.moveCornorPoint === 1) {
+        const positionTargetIndex = this.moveCornorPoint - 1;
+        const target = this.position.crossPoints[positionTargetIndex];
+        const originTarget = this.originPosition.crossPoints[positionTargetIndex];
+
+        const nextDirection = points[this.moveCornorPoint + 1].direction === "horizontal" ? "vertical" : "horizontal";
+        const nextPosition: ArrowPosition["crossPoints"][0] = {
+          cx: points[this.moveCornorPoint].x,
+          cy: points[this.moveCornorPoint].y,
+          direction: nextDirection,
+        };
+
+        if (!this.isMovePoint) {
+          this.isMovePoint = true;
+          this.position.crossPoints.unshift(Object.assign({}, nextPosition));
+          this.originPosition.crossPoints.unshift(Object.assign({}, nextPosition));
+        }
+
+        if (target) {
+          this.updateNeighborPoints(crossPoints, points, positionTargetIndex, this.moveCornorPoint);
+
+          if (target.direction === "vertical") {
+            target.cx = originTarget.cx + moveX;
+          } else {
+            target.cy = originTarget.cy + moveY;
+          }
+        }
+
         return;
       }
 
       if (this.moveCornorPoint === points.length - 1) {
         return;
       }
+
+      const positionTargetIndex = this.moveCornorPoint - 2;
+      const target = this.position.crossPoints[positionTargetIndex];
+      const originTarget = this.originPosition.crossPoints[positionTargetIndex];
 
       if (this.moveCornorPoint === points.length - 2) {
         const nextDirection = points[this.moveCornorPoint - 1].direction === "horizontal" ? "vertical" : "horizontal";
@@ -251,7 +278,6 @@ export class Arrow extends BaseComponent<ArrowPosition> {
     positionTargetIndex: number,
     moveCornorPoint: number
   ) => {
-    console.log(crossPoints, positionTargetIndex);
     if (crossPoints.length <= 1) {
       return;
     }
@@ -261,23 +287,25 @@ export class Arrow extends BaseComponent<ArrowPosition> {
     const targetAfter = crossPoints[positionTargetIndex + 1];
 
     if (target.direction === "vertical") {
-      if (targetBefore) {
-        const beforePoint = points[moveCornorPoint - 2];
+      const beforePoint = points[moveCornorPoint - 2];
+      const afterPoint = points[moveCornorPoint + 2];
+
+      if (targetBefore && beforePoint) {
         targetBefore.cx = beforePoint.x + (target.cx - beforePoint.x) / 2;
       }
 
-      if (targetAfter) {
-        const afterPoint = points[moveCornorPoint + 2];
+      if (targetAfter && afterPoint) {
         targetAfter.cx = target.cx + (afterPoint.x - target.cx) / 2;
       }
     } else {
-      if (targetBefore) {
-        const beforePoint = points[moveCornorPoint - 2];
+      const beforePoint = points[moveCornorPoint - 2];
+      const afterPoint = points[moveCornorPoint + 2];
+
+      if (targetBefore && beforePoint) {
         targetBefore.cy = beforePoint.y + (target.cy - beforePoint.y) / 2;
       }
 
-      if (targetAfter) {
-        const afterPoint = points[moveCornorPoint + 2];
+      if (targetAfter && afterPoint) {
         targetAfter.cy = target.cy + (afterPoint.y - target.cy) / 2;
       }
     }
