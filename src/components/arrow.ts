@@ -176,14 +176,22 @@ export class Arrow extends BaseComponent<ArrowPosition> {
       const { firstSpare, secondSpare } = this.getCircleSpare();
 
       const points = [
-        { x: this.position.x1, y: this.position.y1 },
+        { x: this.position.x1, y: this.position.y1, direction: this.direction },
         { x: firstSpare.cx, y: firstSpare.cy, direction: firstSpare.direction },
         ...crossPoints.map(({ cx, cy, direction }) => ({ x: cx, y: cy, direction })),
         { x: secondSpare.cx, y: secondSpare.cy, direction: secondSpare.direction },
-        { x: this.position.x2, y: this.position.y2 },
+        { x: this.position.x2, y: this.position.y2, direction: this.direction },
       ];
 
+      if (this.moveCornorPoint === 0) {
+        return;
+      }
+
       if (this.moveCornorPoint === 1) {
+        return;
+      }
+
+      if (this.moveCornorPoint === points.length - 1) {
         return;
       }
 
@@ -202,8 +210,26 @@ export class Arrow extends BaseComponent<ArrowPosition> {
         }
       }
 
-      this.position.crossPoints[this.position.crossPoints.length - 1].cy =
-        this.originPosition.crossPoints[this.originPosition.crossPoints.length - 1].cy + moveY;
+      const positionTargetIndex = this.moveCornorPoint - 2;
+      const target = this.position.crossPoints[positionTargetIndex];
+      const originTarget = this.originPosition.crossPoints[positionTargetIndex];
+
+      if (target.direction === "vertical") {
+        if (crossPoints.length > 1 && this.moveCornorPoint > 1) {
+          const targetBefore = this.position.crossPoints[positionTargetIndex - 1];
+          const beforeVertical = points[this.moveCornorPoint - 2];
+          targetBefore.cx = beforeVertical.x + (target.cx - beforeVertical.x) / 2;
+        }
+        target.cx = originTarget.cx + moveX;
+      } else {
+        if (crossPoints.length > 1 && this.moveCornorPoint > 1) {
+          const targetBefore = this.position.crossPoints[positionTargetIndex - 1];
+          const beforeHorizontal = points[this.moveCornorPoint - 2];
+          targetBefore.cy = beforeHorizontal.y + (target.cy - beforeHorizontal.y) / 2;
+        }
+
+        target.cy = originTarget.cy + moveY;
+      }
 
       return;
     }
