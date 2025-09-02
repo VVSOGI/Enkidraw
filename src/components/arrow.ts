@@ -215,19 +215,30 @@ export class Arrow extends BaseComponent<ArrowPosition> {
       const originTarget = this.originPosition.crossPoints[positionTargetIndex];
 
       if (target.direction === "vertical") {
-        if (crossPoints.length > 1 && this.moveCornorPoint > 1) {
+        if (crossPoints.length > 1 && positionTargetIndex > 0) {
           const targetBefore = this.position.crossPoints[positionTargetIndex - 1];
+          const targetAfter = this.position.crossPoints[positionTargetIndex + 1];
           const beforeVertical = points[this.moveCornorPoint - 2];
+          const afterVertical = points[this.moveCornorPoint + 2];
           targetBefore.cx = beforeVertical.x + (target.cx - beforeVertical.x) / 2;
+
+          if (targetAfter) {
+            targetAfter.cx = target.cx + (afterVertical.x - target.cx) / 2;
+          }
         }
         target.cx = originTarget.cx + moveX;
       } else {
-        if (crossPoints.length > 1 && this.moveCornorPoint > 1) {
+        if (crossPoints.length > 1 && positionTargetIndex > 0) {
           const targetBefore = this.position.crossPoints[positionTargetIndex - 1];
+          const targetAfter = this.position.crossPoints[positionTargetIndex + 1];
           const beforeHorizontal = points[this.moveCornorPoint - 2];
+          const afterHorizontal = points[this.moveCornorPoint + 2];
           targetBefore.cy = beforeHorizontal.y + (target.cy - beforeHorizontal.y) / 2;
-        }
 
+          if (targetAfter) {
+            targetAfter.cy = target.cy + (afterHorizontal.y - target.cy) / 2;
+          }
+        }
         target.cy = originTarget.cy + moveY;
       }
 
