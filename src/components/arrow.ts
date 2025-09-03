@@ -24,7 +24,7 @@ export class Arrow extends BaseComponent<ArrowPosition> {
   lineWidth = 5;
 
   private dragCornerRectSize = 7.5;
-  private totalPadding = 10;
+  private totalPadding = 15;
   private dragCornorRectSize = 10;
   private moveCornorPoint = -1;
   private hoverPosition: { position: MousePoint } | null = null;
