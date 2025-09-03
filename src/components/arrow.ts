@@ -218,11 +218,11 @@ export class Arrow extends BaseComponent<ArrowPosition> {
           this.isMovePoint = true;
           this.position.crossPoints.unshift(Object.assign({}, nextPosition));
           this.originPosition.crossPoints.unshift(Object.assign({}, nextPosition));
-          this.startDirection = this.startDirection === "horizontal" ? "vertical" : "horizontal";
+          this.startDirection = points[1].direction === "horizontal" ? "vertical" : "horizontal";
         }
 
         if (target) {
-          this.updateNeighborPoints(crossPoints, points, positionTargetIndex, this.moveCornorPoint);
+          this.updateNeighborPoints(crossPoints, points, positionTargetIndex, this.moveCornorPoint + 1);
 
           if (target.direction === "vertical") {
             target.cx = originTarget.cx + moveX;
@@ -254,6 +254,7 @@ export class Arrow extends BaseComponent<ArrowPosition> {
           this.isMovePoint = true;
           this.position.crossPoints.push(Object.assign({}, nextPosition));
           this.originPosition.crossPoints.push(Object.assign({}, nextPosition));
+          this.endDirection = points[points.length - 2].direction === "horizontal" ? "vertical" : "horizontal";
         }
       }
 
@@ -288,7 +289,7 @@ export class Arrow extends BaseComponent<ArrowPosition> {
     this.position = nextPosition;
   };
 
-  private updateNeighborPoints = (
+  updateNeighborPoints = (
     crossPoints: ArrowPosition["crossPoints"],
     points: { x: number; y: number; direction: Direction }[],
     positionTargetIndex: number,
@@ -747,6 +748,7 @@ export class Arrow extends BaseComponent<ArrowPosition> {
 
     if (this.totalDirection === "horizontal") {
       const horizontalDirection = distanceX >= 0 ? "right" : "left";
+      const verticalDirection = distanceY >= 0 ? "down" : "up";
 
       this.ctx.save();
       this.ctx.beginPath();
@@ -768,25 +770,35 @@ export class Arrow extends BaseComponent<ArrowPosition> {
 
       this.ctx.lineTo(points[points.length - 1].x, points[points.length - 1].y);
 
-      if (horizontalDirection === "right") {
-        this.ctx.moveTo(this.position.x2, this.position.y2);
-        this.ctx.lineTo(this.position.x2 - headLength, this.position.y2 - headLength * headAngle);
-        this.ctx.moveTo(this.position.x2, this.position.y2);
-        this.ctx.lineTo(this.position.x2 - headLength, this.position.y2 + headLength * headAngle);
-        this.ctx.stroke();
-        this.ctx.closePath();
-        this.ctx.restore();
+      if (this.endDirection === "horizontal") {
+        if (horizontalDirection === "right") {
+          this.ctx.moveTo(this.position.x2, this.position.y2);
+          this.ctx.lineTo(this.position.x2 - headLength, this.position.y2 - headLength * headAngle);
+          this.ctx.moveTo(this.position.x2, this.position.y2);
+          this.ctx.lineTo(this.position.x2 - headLength, this.position.y2 + headLength * headAngle);
+        } else {
+          this.ctx.moveTo(this.position.x2, this.position.y2);
+          this.ctx.lineTo(this.position.x2 + headLength, this.position.y2 - headLength * headAngle);
+          this.ctx.moveTo(this.position.x2, this.position.y2);
+          this.ctx.lineTo(this.position.x2 + headLength, this.position.y2 + headLength * headAngle);
+        }
+      } else {
+        if (verticalDirection === "up") {
+          this.ctx.moveTo(this.position.x2, this.position.y2);
+          this.ctx.lineTo(this.position.x2 + headLength * headAngle, this.position.y2 + headLength);
+          this.ctx.moveTo(this.position.x2, this.position.y2);
+          this.ctx.lineTo(this.position.x2 - headLength * headAngle, this.position.y2 + headLength);
+        } else {
+          this.ctx.moveTo(this.position.x2, this.position.y2);
+          this.ctx.lineTo(this.position.x2 + headLength * headAngle, this.position.y2 - headLength);
+          this.ctx.moveTo(this.position.x2, this.position.y2);
+          this.ctx.lineTo(this.position.x2 - headLength * headAngle, this.position.y2 - headLength);
+        }
       }
 
-      if (horizontalDirection === "left") {
-        this.ctx.moveTo(this.position.x2, this.position.y2);
-        this.ctx.lineTo(this.position.x2 + headLength, this.position.y2 - headLength * headAngle);
-        this.ctx.moveTo(this.position.x2, this.position.y2);
-        this.ctx.lineTo(this.position.x2 + headLength, this.position.y2 + headLength * headAngle);
-        this.ctx.stroke();
-        this.ctx.closePath();
-        this.ctx.restore();
-      }
+      this.ctx.stroke();
+      this.ctx.closePath();
+      this.ctx.restore();
 
       return;
     } else {
@@ -807,9 +819,6 @@ export class Arrow extends BaseComponent<ArrowPosition> {
         this.ctx.lineTo(this.position.x2 + headLength * headAngle, this.position.y2 - headLength);
         this.ctx.moveTo(this.position.x2, this.position.y2);
         this.ctx.lineTo(this.position.x2 - headLength * headAngle, this.position.y2 - headLength);
-        this.ctx.stroke();
-        this.ctx.closePath();
-        this.ctx.restore();
       }
 
       if (verticalDirection === "up") {
@@ -817,10 +826,11 @@ export class Arrow extends BaseComponent<ArrowPosition> {
         this.ctx.lineTo(this.position.x2 + headLength * headAngle, this.position.y2 + headLength);
         this.ctx.moveTo(this.position.x2, this.position.y2);
         this.ctx.lineTo(this.position.x2 - headLength * headAngle, this.position.y2 + headLength);
-        this.ctx.stroke();
-        this.ctx.closePath();
-        this.ctx.restore();
       }
+
+      this.ctx.stroke();
+      this.ctx.closePath();
+      this.ctx.restore();
     }
   };
 
