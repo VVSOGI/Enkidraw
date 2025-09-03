@@ -732,13 +732,19 @@ export class Arrow extends BaseComponent<ArrowPosition> {
     const centerY = this.position.y1 + distanceY / 2;
     const headLength = 20;
     const headAngle = Math.PI / 6;
+    const crossPoints = this.position.crossPoints.map((point) => ({
+      x: point.cx,
+      y: point.cy,
+      direction: point.direction,
+    }));
+
     const points = [
       {
         x: this.position.x1,
         y: this.position.y1,
         direction: this.startDirection,
       },
-      ...this.position.crossPoints.map((point) => ({ x: point.cx, y: point.cy, direction: point.direction })),
+      ...crossPoints,
       {
         x: this.position.x2,
         y: this.position.y2,
@@ -747,8 +753,12 @@ export class Arrow extends BaseComponent<ArrowPosition> {
     ];
 
     if (this.totalDirection === "horizontal") {
-      const horizontalDirection = distanceX >= 0 ? "right" : "left";
-      const verticalDirection = distanceY >= 0 ? "down" : "up";
+      const compareBeforeDistanceX = this.position.x2 - crossPoints[crossPoints.length - 1].x;
+      const compareBeforeDistanceY = this.position.y2 - crossPoints[crossPoints.length - 1].y;
+      const horizontalDirection = compareBeforeDistanceX >= 0 ? "right" : "left";
+      const verticalDirection = compareBeforeDistanceY >= 0 ? "down" : "up";
+      const minimumArrowXSize = Math.min(Math.abs(compareBeforeDistanceX), headLength);
+      const minimumArrowYSize = Math.min(Math.abs(compareBeforeDistanceY), headLength);
 
       this.ctx.save();
       this.ctx.beginPath();
@@ -773,26 +783,26 @@ export class Arrow extends BaseComponent<ArrowPosition> {
       if (this.endDirection === "horizontal") {
         if (horizontalDirection === "right") {
           this.ctx.moveTo(this.position.x2, this.position.y2);
-          this.ctx.lineTo(this.position.x2 - headLength, this.position.y2 - headLength * headAngle);
+          this.ctx.lineTo(this.position.x2 - minimumArrowXSize, this.position.y2 - minimumArrowXSize * headAngle);
           this.ctx.moveTo(this.position.x2, this.position.y2);
-          this.ctx.lineTo(this.position.x2 - headLength, this.position.y2 + headLength * headAngle);
+          this.ctx.lineTo(this.position.x2 - minimumArrowXSize, this.position.y2 + minimumArrowXSize * headAngle);
         } else {
           this.ctx.moveTo(this.position.x2, this.position.y2);
-          this.ctx.lineTo(this.position.x2 + headLength, this.position.y2 - headLength * headAngle);
+          this.ctx.lineTo(this.position.x2 + minimumArrowXSize, this.position.y2 - minimumArrowXSize * headAngle);
           this.ctx.moveTo(this.position.x2, this.position.y2);
-          this.ctx.lineTo(this.position.x2 + headLength, this.position.y2 + headLength * headAngle);
+          this.ctx.lineTo(this.position.x2 + minimumArrowXSize, this.position.y2 + minimumArrowXSize * headAngle);
         }
       } else {
         if (verticalDirection === "up") {
           this.ctx.moveTo(this.position.x2, this.position.y2);
-          this.ctx.lineTo(this.position.x2 + headLength * headAngle, this.position.y2 + headLength);
+          this.ctx.lineTo(this.position.x2 + minimumArrowYSize * headAngle, this.position.y2 + minimumArrowYSize);
           this.ctx.moveTo(this.position.x2, this.position.y2);
-          this.ctx.lineTo(this.position.x2 - headLength * headAngle, this.position.y2 + headLength);
+          this.ctx.lineTo(this.position.x2 - minimumArrowYSize * headAngle, this.position.y2 + minimumArrowYSize);
         } else {
           this.ctx.moveTo(this.position.x2, this.position.y2);
-          this.ctx.lineTo(this.position.x2 + headLength * headAngle, this.position.y2 - headLength);
+          this.ctx.lineTo(this.position.x2 + minimumArrowYSize * headAngle, this.position.y2 - minimumArrowYSize);
           this.ctx.moveTo(this.position.x2, this.position.y2);
-          this.ctx.lineTo(this.position.x2 - headLength * headAngle, this.position.y2 - headLength);
+          this.ctx.lineTo(this.position.x2 - minimumArrowYSize * headAngle, this.position.y2 - minimumArrowYSize);
         }
       }
 
