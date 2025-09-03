@@ -726,10 +726,6 @@ export class Arrow extends BaseComponent<ArrowPosition> {
   };
 
   drawAngleLine = () => {
-    const distanceX = this.position.x2 - this.position.x1;
-    const distanceY = this.position.y2 - this.position.y1;
-    const centerX = this.position.x1 + distanceX / 2;
-    const centerY = this.position.y1 + distanceY / 2;
     const headLength = 20;
     const headAngle = Math.PI / 6;
     const crossPoints = this.position.crossPoints.map((point) => ({
@@ -737,6 +733,13 @@ export class Arrow extends BaseComponent<ArrowPosition> {
       y: point.cy,
       direction: point.direction,
     }));
+
+    const compareBeforeDistanceX = this.position.x2 - crossPoints[crossPoints.length - 1].x;
+    const compareBeforeDistanceY = this.position.y2 - crossPoints[crossPoints.length - 1].y;
+    const horizontalDirection = compareBeforeDistanceX >= 0 ? "right" : "left";
+    const verticalDirection = compareBeforeDistanceY >= 0 ? "down" : "up";
+    const minimumArrowXSize = Math.min(Math.abs(compareBeforeDistanceX), headLength);
+    const minimumArrowYSize = Math.min(Math.abs(compareBeforeDistanceY), headLength);
 
     const points = [
       {
@@ -752,96 +755,55 @@ export class Arrow extends BaseComponent<ArrowPosition> {
       },
     ];
 
-    if (this.totalDirection === "horizontal") {
-      const compareBeforeDistanceX = this.position.x2 - crossPoints[crossPoints.length - 1].x;
-      const compareBeforeDistanceY = this.position.y2 - crossPoints[crossPoints.length - 1].y;
-      const horizontalDirection = compareBeforeDistanceX >= 0 ? "right" : "left";
-      const verticalDirection = compareBeforeDistanceY >= 0 ? "down" : "up";
-      const minimumArrowXSize = Math.min(Math.abs(compareBeforeDistanceX), headLength);
-      const minimumArrowYSize = Math.min(Math.abs(compareBeforeDistanceY), headLength);
+    this.ctx.save();
+    this.ctx.beginPath();
+    this.ctx.strokeStyle = this.color;
+    this.ctx.lineWidth = this.lineWidth;
+    this.ctx.lineCap = "round";
+    this.ctx.moveTo(this.position.x1, this.position.y1);
 
-      this.ctx.save();
-      this.ctx.beginPath();
-      this.ctx.strokeStyle = this.color;
-      this.ctx.lineWidth = this.lineWidth;
-      this.ctx.lineCap = "round";
-      this.ctx.moveTo(points[0].x, points[0].y);
+    for (let i = 0; i < points.length - 1; i++) {
+      const { x: currentX, y: currentY, direction } = points[i];
+      const { x: nextX, y: nextY } = points[i + 1];
 
-      for (let i = 0; i < points.length - 1; i++) {
-        const { x: currentX, y: currentY, direction } = points[i];
-        const { x: nextX, y: nextY } = points[i + 1];
-
-        if (direction === "horizontal") {
-          this.ctx.lineTo(nextX, currentY);
-        } else {
-          this.ctx.lineTo(currentX, nextY);
-        }
-      }
-
-      this.ctx.lineTo(points[points.length - 1].x, points[points.length - 1].y);
-
-      if (this.endDirection === "horizontal") {
-        if (horizontalDirection === "right") {
-          this.ctx.moveTo(this.position.x2, this.position.y2);
-          this.ctx.lineTo(this.position.x2 - minimumArrowXSize, this.position.y2 - minimumArrowXSize * headAngle);
-          this.ctx.moveTo(this.position.x2, this.position.y2);
-          this.ctx.lineTo(this.position.x2 - minimumArrowXSize, this.position.y2 + minimumArrowXSize * headAngle);
-        } else {
-          this.ctx.moveTo(this.position.x2, this.position.y2);
-          this.ctx.lineTo(this.position.x2 + minimumArrowXSize, this.position.y2 - minimumArrowXSize * headAngle);
-          this.ctx.moveTo(this.position.x2, this.position.y2);
-          this.ctx.lineTo(this.position.x2 + minimumArrowXSize, this.position.y2 + minimumArrowXSize * headAngle);
-        }
+      if (direction === "horizontal") {
+        this.ctx.lineTo(nextX, currentY);
       } else {
-        if (verticalDirection === "up") {
-          this.ctx.moveTo(this.position.x2, this.position.y2);
-          this.ctx.lineTo(this.position.x2 + minimumArrowYSize * headAngle, this.position.y2 + minimumArrowYSize);
-          this.ctx.moveTo(this.position.x2, this.position.y2);
-          this.ctx.lineTo(this.position.x2 - minimumArrowYSize * headAngle, this.position.y2 + minimumArrowYSize);
-        } else {
-          this.ctx.moveTo(this.position.x2, this.position.y2);
-          this.ctx.lineTo(this.position.x2 + minimumArrowYSize * headAngle, this.position.y2 - minimumArrowYSize);
-          this.ctx.moveTo(this.position.x2, this.position.y2);
-          this.ctx.lineTo(this.position.x2 - minimumArrowYSize * headAngle, this.position.y2 - minimumArrowYSize);
-        }
+        this.ctx.lineTo(currentX, nextY);
       }
+    }
 
-      this.ctx.stroke();
-      this.ctx.closePath();
-      this.ctx.restore();
+    this.ctx.lineTo(points[points.length - 1].x, points[points.length - 1].y);
 
-      return;
+    if (this.endDirection === "horizontal") {
+      if (horizontalDirection === "right") {
+        this.ctx.moveTo(this.position.x2, this.position.y2);
+        this.ctx.lineTo(this.position.x2 - minimumArrowXSize, this.position.y2 - minimumArrowXSize * headAngle);
+        this.ctx.moveTo(this.position.x2, this.position.y2);
+        this.ctx.lineTo(this.position.x2 - minimumArrowXSize, this.position.y2 + minimumArrowXSize * headAngle);
+      } else {
+        this.ctx.moveTo(this.position.x2, this.position.y2);
+        this.ctx.lineTo(this.position.x2 + minimumArrowXSize, this.position.y2 - minimumArrowXSize * headAngle);
+        this.ctx.moveTo(this.position.x2, this.position.y2);
+        this.ctx.lineTo(this.position.x2 + minimumArrowXSize, this.position.y2 + minimumArrowXSize * headAngle);
+      }
     } else {
-      const verticalDirection = distanceY >= 0 ? "down" : "up";
-
-      this.ctx.save();
-      this.ctx.beginPath();
-      this.ctx.strokeStyle = this.color;
-      this.ctx.lineWidth = this.lineWidth;
-      this.ctx.lineCap = "round";
-      this.ctx.moveTo(this.position.x1, this.position.y1);
-      this.ctx.lineTo(this.position.x1, centerY);
-      this.ctx.lineTo(this.position.x2, centerY);
-      this.ctx.lineTo(this.position.x2, this.position.y2);
-
-      if (verticalDirection === "down") {
-        this.ctx.moveTo(this.position.x2, this.position.y2);
-        this.ctx.lineTo(this.position.x2 + headLength * headAngle, this.position.y2 - headLength);
-        this.ctx.moveTo(this.position.x2, this.position.y2);
-        this.ctx.lineTo(this.position.x2 - headLength * headAngle, this.position.y2 - headLength);
-      }
-
       if (verticalDirection === "up") {
         this.ctx.moveTo(this.position.x2, this.position.y2);
-        this.ctx.lineTo(this.position.x2 + headLength * headAngle, this.position.y2 + headLength);
+        this.ctx.lineTo(this.position.x2 + minimumArrowYSize * headAngle, this.position.y2 + minimumArrowYSize);
         this.ctx.moveTo(this.position.x2, this.position.y2);
-        this.ctx.lineTo(this.position.x2 - headLength * headAngle, this.position.y2 + headLength);
+        this.ctx.lineTo(this.position.x2 - minimumArrowYSize * headAngle, this.position.y2 + minimumArrowYSize);
+      } else {
+        this.ctx.moveTo(this.position.x2, this.position.y2);
+        this.ctx.lineTo(this.position.x2 + minimumArrowYSize * headAngle, this.position.y2 - minimumArrowYSize);
+        this.ctx.moveTo(this.position.x2, this.position.y2);
+        this.ctx.lineTo(this.position.x2 - minimumArrowYSize * headAngle, this.position.y2 - minimumArrowYSize);
       }
-
-      this.ctx.stroke();
-      this.ctx.closePath();
-      this.ctx.restore();
     }
+
+    this.ctx.stroke();
+    this.ctx.closePath();
+    this.ctx.restore();
   };
 
   dragEffect = () => {
