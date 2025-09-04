@@ -235,6 +235,19 @@ export class Arrow extends BaseComponent<ArrowPosition> {
       }
 
       if (this.moveCornorPoint === points.length - 1) {
+        nextPosition.x2 = this.originPosition.x2 + moveX;
+        nextPosition.y2 = this.originPosition.y2 + moveY;
+
+        const beforePoint = points[points.length - 4];
+
+        if (this.endDirection === "horizontal") {
+          crossPoints[crossPoints.length - 1].cy = beforePoint.y + (nextPosition.y2 - beforePoint.y) / 2;
+        } else {
+          crossPoints[crossPoints.length - 1].cx = beforePoint.x + (nextPosition.x2 - beforePoint.x) / 2;
+        }
+
+        this.position.crossPoints = [...this.position.crossPoints, ...crossPoints];
+        this.position = nextPosition;
         return;
       }
 
