@@ -104,7 +104,7 @@ export class Arrow extends BaseComponent<ArrowPosition> {
   };
 
   isHover = (e: MouseEvent) => {
-    const { x1, y1, x2, y2 } = this.position;
+    const { x1, y1, x2, y2 } = this.getPosition();
     const transform = this.getZoomTransform();
 
     if (this.isActive) {
@@ -136,7 +136,7 @@ export class Arrow extends BaseComponent<ArrowPosition> {
   };
 
   isClicked = (e: MouseEvent) => {
-    const { x1, y1, x2, y2 } = this.position;
+    const { x1, y1, x2, y2 } = this.getPosition();
     const transform = this.getZoomTransform();
 
     if (this.isActive) {
@@ -593,7 +593,7 @@ export class Arrow extends BaseComponent<ArrowPosition> {
   };
 
   getMultiSelectHoverZone = (mouse: MousePoint): EdgeDirection | "inside" | "outside" => {
-    const { x1: left, x2: right, y1: top, y2: bottom } = this.position;
+    const { x1: left, x2: right, y1: top, y2: bottom } = this.getPosition();
 
     if (
       mouse.x >= left - (this.totalPadding + this.dragCornorRectSize) &&
