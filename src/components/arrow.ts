@@ -898,12 +898,13 @@ export class Arrow extends BaseComponent<ArrowPosition> {
   dragCornorEffect = () => {
     this.ctx.save();
     this.ctx.beginPath();
+    const { x1, x2, y1, y2 } = this.getPosition();
 
-    const width = this.position.x2 - this.position.x1 + this.totalPadding * 2;
-    const height = this.position.y2 - this.position.y1 + this.totalPadding * 2;
+    const width = x2 - x1;
+    const height = y2 - y1;
 
     this.ctx.strokeStyle = STYLE_SYSTEM.PRIMARY;
-    this.ctx.rect(this.position.x1 - this.totalPadding, this.position.y1 - this.totalPadding, width, height);
+    this.ctx.rect(x1, y1, width, height);
     this.ctx.stroke();
     this.ctx.closePath();
     this.ctx.restore();
@@ -911,29 +912,29 @@ export class Arrow extends BaseComponent<ArrowPosition> {
     this.ctx.save();
     this.ctx.beginPath();
     this.ctx.roundRect(
-      this.position.x1 + this.dragCornorRectSize / 2 - this.totalPadding,
-      this.position.y1 + this.dragCornorRectSize / 2 - this.totalPadding,
+      x1 + this.dragCornorRectSize / 2,
+      y1 + this.dragCornorRectSize / 2,
       -this.dragCornorRectSize,
       -this.dragCornorRectSize,
       4
     );
     this.ctx.roundRect(
-      this.position.x2 + this.dragCornorRectSize / 2 + this.totalPadding,
-      this.position.y1 + this.dragCornorRectSize / 2 - this.totalPadding,
+      x2 + this.dragCornorRectSize / 2,
+      y1 + this.dragCornorRectSize / 2,
       -this.dragCornorRectSize,
       -this.dragCornorRectSize,
       4
     );
     this.ctx.roundRect(
-      this.position.x1 + this.dragCornorRectSize / 2 - this.totalPadding,
-      this.position.y2 + this.dragCornorRectSize / 2 + this.totalPadding,
+      x1 + this.dragCornorRectSize / 2,
+      y2 + this.dragCornorRectSize / 2,
       -this.dragCornorRectSize,
       -this.dragCornorRectSize,
       4
     );
     this.ctx.roundRect(
-      this.position.x2 + this.dragCornorRectSize / 2 + this.totalPadding,
-      this.position.y2 + this.dragCornorRectSize / 2 + this.totalPadding,
+      x2 + this.dragCornorRectSize / 2,
+      y2 + this.dragCornorRectSize / 2,
       -this.dragCornorRectSize,
       -this.dragCornorRectSize,
       4
