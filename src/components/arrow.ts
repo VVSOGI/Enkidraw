@@ -111,7 +111,7 @@ export class Arrow extends BaseComponent<ArrowPosition> {
       const { x: mouseX, y: mouseY } = MouseUtils.getLogicalMousePos(e, this.canvas, transform);
 
       if (
-        mouseX >= x1 - this.totalPadding - this.dragCornorRectSize / 2 &&
+        mouseX >= x1 - this.totalPadding - this.dragCornorRectSize &&
         mouseX <= x2 + this.totalPadding + this.dragCornorRectSize / 2 &&
         mouseY >= y1 - this.totalPadding - this.dragCornorRectSize / 2 &&
         mouseY <= y2 + this.totalPadding + this.dragCornorRectSize / 2
@@ -596,82 +596,82 @@ export class Arrow extends BaseComponent<ArrowPosition> {
     const { x1: left, x2: right, y1: top, y2: bottom } = this.position;
 
     if (
-      mouse.x >= left - (this.multiDragPadding + this.dragCornorRectSize) &&
-      mouse.x <= left - this.multiDragPadding &&
-      mouse.y >= top - (this.multiDragPadding + this.dragCornorRectSize) &&
-      mouse.y <= top - this.multiDragPadding
+      mouse.x >= left - (this.totalPadding + this.dragCornorRectSize) &&
+      mouse.x <= left - this.totalPadding &&
+      mouse.y >= top - (this.totalPadding + this.dragCornorRectSize) &&
+      mouse.y <= top - this.totalPadding
     ) {
       return "top-left";
     }
 
     if (
-      mouse.x >= right + this.multiDragPadding &&
-      mouse.x <= right + this.multiDragPadding + this.dragCornorRectSize &&
-      mouse.y >= top - (this.multiDragPadding + this.dragCornorRectSize) &&
-      mouse.y <= top - this.multiDragPadding
+      mouse.x >= right + this.totalPadding &&
+      mouse.x <= right + this.totalPadding + this.dragCornorRectSize &&
+      mouse.y >= top - (this.totalPadding + this.dragCornorRectSize) &&
+      mouse.y <= top - this.totalPadding
     ) {
       return "top-right";
     }
 
     if (
-      mouse.x >= left - (this.multiDragPadding + this.dragCornorRectSize) &&
-      mouse.x <= left - this.multiDragPadding &&
-      mouse.y >= bottom + this.multiDragPadding &&
-      mouse.y <= bottom + this.multiDragPadding + this.dragCornorRectSize
+      mouse.x >= left - (this.totalPadding + this.dragCornorRectSize) &&
+      mouse.x <= left - this.totalPadding &&
+      mouse.y >= bottom + this.totalPadding &&
+      mouse.y <= bottom + this.totalPadding + this.dragCornorRectSize
     ) {
       return "bottom-left";
     }
 
     if (
-      mouse.x >= right + this.multiDragPadding &&
-      mouse.x <= right + this.multiDragPadding + this.dragCornorRectSize &&
-      mouse.y >= bottom + this.multiDragPadding &&
-      mouse.y <= bottom + this.multiDragPadding + this.dragCornorRectSize
+      mouse.x >= right + this.totalPadding &&
+      mouse.x <= right + this.totalPadding + this.dragCornorRectSize &&
+      mouse.y >= bottom + this.totalPadding &&
+      mouse.y <= bottom + this.totalPadding + this.dragCornorRectSize
     ) {
       return "bottom-right";
     }
 
     if (
-      mouse.x >= left - (this.multiDragPadding + this.dragCornorRectSize) &&
-      mouse.x <= left - this.multiDragPadding &&
-      mouse.y > top - this.multiDragPadding &&
-      mouse.y < bottom + this.multiDragPadding
+      mouse.x >= left - (this.totalPadding + this.dragCornorRectSize) &&
+      mouse.x <= left - this.totalPadding &&
+      mouse.y > top - this.totalPadding &&
+      mouse.y < bottom + this.totalPadding
     ) {
       return "left";
     }
 
     if (
-      mouse.x >= right + this.multiDragPadding &&
-      mouse.x <= right + this.multiDragPadding + this.dragCornorRectSize &&
-      mouse.y > top - this.multiDragPadding &&
-      mouse.y < bottom + this.multiDragPadding
+      mouse.x >= right + this.totalPadding &&
+      mouse.x <= right + this.totalPadding + this.dragCornorRectSize &&
+      mouse.y > top - this.totalPadding &&
+      mouse.y < bottom + this.totalPadding
     ) {
       return "right";
     }
 
     if (
-      mouse.x > left - this.multiDragPadding &&
-      mouse.x < right + this.multiDragPadding &&
-      mouse.y >= top - (this.multiDragPadding + this.dragCornorRectSize) &&
-      mouse.y <= top - this.multiDragPadding
+      mouse.x > left - this.totalPadding &&
+      mouse.x < right + this.totalPadding &&
+      mouse.y >= top - (this.totalPadding + this.dragCornorRectSize) &&
+      mouse.y <= top - this.totalPadding
     ) {
       return "top";
     }
 
     if (
-      mouse.x > left - this.multiDragPadding &&
-      mouse.x < right + this.multiDragPadding &&
-      mouse.y >= bottom + this.multiDragPadding &&
-      mouse.y <= bottom + this.multiDragPadding + this.dragCornorRectSize
+      mouse.x > left - this.totalPadding &&
+      mouse.x < right + this.totalPadding &&
+      mouse.y >= bottom + this.totalPadding &&
+      mouse.y <= bottom + this.totalPadding + this.dragCornorRectSize
     ) {
       return "bottom";
     }
 
     if (
-      mouse.x >= left - this.multiDragPadding &&
-      mouse.x <= right + this.multiDragPadding &&
-      mouse.y >= top - this.multiDragPadding &&
-      mouse.y <= bottom + this.multiDragPadding
+      mouse.x >= left - this.totalPadding &&
+      mouse.x <= right + this.totalPadding &&
+      mouse.y >= top - this.totalPadding &&
+      mouse.y <= bottom + this.totalPadding
     ) {
       return "inside";
     }
