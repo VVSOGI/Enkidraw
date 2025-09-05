@@ -186,7 +186,7 @@ export class Arrow extends BaseComponent<ArrowPosition> {
     const { x: moveX, y: moveY } = move;
     const nextPosition = Object.assign({}, this.position);
 
-    if (this.moveCornorPoint >= 0) {
+    if (this.moveCornorPoint >= 0 && this.hoverPosition?.position) {
       const crossPoints = this.position.crossPoints;
       const { firstSpare, secondSpare } = this.getCircleSpare();
 
@@ -201,6 +201,8 @@ export class Arrow extends BaseComponent<ArrowPosition> {
       if (this.moveCornorPoint === 0) {
         nextPosition.x1 = this.originPosition.x1 + moveX;
         nextPosition.y1 = this.originPosition.y1 + moveY;
+        this.hoverPosition.position.x = nextPosition.x1;
+        this.hoverPosition.position.y = nextPosition.y1;
 
         const afterPoint = points[2];
 
@@ -232,6 +234,7 @@ export class Arrow extends BaseComponent<ArrowPosition> {
           this.position.crossPoints.unshift(Object.assign({}, nextPosition));
           this.originPosition.crossPoints.unshift(Object.assign({}, nextPosition));
           this.startDirection = points[1].direction === "horizontal" ? "vertical" : "horizontal";
+          return;
         }
 
         if (target) {
@@ -239,8 +242,10 @@ export class Arrow extends BaseComponent<ArrowPosition> {
 
           if (target.direction === "vertical") {
             target.cx = originTarget.cx + moveX;
+            this.hoverPosition.position.x = target.cx;
           } else {
             target.cy = originTarget.cy + moveY;
+            this.hoverPosition.position.y = target.cy;
           }
         }
 
@@ -250,6 +255,8 @@ export class Arrow extends BaseComponent<ArrowPosition> {
       if (this.moveCornorPoint === points.length - 1) {
         nextPosition.x2 = this.originPosition.x2 + moveX;
         nextPosition.y2 = this.originPosition.y2 + moveY;
+        this.hoverPosition.position.x = nextPosition.x2;
+        this.hoverPosition.position.y = nextPosition.y2;
 
         const beforePoint = points[points.length - 4];
 
@@ -289,8 +296,10 @@ export class Arrow extends BaseComponent<ArrowPosition> {
 
         if (target.direction === "vertical") {
           target.cx = originTarget.cx + moveX;
+          this.hoverPosition.position.x = target.cx;
         } else {
           target.cy = originTarget.cy + moveY;
+          this.hoverPosition.position.y = target.cy;
         }
       }
 
