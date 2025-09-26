@@ -3,11 +3,13 @@ import { EdgeDirection, MousePoint } from "../types";
 import { ActiveManager, SelectedComponentManager } from ".";
 import { KeyUtils } from "../utils";
 import { checkSkipStatus } from "../config";
+import { MemoryManager } from "./memory-manager";
 
 interface Props {
   canvas: HTMLCanvasElement;
   activeManager: ActiveManager;
   selectionManager: SelectedComponentManager;
+  memoryManager: MemoryManager;
   getComponents: () => BaseComponent<BasePosition>[];
   removeSelectedComponents: (selectedComponents: BaseComponent[]) => void;
   getZoomTransform?: () => { zoom: number; translateX: number; translateY: number };
@@ -17,6 +19,7 @@ export class ComponentInteractionManager {
   private canvas: HTMLCanvasElement;
   private activeManager: ActiveManager;
   private selectionManager: SelectedComponentManager;
+  private memoryManager: MemoryManager;
   private getComponents: () => BaseComponent<BasePosition>[];
   private removeSelectedComponents: (selectedComponents: BaseComponent[]) => void;
   private getZoomTransform?: () => { zoom: number; translateX: number; translateY: number };
@@ -28,6 +31,7 @@ export class ComponentInteractionManager {
     canvas,
     activeManager,
     selectionManager,
+    memoryManager,
     getComponents,
     removeSelectedComponents,
     getZoomTransform,
@@ -35,6 +39,7 @@ export class ComponentInteractionManager {
     this.canvas = canvas;
     this.activeManager = activeManager;
     this.selectionManager = selectionManager;
+    this.memoryManager = memoryManager;
     this.getComponents = getComponents;
     this.removeSelectedComponents = removeSelectedComponents;
     this.getZoomTransform = getZoomTransform;
@@ -166,6 +171,15 @@ export class ComponentInteractionManager {
 
     this.tempPosition = null;
     this.selectionManager.resetOriginMultiSelectRange();
+
+    if (this.activeManager.currentActive === "move") {
+      const saved = [];
+      for (const component of this.selectionManager.selectedComponents) {
+        const saveComponent = Object.assign({}, component);
+        saved.push(saveComponent);
+      }
+      this.memoryManager.addRedoStack(saved, "move");
+    }
 
     if (this.activeManager.currentActive === "resize") {
       this.selectionManager.updateMultiSelectMode();
