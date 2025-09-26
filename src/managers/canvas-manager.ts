@@ -4,6 +4,7 @@ import { ArrowTool } from "../tools/arrow-tool";
 import { CircleTool } from "../tools/circle-tool";
 import { TextTool } from "../tools/text-tool";
 import { ActiveManager } from "./active-manager";
+import { MemoryManager } from "./memory-manager";
 
 export class CanvasManager {
   private canvas: HTMLCanvasElement;
@@ -25,6 +26,7 @@ export class CanvasManager {
   private activeManager: ActiveManager;
   private componentManager: ComponentManager;
   private leftMenuManager: LeftMenuManager;
+  private memoryManager: MemoryManager;
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
@@ -37,12 +39,14 @@ export class CanvasManager {
     window.addEventListener("resize", this.resize);
 
     this.activeManager = new ActiveManager();
+    this.memoryManager = new MemoryManager();
     this.leftMenuManager = new LeftMenuManager();
     this.componentManager = new ComponentManager(
       canvas,
       this.ctx,
       this.leftMenuManager,
       this.activeManager,
+      this.memoryManager,
       this.getZoomTransform
     );
 
@@ -135,9 +139,18 @@ export class CanvasManager {
 
     document.addEventListener("keydown", (e) => {
       if (this.currentTool?.name === "text-tool") return;
-
       if (e.code === "Escape") return;
       this.currentTool?.deactivate();
+
+      if ((e.ctrlKey || e.metaKey) && e.code === "KeyZ" && e.shiftKey) {
+        this.memoryManager.undo(this.componentManager);
+        return;
+      }
+
+      if ((e.ctrlKey || e.metaKey) && e.code === "KeyZ") {
+        this.memoryManager.redo(this.componentManager);
+        return;
+      }
 
       if (e.code === "Digit1") {
         this.lineTool.activate();
