@@ -266,7 +266,10 @@ export class ComponentInteractionManager {
     for (const component of this.getComponents()) {
       if (component.isHover(e)) {
         const zone = component.getMultiSelectHoverZone(mouse);
-        if (zone === "outside") return;
+        if (zone === "outside") {
+          this.activeManager.selectCurrentActive("default");
+          return;
+        }
 
         component.hoverComponent(e, mouse);
 
