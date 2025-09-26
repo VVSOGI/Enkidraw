@@ -183,6 +183,12 @@ export class ComponentInteractionManager {
 
     if (this.activeManager.currentActive === "resize") {
       this.selectionManager.updateMultiSelectMode();
+      const saved = [];
+      for (const component of this.selectionManager.selectedComponents) {
+        const saveComponent = Object.assign({}, component);
+        saved.push(saveComponent);
+      }
+      this.memoryManager.addRedoStack(saved, "resize");
     }
 
     for (const component of this.getComponents()) {

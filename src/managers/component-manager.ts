@@ -7,10 +7,10 @@ import { MemoryManager } from "./memory-manager";
 
 export class ComponentManager {
   public components: BaseComponent<BasePosition>[];
+  public selectedComponentManager: SelectedComponentManager;
 
   protected canvas: HTMLCanvasElement;
   protected ctx: CanvasRenderingContext2D;
-  protected selectedComponentManager: SelectedComponentManager;
   protected componentInteractionManager: ComponentInteractionManager;
   protected leftMenuManager: LeftMenuManager;
   protected activeManager: ActiveManager;
