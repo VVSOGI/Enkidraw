@@ -213,11 +213,13 @@ export class SelectedComponentManager extends EventEmitter {
       case "bottom":
         return "ns-resize";
       case "top-left":
-      case "bottom-right":
         return "nw-resize";
+      case "bottom-right":
+        return "se-resize";
       case "top-right":
-      case "bottom-left":
         return "ne-resize";
+      case "bottom-left":
+        return "sw-resize";
       case "inside":
         return "move";
       default:

@@ -1,5 +1,5 @@
-import { LeftMenuManager, MousePoint } from "..";
-import { Arrow, ArrowPosition } from "../components";
+import { LeftMenuManager, MousePoint, STYLE_SYSTEM } from "..";
+import { Arrow } from "../components";
 import { BaseTool, BaseToolProps } from "./base-tool";
 
 interface ArrowToolProps extends BaseToolProps {
@@ -12,7 +12,6 @@ export class ArrowTool extends BaseTool {
   private initPoint: MousePoint | null = null;
   private movePoint: MousePoint | null = null;
   private points: MousePoint[] = [];
-  private lineWidth = 5;
   private type: "line" | "curve" | "angle" = "angle";
 
   protected leftMenuManager: LeftMenuManager;
@@ -113,7 +112,7 @@ export class ArrowTool extends BaseTool {
     this.ctx.moveTo(this.initPoint.x, this.initPoint.y);
     this.ctx.lineTo(this.movePoint.x, this.movePoint.y);
     this.ctx.strokeStyle = this.leftMenuManager.strokeColor;
-    this.ctx.lineWidth = this.lineWidth;
+    this.ctx.lineWidth = STYLE_SYSTEM.STROKE_WIDTH;
     this.ctx.lineCap = "round";
     this.ctx.stroke();
     this.ctx.closePath();
@@ -152,7 +151,7 @@ export class ArrowTool extends BaseTool {
       this.ctx.save();
       this.ctx.beginPath();
       this.ctx.strokeStyle = this.leftMenuManager.strokeColor;
-      this.ctx.lineWidth = this.lineWidth;
+      this.ctx.lineWidth = STYLE_SYSTEM.STROKE_WIDTH;
       this.ctx.lineCap = "round";
       this.ctx.moveTo(this.initPoint.x, this.initPoint.y);
       this.ctx.lineTo(centerX, this.initPoint.y);
@@ -185,7 +184,7 @@ export class ArrowTool extends BaseTool {
       this.ctx.save();
       this.ctx.beginPath();
       this.ctx.strokeStyle = this.leftMenuManager.strokeColor;
-      this.ctx.lineWidth = this.lineWidth;
+      this.ctx.lineWidth = STYLE_SYSTEM.STROKE_WIDTH;
       this.ctx.lineCap = "round";
       this.ctx.moveTo(this.initPoint.x, this.initPoint.y);
       this.ctx.lineTo(this.initPoint.x, centerY);

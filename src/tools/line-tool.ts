@@ -2,6 +2,7 @@ import { BaseTool, BaseToolProps } from "./base-tool";
 import { MousePoint } from "../types";
 import { Line } from "../components";
 import { ComponentManager, LeftMenuManager } from "../managers";
+import { STYLE_SYSTEM } from "../utils";
 
 interface LineToolProps extends BaseToolProps {
   componentManager: ComponentManager;
@@ -116,7 +117,7 @@ export class LineTool extends BaseTool {
     }
     this.ctx.lineTo(this.movePoint.x, this.movePoint.y);
     this.ctx.strokeStyle = this.leftMenuManager.strokeColor;
-    this.ctx.lineWidth = 10;
+    this.ctx.lineWidth = STYLE_SYSTEM.STROKE_WIDTH;
     this.ctx.lineCap = "round";
     this.ctx.stroke();
     this.ctx.closePath();
