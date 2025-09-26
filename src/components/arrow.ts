@@ -21,7 +21,6 @@ interface Props<T> extends BaseComponentProps<T> {
 export class Arrow extends BaseComponent<ArrowPosition> {
   name = "arrow-component";
   type: "line" | "curve" | "angle" = "line";
-  lineWidth = 5;
 
   private dragCornerRectSize = 7.5;
   private totalPadding = 15;
@@ -603,84 +602,84 @@ export class Arrow extends BaseComponent<ArrowPosition> {
 
   getMultiSelectHoverZone = (mouse: MousePoint): EdgeDirection | "inside" | "outside" => {
     const { x1: left, x2: right, y1: top, y2: bottom } = this.getPosition();
-
+    //
     if (
-      mouse.x >= left - (this.totalPadding + this.dragCornorRectSize) &&
-      mouse.x <= left - this.totalPadding &&
-      mouse.y >= top - (this.totalPadding + this.dragCornorRectSize) &&
-      mouse.y <= top - this.totalPadding
+      mouse.x >= left - this.dragCornorRectSize &&
+      mouse.x <= left + this.dragCornorRectSize &&
+      mouse.y >= top - this.dragCornorRectSize &&
+      mouse.y <= top + this.dragCornorRectSize
     ) {
       return "top-left";
     }
 
     if (
-      mouse.x >= right + this.totalPadding &&
-      mouse.x <= right + this.totalPadding + this.dragCornorRectSize &&
-      mouse.y >= top - (this.totalPadding + this.dragCornorRectSize) &&
-      mouse.y <= top - this.totalPadding
+      mouse.x >= right - this.dragCornorRectSize &&
+      mouse.x <= right + this.dragCornorRectSize &&
+      mouse.y >= top - this.dragCornorRectSize &&
+      mouse.y <= top + this.dragCornorRectSize
     ) {
       return "top-right";
     }
 
     if (
-      mouse.x >= left - (this.totalPadding + this.dragCornorRectSize) &&
-      mouse.x <= left - this.totalPadding &&
-      mouse.y >= bottom + this.totalPadding &&
-      mouse.y <= bottom + this.totalPadding + this.dragCornorRectSize
+      mouse.x >= left - this.dragCornorRectSize &&
+      mouse.x <= left + this.dragCornorRectSize &&
+      mouse.y >= bottom - this.dragCornorRectSize &&
+      mouse.y <= bottom + this.dragCornorRectSize
     ) {
       return "bottom-left";
     }
 
     if (
-      mouse.x >= right + this.totalPadding &&
-      mouse.x <= right + this.totalPadding + this.dragCornorRectSize &&
-      mouse.y >= bottom + this.totalPadding &&
-      mouse.y <= bottom + this.totalPadding + this.dragCornorRectSize
+      mouse.x >= right - this.dragCornorRectSize &&
+      mouse.x <= right + this.dragCornorRectSize &&
+      mouse.y >= bottom - this.dragCornorRectSize &&
+      mouse.y <= bottom + this.dragCornorRectSize
     ) {
       return "bottom-right";
     }
 
     if (
-      mouse.x >= left - (this.totalPadding + this.dragCornorRectSize) &&
-      mouse.x <= left - this.totalPadding &&
-      mouse.y > top - this.totalPadding &&
-      mouse.y < bottom + this.totalPadding
+      mouse.x >= left - this.dragCornorRectSize &&
+      mouse.x <= left + this.dragCornorRectSize &&
+      mouse.y > top - this.dragCornorRectSize &&
+      mouse.y < bottom + this.dragCornorRectSize
     ) {
       return "left";
     }
 
     if (
-      mouse.x >= right + this.totalPadding &&
-      mouse.x <= right + this.totalPadding + this.dragCornorRectSize &&
-      mouse.y > top - this.totalPadding &&
-      mouse.y < bottom + this.totalPadding
+      mouse.x >= right - this.dragCornorRectSize &&
+      mouse.x <= right + this.dragCornorRectSize &&
+      mouse.y > top - this.dragCornorRectSize &&
+      mouse.y < bottom + this.dragCornorRectSize
     ) {
       return "right";
     }
 
     if (
-      mouse.x > left - this.totalPadding &&
-      mouse.x < right + this.totalPadding &&
-      mouse.y >= top - (this.totalPadding + this.dragCornorRectSize) &&
-      mouse.y <= top - this.totalPadding
+      mouse.x > left - this.dragCornorRectSize &&
+      mouse.x < right + this.dragCornorRectSize &&
+      mouse.y >= top - this.dragCornorRectSize &&
+      mouse.y <= top + this.dragCornorRectSize
     ) {
       return "top";
     }
 
     if (
-      mouse.x > left - this.totalPadding &&
-      mouse.x < right + this.totalPadding &&
-      mouse.y >= bottom + this.totalPadding &&
-      mouse.y <= bottom + this.totalPadding + this.dragCornorRectSize
+      mouse.x > left - this.dragCornorRectSize &&
+      mouse.x < right + this.dragCornorRectSize &&
+      mouse.y >= bottom - this.dragCornorRectSize &&
+      mouse.y <= bottom + this.dragCornorRectSize
     ) {
       return "bottom";
     }
 
     if (
-      mouse.x >= left - this.totalPadding &&
-      mouse.x <= right + this.totalPadding &&
-      mouse.y >= top - this.totalPadding &&
-      mouse.y <= bottom + this.totalPadding
+      mouse.x >= left - this.dragCornorRectSize &&
+      mouse.x <= right + this.dragCornorRectSize &&
+      mouse.y >= top - this.dragCornorRectSize &&
+      mouse.y <= bottom + this.dragCornorRectSize
     ) {
       return "inside";
     }
@@ -735,7 +734,7 @@ export class Arrow extends BaseComponent<ArrowPosition> {
     this.ctx.moveTo(this.position.x1, this.position.y1);
     this.ctx.lineTo(this.position.x2, this.position.y2);
     this.ctx.strokeStyle = this.color;
-    this.ctx.lineWidth = this.lineWidth;
+    this.ctx.lineWidth = STYLE_SYSTEM.STROKE_WIDTH;
     this.ctx.lineCap = "round";
     this.ctx.stroke();
     this.ctx.closePath();
@@ -793,7 +792,7 @@ export class Arrow extends BaseComponent<ArrowPosition> {
     this.ctx.save();
     this.ctx.beginPath();
     this.ctx.strokeStyle = this.color;
-    this.ctx.lineWidth = this.lineWidth;
+    this.ctx.lineWidth = STYLE_SYSTEM.STROKE_WIDTH;
     this.ctx.lineCap = "round";
     this.ctx.moveTo(this.position.x1, this.position.y1);
 
