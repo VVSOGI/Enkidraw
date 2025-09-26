@@ -1,8 +1,9 @@
 import { ComponentInteractionManager, LeftMenuManager, SelectedComponentManager } from ".";
 import { BaseComponent, BasePosition } from "../components";
-import { Active, DragRange } from "../types";
+import { DragRange } from "../types";
 import { STYLE_SYSTEM } from "../utils";
 import { ActiveManager } from "./active-manager";
+import { MemoryManager } from "./memory-manager";
 
 export class ComponentManager {
   public components: BaseComponent<BasePosition>[];
@@ -13,12 +14,14 @@ export class ComponentManager {
   protected componentInteractionManager: ComponentInteractionManager;
   protected leftMenuManager: LeftMenuManager;
   protected activeManager: ActiveManager;
+  protected memoryManager: MemoryManager;
 
   constructor(
     canvas: HTMLCanvasElement,
     ctx: CanvasRenderingContext2D,
     leftMenuManager: LeftMenuManager,
     activeManager: ActiveManager,
+    memoryManager: MemoryManager,
     getZoomTransform: () => { zoom: number; translateX: number; translateY: number }
   ) {
     this.canvas = canvas;
@@ -26,6 +29,7 @@ export class ComponentManager {
     this.components = [];
     this.leftMenuManager = leftMenuManager;
     this.activeManager = activeManager;
+    this.memoryManager = memoryManager;
 
     this.selectedComponentManager = new SelectedComponentManager();
     this.selectedComponentManager.on("lineMenuActivate", () => {
@@ -41,6 +45,7 @@ export class ComponentManager {
       canvas: this.canvas,
       activeManager: this.activeManager,
       selectionManager: this.selectedComponentManager,
+      memoryManager: this.memoryManager,
       getComponents: () => this.components,
       removeSelectedComponents: this.removeSelected,
       getZoomTransform: getZoomTransform,
@@ -61,21 +66,29 @@ export class ComponentManager {
 
   public add = (component: BaseComponent) => {
     this.components.push(component);
+    this.memoryManager.addRedoStack(component, "add");
   };
 
   public remove = (component: BaseComponent) => {
     this.components = this.components.filter((exist) => exist.id !== component.id);
+    this.memoryManager.addRedoStack(component, "delete");
   };
 
   public removeSelected = (selectedComponents: BaseComponent[]) => {
+    const exceptComponents: BaseComponent[] = [];
+
     this.components = this.components.filter((exist) => {
       for (const component of selectedComponents) {
-        if (exist.id === component.id) return false;
+        if (exist.id === component.id) {
+          exceptComponents.push(exist);
+          return false;
+        }
       }
 
       return true;
     });
 
+    this.memoryManager.addRedoStack(exceptComponents, "delete");
     this.selectedComponentManager.clearSelection();
   };
 
@@ -85,6 +98,10 @@ export class ComponentManager {
 
   public dragComponents = (dragRange: DragRange) => {
     this.selectedComponentManager.dragComponents(this.components, dragRange);
+  };
+
+  public findComponent = (id: string) => {
+    return this.components.find((component) => component.id === id);
   };
 
   private multiDragRangeEffect = (range: DragRange) => {
